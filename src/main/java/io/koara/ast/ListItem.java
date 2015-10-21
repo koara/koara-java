@@ -3,7 +3,6 @@
 package io.koara.ast;
 
 import io.koara.KoaraVisitor;
-import io.koara.Parser;
 import io.koara.SimpleNode;
 
 public
@@ -13,10 +12,6 @@ class ListItem extends SimpleNode {
 	
   public ListItem(int id) {
     super(id);
-  }
-
-  public ListItem(Parser p, int id) {
-    super(p, id);
   }
 
   public Integer getNumber() {

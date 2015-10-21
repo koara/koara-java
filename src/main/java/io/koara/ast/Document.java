@@ -3,16 +3,11 @@
 package io.koara.ast;
 
 import io.koara.KoaraVisitor;
-import io.koara.Parser;
 import io.koara.SimpleNode;
 
 public class Document extends SimpleNode {
   public Document(int id) {
     super(id);
-  }
-
-  public Document(Parser p, int id) {
-    super(p, id);
   }
 
 

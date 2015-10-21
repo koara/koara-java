@@ -15,11 +15,6 @@ class SimpleNode implements Node {
     id = i;
   }
 
-  public SimpleNode(Parser p, int i) {
-    this(i);
-    parser = p;
-  }
-
   public void jjtOpen() {
   }
 

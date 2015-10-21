@@ -3,7 +3,6 @@
 package io.koara.ast;
 
 import io.koara.KoaraVisitor;
-import io.koara.Parser;
 import io.koara.SimpleNode;
 
 public
@@ -11,11 +10,6 @@ class Em extends SimpleNode {
   public Em(int id) {
     super(id);
   }
-
-  public Em(Parser p, int id) {
-    super(p, id);
-  }
-
 
   /** Accept the visitor. **/
   public Object jjtAccept(KoaraVisitor visitor, Object data) {

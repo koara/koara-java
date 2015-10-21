@@ -71,30 +71,22 @@ public class Token implements java.io.Serializable {
   public Object getValue() {
     return null;
   }
-
-  /**
-   * No-argument constructor
-   */
-  public Token() {}
-
-  /**
-   * Constructs a new token for the specified Image.
-   */
-  public Token(int kind)
-  {
-    this(kind, null);
+  
+  public Token() {
   }
 
-  /**
-   * Constructs a new token for the specified Image and Kind.
-   */
-  public Token(int kind, String image)
-  {
-    this.kind = kind;
-    this.image = image;
-  }
+  public Token(int kind, int beginLine, int beginColumn, int endLine, int endColumn, String image) {
+	this.kind = kind;
+	this.beginLine = beginLine;
+	this.beginColumn = beginColumn;
+	this.endLine = endLine;
+	this.endColumn = endColumn;
+	this.image = image;
+}
 
-  /**
+
+
+/**
    * Returns the image.
    */
   public String toString()
@@ -102,30 +94,7 @@ public class Token implements java.io.Serializable {
     return image;
   }
 
-  /**
-   * Returns a new Token object, by default. However, if you want, you
-   * can create and return subclass objects based on the value of ofKind.
-   * Simply add the cases to the switch for all those special cases.
-   * For example, if you have a subclass of Token called IDToken that
-   * you want to create if ofKind is ID, simply add something like :
-   *
-   *    case MyParserConstants.ID : return new IDToken(ofKind, image);
-   *
-   * to the following switch statement. Then you can cast matchedToken
-   * variable to the appropriate type and use sit in your lexical actions.
-   */
-  public static Token newToken(int ofKind, String image)
-  {
-    switch(ofKind)
-    {
-      default : return new Token(ofKind, image);
-    }
-  }
 
-  public static Token newToken(int ofKind)
-  {
-    return newToken(ofKind, null);
-  }
 
 }
 /* JavaCC - OriginalChecksum=d0e53595d63c2f4c8d0cef6968e40294 (do not edit this line) */

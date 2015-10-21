@@ -29,10 +29,8 @@ public class Parser/*@bgen(jjtree)*/implements KoaraTreeConstants, KoaraConstant
     public Parser() {
     }
     
-
-    
 	public Document parse(String text) throws ParseException {
-	      jj_input_stream = new CharStream(new StringReader(text), 1, 1);
+	      jj_input_stream = new CharStream(new StringReader(text));
 	      token_source = new TokenManager(jj_input_stream);
 	      token = new Token();
 	      jj_ntk = -1;
@@ -5989,16 +5987,7 @@ if (jjtc000) {
   private int jj_gc = 0;
 
 
-  /** Constructor with InputStream and supplied encoding */
-  public Parser(java.io.InputStream stream, String encoding) {
-    try { jj_input_stream = new CharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
-    token_source = new TokenManager(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 46; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
+
 
   /** Reinitialise. */
   public void ReInit(java.io.InputStream stream) {
@@ -6030,15 +6019,6 @@ if (jjtc000) {
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
-  /** Constructor with generated Token Manager. */
-  public Parser(TokenManager tm) {
-    token_source = tm;
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 46; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
 
   /** Reinitialise. */
   public void ReInit(TokenManager tm) {
@@ -6188,7 +6168,7 @@ if (jjtc000) {
     for (int i = 0; i < jj_expentries.size(); i++) {
       exptokseq[i] = jj_expentries.get(i);
     }
-    return new ParseException(token, exptokseq, tokenImage);
+    return new ParseException();
   }
 
   /** Enable tracing. */
