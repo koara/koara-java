@@ -9,7 +9,7 @@ public class KoaraDefaultVisitor implements KoaraVisitor{
   public Object visit(SimpleNode node, Object data){
     return defaultVisit(node, data);
   }
-  public Object visit(ASTDocument node, Object data){
+  public Object visit(Document node, Object data){
     return defaultVisit(node, data);
   }
   public Object visit(ASTHeading node, Object data){

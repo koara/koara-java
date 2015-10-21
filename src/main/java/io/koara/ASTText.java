@@ -8,7 +8,7 @@ class ASTText extends SimpleNode {
     super(id);
   }
 
-  public ASTText(Koara p, int id) {
+  public ASTText(Parser p, int id) {
     super(p, id);
   }
 

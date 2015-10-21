@@ -7,7 +7,7 @@ public class ASTBlockElement extends SimpleNode {
 	}
 	
 	public boolean isNested() {
-		return !(parent instanceof ASTDocument);
+		return !(parent instanceof Document);
 	}
 	
 	public boolean isSingleChild() {

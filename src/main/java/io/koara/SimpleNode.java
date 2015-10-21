@@ -9,13 +9,13 @@ class SimpleNode implements Node {
   protected Node[] children;
   protected int id;
   protected Object value;
-  protected Koara parser;
+  protected Parser parser;
 
   public SimpleNode(int i) {
     id = i;
   }
 
-  public SimpleNode(Koara p, int i) {
+  public SimpleNode(Parser p, int i) {
     this(i);
     parser = p;
   }

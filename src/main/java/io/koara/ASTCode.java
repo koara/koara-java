@@ -8,7 +8,7 @@ class ASTCode extends SimpleNode {
     super(id);
   }
 
-  public ASTCode(Koara p, int id) {
+  public ASTCode(Parser p, int id) {
     super(p, id);
   }
 

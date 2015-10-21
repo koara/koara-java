@@ -8,7 +8,7 @@ class ASTStrong extends SimpleNode {
     super(id);
   }
 
-  public ASTStrong(Koara p, int id) {
+  public ASTStrong(Parser p, int id) {
     super(p, id);
   }
 

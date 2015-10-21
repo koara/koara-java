@@ -2,14 +2,14 @@ package io.koara;
 
 import java.util.Stack;
 
-public class Html5Renderer extends KoaraDefaultVisitor {
+public class HtmlRenderer extends KoaraDefaultVisitor {
 
 	private StringBuffer out;
 	private int level;
 	private Stack<Integer> listSequence = new Stack<Integer>();
 
 	@Override
-	public Object visit(ASTDocument node, Object data) {
+	public Object visit(Document node, Object data) {
 		out = new StringBuffer();
 		node.childrenAccept(this, data);
 		return null;

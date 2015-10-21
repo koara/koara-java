@@ -11,7 +11,7 @@ class ASTListItem extends SimpleNode {
     super(id);
   }
 
-  public ASTListItem(Koara p, int id) {
+  public ASTListItem(Parser p, int id) {
     super(p, id);
   }
 

@@ -8,7 +8,7 @@ class ASTEm extends SimpleNode {
     super(id);
   }
 
-  public ASTEm(Koara p, int id) {
+  public ASTEm(Parser p, int id) {
     super(p, id);
   }
 

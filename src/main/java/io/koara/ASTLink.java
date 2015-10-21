@@ -8,7 +8,7 @@ class ASTLink extends SimpleNode {
     super(id);
   }
 
-  public ASTLink(Koara p, int id) {
+  public ASTLink(Parser p, int id) {
     super(p, id);
   }
 

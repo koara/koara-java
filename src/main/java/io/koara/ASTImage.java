@@ -6,7 +6,7 @@ class ASTImage extends SimpleNode {
     super(id);
   }
 
-  public ASTImage(Koara p, int id) {
+  public ASTImage(Parser p, int id) {
     super(p, id);
   }
 

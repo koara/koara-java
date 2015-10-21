@@ -3,7 +3,6 @@ package io.koara;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -52,12 +51,13 @@ public class ComplianceTest {
 	@Test
 	public void output() throws Exception {
 		String html = readFile(TESTSUITE_FOLDER.resolve(module).resolve(testcase + ".htm"));
-		Koara koara = new Koara(new FileInputStream(TESTSUITE_FOLDER.resolve(module).resolve(testcase + ".kd").toFile()));
-		ASTDocument document = koara.Document();
-		Html5Renderer renderer = new Html5Renderer();
-		document.jjtAccept(renderer, null);
-		assertEquals(html, renderer.getOutput());
+		String kd = readFile(TESTSUITE_FOLDER.resolve(module).resolve(testcase + ".kd"));
 		
+		Parser parser = new Parser();
+		Document document = parser.parse(kd); // Generate AST
+		HtmlRenderer renderer = new HtmlRenderer();
+		document.accept(renderer);
+		assertEquals(html, renderer.getOutput());
 	}
 	
 	private String readFile(Path path) throws IOException {

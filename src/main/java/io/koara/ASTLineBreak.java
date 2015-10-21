@@ -8,7 +8,7 @@ class ASTLineBreak extends SimpleNode {
     super(id);
   }
 
-  public ASTLineBreak(Koara p, int id) {
+  public ASTLineBreak(Parser p, int id) {
     super(p, id);
   }
 

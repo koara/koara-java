@@ -4,7 +4,7 @@ package io.koara;
 public interface KoaraVisitor
 {
   public Object visit(SimpleNode node, Object data);
-  public Object visit(ASTDocument node, Object data);
+  public Object visit(Document node, Object data);
   public Object visit(ASTHeading node, Object data);
   public Object visit(ASTBlockquote node, Object data);
   public Object visit(ASTList node, Object data);
