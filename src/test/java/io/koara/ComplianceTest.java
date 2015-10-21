@@ -15,6 +15,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import io.koara.ast.Document;
+import io.koara.renderer.HtmlRenderer;
+
 @RunWith(Parameterized.class)
 public class ComplianceTest {
 

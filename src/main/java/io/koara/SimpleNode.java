@@ -5,10 +5,10 @@ package io.koara;
 public
 class SimpleNode implements Node {
 
-  protected Node parent;
-  protected Node[] children;
+  public Node parent;
+  public Node[] children;
   protected int id;
-  protected Object value;
+  public Object value;
   protected Parser parser;
 
   public SimpleNode(int i) {

@@ -1,4 +1,6 @@
-package io.koara;
+package io.koara.ast;
+
+import io.koara.SimpleNode;
 
 public class ASTBlockElement extends SimpleNode {
 

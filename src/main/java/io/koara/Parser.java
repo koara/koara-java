@@ -5,6 +5,21 @@ package io.koara;
 import java.io.StringReader;
 import java.util.Arrays;
 
+import io.koara.ast.ASTBlockquote;
+import io.koara.ast.ASTCode;
+import io.koara.ast.ASTCodeBlock;
+import io.koara.ast.ASTEm;
+import io.koara.ast.ASTHeading;
+import io.koara.ast.ASTImage;
+import io.koara.ast.ASTLineBreak;
+import io.koara.ast.ASTLink;
+import io.koara.ast.ASTList;
+import io.koara.ast.ASTListItem;
+import io.koara.ast.ASTParagraph;
+import io.koara.ast.ASTStrong;
+import io.koara.ast.ASTText;
+import io.koara.ast.Document;
+
 public class Parser/*@bgen(jjtree)*/implements KoaraTreeConstants, KoaraConstants {/*@bgen(jjtree)*/
     
 	protected JJTKoaraState jjtree = new JJTKoaraState();

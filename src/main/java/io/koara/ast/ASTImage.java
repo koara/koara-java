@@ -1,4 +1,8 @@
-package io.koara;
+package io.koara.ast;
+
+import io.koara.KoaraVisitor;
+import io.koara.Parser;
+import io.koara.SimpleNode;
 
 public
 class ASTImage extends SimpleNode {

@@ -1,6 +1,22 @@
-package io.koara;
+package io.koara.renderer;
 
 import java.util.Stack;
+
+import io.koara.KoaraDefaultVisitor;
+import io.koara.ast.ASTBlockquote;
+import io.koara.ast.ASTCode;
+import io.koara.ast.ASTCodeBlock;
+import io.koara.ast.ASTEm;
+import io.koara.ast.ASTHeading;
+import io.koara.ast.ASTImage;
+import io.koara.ast.ASTLineBreak;
+import io.koara.ast.ASTLink;
+import io.koara.ast.ASTList;
+import io.koara.ast.ASTListItem;
+import io.koara.ast.ASTParagraph;
+import io.koara.ast.ASTStrong;
+import io.koara.ast.ASTText;
+import io.koara.ast.Document;
 
 public class HtmlRenderer extends KoaraDefaultVisitor {
 

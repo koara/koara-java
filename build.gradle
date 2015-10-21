@@ -1,9 +1,88 @@
-apply plugin: 'java'
+buildscript {
+	repositories {
+	   mavenCentral()
+	   maven { url "https://oss.sonatype.org/content/groups/public"}
+	}
+	dependencies {
+	   classpath 'com.github.townsfolk:gradle-release:1.2'
+	}
+ }
+
+apply plugin: "java"
+apply plugin: "maven"
+apply plugin: "release"
+apply plugin: "signing"
+
+group = "io.koara"
+jar.baseName = 'koara'
+
+sourceCompatibility = 1.6
 
 repositories {
-    mavenCentral()
+	mavenCentral()
+}
+
+signing {
+	required = false
+	//required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
+	sign configurations.archives
 }
 
 dependencies {
-    testCompile "junit:junit:4.11"
+	testCompile "junit:junit:4.11"
+}
+
+task sourcesJar(type: Jar, dependsOn:classes) {
+	classifier = "sources"
+	from sourceSets.main.allJava.srcDirs
+}
+
+task javadocJar(type: Jar) {
+	classifier = "javadoc"
+	from javadoc
+}
+
+artifacts {
+	archives jar
+	archives javadocJar
+	archives sourcesJar
+}
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				ext.sonatypeUsername = rootProject.hasProperty('sonatypeUsername') ? rootProject.sonatypeUsername : ''
+				ext.sonatypePassword = rootProject.hasProperty('sonatypePassword') ? rootProject.sonatypePassword : ''
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+
+			pom.project {
+				name 'koara'
+				packaging 'jar'
+				description ''
+				url 'http://www.koara.io'
+
+				scm {
+					url 'https://github.com/koara/koara-java.git'
+					connection 'https://github.com/koara/koara-java.git'
+					developerConnection 'https://github.com/koara/koara-java.git'
+				}
+				licenses {
+					license {
+						name 'The Apache Software License, Version 2.0'
+						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+						distribution 'repo'
+					}
+				}
+				developers {
+					developer {
+						id 'andyvdh'
+						name 'Andy Van Den Heuvel'
+					}
+				}
+			}
+		}
+	}
 }
