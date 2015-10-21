@@ -55,6 +55,7 @@ public class ComplianceTest {
 		
 		Parser parser = new Parser();
 		Document document = parser.parse(kd); // Generate AST
+		
 		HtmlRenderer renderer = new HtmlRenderer();
 		document.accept(renderer);
 		assertEquals(html, renderer.getOutput());

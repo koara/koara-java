@@ -5986,51 +5986,6 @@ if (jjtc000) {
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
-
-
-
-  /** Reinitialise. */
-  public void ReInit(java.io.InputStream stream) {
-     ReInit(stream, null);
-  }
-  /** Reinitialise. */
-  public void ReInit(java.io.InputStream stream, String encoding) {
-    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
-    token_source.ReInit(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jjtree.reset();
-    jj_gen = 0;
-    for (int i = 0; i < 46; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
-
-
-  /** Reinitialise. */
-  public void ReInit(java.io.Reader stream) {
-    jj_input_stream.ReInit(stream, 1, 1);
-    token_source.ReInit(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jjtree.reset();
-    jj_gen = 0;
-    for (int i = 0; i < 46; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
-
-  /** Reinitialise. */
-  public void ReInit(TokenManager tm) {
-    token_source = tm;
-    token = new Token();
-    jj_ntk = -1;
-    jjtree.reset();
-    jj_gen = 0;
-    for (int i = 0; i < 46; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
   private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
     if ((oldToken = token).next != null) token = token.next;

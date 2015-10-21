@@ -23,15 +23,6 @@ public class TreeState {
     return node_created;
   }
 
-  /* Call this to reinitialize the node stack.  It is called
-     automatically by the parser's ReInit() method. */
-  public void reset() {
-    nodes.clear();
-    marks.clear();
-    sp = 0;
-    mk = 0;
-  }
-
   /* Returns the root node of the AST.  It only makes sense to call
      this after a successful parse. */
   public Node rootNode() {
