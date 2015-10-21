@@ -1,13 +1,10 @@
 package io.koara.ast;
 
 import io.koara.KoaraVisitor;
-import io.koara.SimpleNode;
+import io.koara.Node;
 
-public class Document extends SimpleNode {
-  public Document(int id) {
-    super(id);
-  }
-
+public class Document extends Node {
+  
 
   public Object accept(KoaraVisitor visitor) {
 

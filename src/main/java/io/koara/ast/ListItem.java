@@ -1,16 +1,12 @@
 package io.koara.ast;
 
 import io.koara.KoaraVisitor;
-import io.koara.SimpleNode;
+import io.koara.Node;
 
 public
-class ListItem extends SimpleNode {
+class ListItem extends Node {
 
   private Integer number;
-	
-  public ListItem(int id) {
-    super(id);
-  }
 
   public Integer getNumber() {
 	return number;

@@ -1,13 +1,10 @@
 package io.koara.ast;
 
 import io.koara.KoaraVisitor;
-import io.koara.SimpleNode;
+import io.koara.Node;
 
 public
-class Em extends SimpleNode {
-  public Em(int id) {
-    super(id);
-  }
+class Em extends Node {
 
   public Object jjtAccept(KoaraVisitor visitor, Object data) {
 

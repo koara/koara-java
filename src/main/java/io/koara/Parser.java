@@ -181,7 +181,7 @@ public class Parser implements KoaraTreeConstants, KoaraConstants {
     }
 
   final public Document Document() throws ParseException {
-  Document jjtn000 = new Document(JJTDOCUMENT);
+  Document jjtn000 = new Document();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -298,7 +298,7 @@ currentBlockLevel--;
   }
 
   final public void Heading() throws ParseException {
-                           Heading jjtn000 = new Heading(JJTHEADING);
+                           Heading jjtn000 = new Heading();
                            boolean jjtc000 = true;
                            jjtree.openNodeScope(jjtn000);Token t; int heading=0;
     try {
@@ -377,7 +377,7 @@ if (jjtc000) {
   }
 
   final public void Blockquote() throws ParseException {
-                                  Blockquote jjtn000 = new Blockquote(JJTBLOCKQUOTE);
+                                  Blockquote jjtn000 = new Blockquote();
                                   boolean jjtc000 = true;
                                   jjtree.openNodeScope(jjtn000);currentQuoteLevel++;
     try {
@@ -487,7 +487,7 @@ if (jjtc000) {
   }
 
   final public void UnorderedList() throws ParseException {
-  List jjtn000 = new List(JJTLIST);
+  List jjtn000 = new List();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -537,7 +537,7 @@ if (jjtc000) {
   }
 
   final public void UnorderedListItem() throws ParseException {
-  ListItem jjtn000 = new ListItem(JJTLISTITEM);
+  ListItem jjtn000 = new ListItem();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -598,7 +598,7 @@ if (jjtc000) {
   }
 
   final public void OrderedList() throws ParseException {
-  List jjtn000 = new List(JJTLIST);
+  List jjtn000 = new List();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -651,7 +651,7 @@ if (jjtc000) {
   }
 
   final public void OrderedListItem() throws ParseException {
-                                    ListItem jjtn000 = new ListItem(JJTLISTITEM);
+                                    ListItem jjtn000 = new ListItem();
                                     boolean jjtc000 = true;
                                     jjtree.openNodeScope(jjtn000);Token t;
     try {
@@ -716,7 +716,7 @@ if (jjtc000) {
   }
 
   final public void FencedCodeBlock() throws ParseException {
-                                     CodeBlock jjtn000 = new CodeBlock(JJTCODEBLOCK);
+                                     CodeBlock jjtn000 = new CodeBlock();
                                      boolean jjtc000 = true;
                                      jjtree.openNodeScope(jjtn000);Token t; String language; StringBuilder s = new StringBuilder(); int beginColumn;
     try {
@@ -988,7 +988,7 @@ s.append(t.image);
   }
 
   final public void Paragraph() throws ParseException {
-  Paragraph jjtn000 = new Paragraph(JJTPARAGRAPH);
+  Paragraph jjtn000 = new Paragraph();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -1078,7 +1078,7 @@ if (jjtc000) {
   }
 
   final public void Image() throws ParseException {
-                       Image jjtn000 = new Image(JJTIMAGE);
+                       Image jjtn000 = new Image();
                        boolean jjtc000 = true;
                        jjtree.openNodeScope(jjtn000);String ref = "";
     try {
@@ -1143,7 +1143,7 @@ if (jjtc000) {
   }
 
   final public void Link() throws ParseException {
-                     Link jjtn000 = new Link(JJTLINK);
+                     Link jjtn000 = new Link();
                      boolean jjtc000 = true;
                      jjtree.openNodeScope(jjtn000);String ref = "";
     try {
@@ -1214,7 +1214,7 @@ if (jjtc000) {
   }
 
   final public void ResourceText() throws ParseException {
-                             Text jjtn000 = new Text(JJTTEXT);
+                             Text jjtn000 = new Text();
                              boolean jjtc000 = true;
                              jjtree.openNodeScope(jjtn000);Token t; StringBuilder s = new StringBuilder();
     try {
@@ -1460,7 +1460,7 @@ s.append("    ");
   }
 
   final public void StrongMultiline() throws ParseException {
-  Strong jjtn000 = new Strong(JJTSTRONG);
+  Strong jjtn000 = new Strong();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -1515,7 +1515,7 @@ if (jjtc000) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case BACKTICK:{
           t = jj_consume_token(BACKTICK);
-Text jjtn001 = new Text(JJTTEXT);
+Text jjtn001 = new Text();
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
           try {
@@ -1531,7 +1531,7 @@ if (jjtc001) {
           }
         case LBRACK:{
           t = jj_consume_token(LBRACK);
-Text jjtn002 = new Text(JJTTEXT);
+Text jjtn002 = new Text();
                                                           boolean jjtc002 = true;
                                                           jjtree.openNodeScope(jjtn002);
           try {
@@ -1547,7 +1547,7 @@ if (jjtc002) {
           }
         case UNDERSCORE:{
           t = jj_consume_token(UNDERSCORE);
-Text jjtn003 = new Text(JJTTEXT);
+Text jjtn003 = new Text();
                                                           boolean jjtc003 = true;
                                                           jjtree.openNodeScope(jjtn003);
           try {
@@ -1576,7 +1576,7 @@ if (jjtc003) {
   }
 
   final public void StrongWithinEmMultiline() throws ParseException {
-  Strong jjtn000 = new Strong(JJTSTRONG);
+  Strong jjtn000 = new Strong();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -1629,7 +1629,7 @@ if (jjtc000) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case BACKTICK:{
           t = jj_consume_token(BACKTICK);
-Text jjtn001 = new Text(JJTTEXT);
+Text jjtn001 = new Text();
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
           try {
@@ -1645,7 +1645,7 @@ if (jjtc001) {
           }
         case LBRACK:{
           t = jj_consume_token(LBRACK);
-Text jjtn002 = new Text(JJTTEXT);
+Text jjtn002 = new Text();
                                                                   boolean jjtc002 = true;
                                                                   jjtree.openNodeScope(jjtn002);
           try {
@@ -1661,7 +1661,7 @@ if (jjtc002) {
           }
         case UNDERSCORE:{
           t = jj_consume_token(UNDERSCORE);
-Text jjtn003 = new Text(JJTTEXT);
+Text jjtn003 = new Text();
                                                           boolean jjtc003 = true;
                                                           jjtree.openNodeScope(jjtn003);
           try {
@@ -1690,7 +1690,7 @@ if (jjtc003) {
   }
 
   final public void Strong() throws ParseException {
-                         Strong jjtn000 = new Strong(JJTSTRONG);
+                         Strong jjtn000 = new Strong();
                          boolean jjtc000 = true;
                          jjtree.openNodeScope(jjtn000);Token t;
     try {
@@ -1711,7 +1711,7 @@ if (jjtc003) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case BACKTICK:{
             t = jj_consume_token(BACKTICK);
-Text jjtn001 = new Text(JJTTEXT);
+Text jjtn001 = new Text();
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
             try {
@@ -1727,7 +1727,7 @@ if (jjtc001) {
             }
           case LBRACK:{
             t = jj_consume_token(LBRACK);
-Text jjtn002 = new Text(JJTTEXT);
+Text jjtn002 = new Text();
                                                                   boolean jjtc002 = true;
                                                                   jjtree.openNodeScope(jjtn002);
             try {
@@ -1743,7 +1743,7 @@ if (jjtc002) {
             }
           case UNDERSCORE:{
             t = jj_consume_token(UNDERSCORE);
-Text jjtn003 = new Text(JJTTEXT);
+Text jjtn003 = new Text();
                                                           boolean jjtc003 = true;
                                                           jjtree.openNodeScope(jjtn003);
             try {
@@ -1792,7 +1792,7 @@ if (jjtc000) {
   }
 
   final public void StrongWithinEm() throws ParseException {
-                                 Strong jjtn000 = new Strong(JJTSTRONG);
+                                 Strong jjtn000 = new Strong();
                                  boolean jjtc000 = true;
                                  jjtree.openNodeScope(jjtn000);Token t;
     try {
@@ -1811,7 +1811,7 @@ if (jjtc000) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case BACKTICK:{
             t = jj_consume_token(BACKTICK);
-Text jjtn001 = new Text(JJTTEXT);
+Text jjtn001 = new Text();
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
             try {
@@ -1827,7 +1827,7 @@ if (jjtc001) {
             }
           case LBRACK:{
             t = jj_consume_token(LBRACK);
-Text jjtn002 = new Text(JJTTEXT);
+Text jjtn002 = new Text();
                                                                   boolean jjtc002 = true;
                                                                   jjtree.openNodeScope(jjtn002);
             try {
@@ -1843,7 +1843,7 @@ if (jjtc002) {
             }
           case UNDERSCORE:{
             t = jj_consume_token(UNDERSCORE);
-Text jjtn003 = new Text(JJTTEXT);
+Text jjtn003 = new Text();
                                                           boolean jjtc003 = true;
                                                           jjtree.openNodeScope(jjtn003);
             try {
@@ -1892,7 +1892,7 @@ if (jjtc000) {
   }
 
   final public void EmMultiline() throws ParseException {
-  Em jjtn000 = new Em(JJTEM);
+  Em jjtn000 = new Em();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -1947,7 +1947,7 @@ if (jjtc000) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ASTERISK:{
           t = jj_consume_token(ASTERISK);
-Text jjtn001 = new Text(JJTTEXT);
+Text jjtn001 = new Text();
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
           try {
@@ -1963,7 +1963,7 @@ if (jjtc001) {
           }
         case BACKTICK:{
           t = jj_consume_token(BACKTICK);
-Text jjtn002 = new Text(JJTTEXT);
+Text jjtn002 = new Text();
                                                           boolean jjtc002 = true;
                                                           jjtree.openNodeScope(jjtn002);
           try {
@@ -1979,7 +1979,7 @@ if (jjtc002) {
           }
         case LBRACK:{
           t = jj_consume_token(LBRACK);
-Text jjtn003 = new Text(JJTTEXT);
+Text jjtn003 = new Text();
                                                                   boolean jjtc003 = true;
                                                                   jjtree.openNodeScope(jjtn003);
           try {
@@ -2008,7 +2008,7 @@ if (jjtc003) {
   }
 
   final public void EmWithinStrongMultiline() throws ParseException {
-  Em jjtn000 = new Em(JJTEM);
+  Em jjtn000 = new Em();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -2061,7 +2061,7 @@ if (jjtc000) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ASTERISK:{
           t = jj_consume_token(ASTERISK);
-Text jjtn001 = new Text(JJTTEXT);
+Text jjtn001 = new Text();
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
           try {
@@ -2077,7 +2077,7 @@ if (jjtc001) {
           }
         case BACKTICK:{
           t = jj_consume_token(BACKTICK);
-Text jjtn002 = new Text(JJTTEXT);
+Text jjtn002 = new Text();
                                                           boolean jjtc002 = true;
                                                           jjtree.openNodeScope(jjtn002);
           try {
@@ -2093,7 +2093,7 @@ if (jjtc002) {
           }
         case LBRACK:{
           t = jj_consume_token(LBRACK);
-Text jjtn003 = new Text(JJTTEXT);
+Text jjtn003 = new Text();
                                                                   boolean jjtc003 = true;
                                                                   jjtree.openNodeScope(jjtn003);
           try {
@@ -2122,7 +2122,7 @@ if (jjtc003) {
   }
 
   final public void Em() throws ParseException {
-                 Em jjtn000 = new Em(JJTEM);
+                 Em jjtn000 = new Em();
                  boolean jjtc000 = true;
                  jjtree.openNodeScope(jjtn000);Token t;
     try {
@@ -2143,7 +2143,7 @@ if (jjtc003) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case ASTERISK:{
             t = jj_consume_token(ASTERISK);
-Text jjtn001 = new Text(JJTTEXT);
+Text jjtn001 = new Text();
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
             try {
@@ -2159,7 +2159,7 @@ if (jjtc001) {
             }
           case BACKTICK:{
             t = jj_consume_token(BACKTICK);
-Text jjtn002 = new Text(JJTTEXT);
+Text jjtn002 = new Text();
                                                           boolean jjtc002 = true;
                                                           jjtree.openNodeScope(jjtn002);
             try {
@@ -2175,7 +2175,7 @@ if (jjtc002) {
             }
           case LBRACK:{
             t = jj_consume_token(LBRACK);
-Text jjtn003 = new Text(JJTTEXT);
+Text jjtn003 = new Text();
                                                                   boolean jjtc003 = true;
                                                                   jjtree.openNodeScope(jjtn003);
             try {
@@ -2224,7 +2224,7 @@ if (jjtc000) {
   }
 
   final public void EmWithinStrong() throws ParseException {
-                             Em jjtn000 = new Em(JJTEM);
+                             Em jjtn000 = new Em();
                              boolean jjtc000 = true;
                              jjtree.openNodeScope(jjtn000);Token t;
     try {
@@ -2243,7 +2243,7 @@ if (jjtc000) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case ASTERISK:{
             t = jj_consume_token(ASTERISK);
-Text jjtn001 = new Text(JJTTEXT);
+Text jjtn001 = new Text();
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
             try {
@@ -2259,7 +2259,7 @@ if (jjtc001) {
             }
           case BACKTICK:{
             t = jj_consume_token(BACKTICK);
-Text jjtn002 = new Text(JJTTEXT);
+Text jjtn002 = new Text();
                                                           boolean jjtc002 = true;
                                                           jjtree.openNodeScope(jjtn002);
             try {
@@ -2275,7 +2275,7 @@ if (jjtc002) {
             }
           case LBRACK:{
             t = jj_consume_token(LBRACK);
-Text jjtn003 = new Text(JJTTEXT);
+Text jjtn003 = new Text();
                                                                   boolean jjtc003 = true;
                                                                   jjtree.openNodeScope(jjtn003);
             try {
@@ -2324,7 +2324,7 @@ if (jjtc000) {
   }
 
   final public void CodeMultiline() throws ParseException {
-  Code jjtn000 = new Code(JJTCODE);
+  Code jjtn000 = new Code();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -2378,7 +2378,7 @@ if (jjtc000) {
   }
 
   final public void Code() throws ParseException {
-  Code jjtn000 = new Code(JJTCODE);
+  Code jjtn000 = new Code();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -2407,7 +2407,7 @@ if (jjtc000) {
   }
 
   final public void CodeText() throws ParseException {
-                         Text jjtn000 = new Text(JJTTEXT);
+                         Text jjtn000 = new Text();
                          boolean jjtc000 = true;
                          jjtree.openNodeScope(jjtn000);Token t; StringBuffer s = new StringBuffer();
     try {
@@ -2540,7 +2540,7 @@ if (jjtc000) {
   }
 
   final public void Text() throws ParseException {
-                     Text jjtn000 = new Text(JJTTEXT);
+                     Text jjtn000 = new Text();
                      boolean jjtc000 = true;
                      jjtree.openNodeScope(jjtn000);Token t; StringBuffer s = new StringBuffer();
     try {
@@ -2658,7 +2658,7 @@ if (jjtc000) {
   }
 
   final public void LooseChar() throws ParseException {
-                          Text jjtn000 = new Text(JJTTEXT);
+                          Text jjtn000 = new Text();
                           boolean jjtc000 = true;
                           jjtree.openNodeScope(jjtn000);Token t;
     try {
@@ -2695,7 +2695,7 @@ if (jjtc000) {
   }
 
   final public void LineBreak() throws ParseException {
-  LineBreak jjtn000 = new LineBreak(JJTLINEBREAK);
+  LineBreak jjtn000 = new LineBreak();
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {

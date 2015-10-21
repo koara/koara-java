@@ -17,7 +17,7 @@ import io.koara.ast.Document;
 
 public interface KoaraVisitor
 {
-  public Object visit(SimpleNode node, Object data);
+  public Object visit(Node node, Object data);
   public Object visit(Document node, Object data);
   public Object visit(Heading node, Object data);
   public Object visit(Blockquote node, Object data);

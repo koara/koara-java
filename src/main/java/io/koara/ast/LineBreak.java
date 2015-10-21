@@ -1,14 +1,11 @@
 package io.koara.ast;
 
 import io.koara.KoaraVisitor;
-import io.koara.SimpleNode;
+import io.koara.Node;
 
 public
-class LineBreak extends SimpleNode {
-  public LineBreak(int id) {
-    super(id);
-  }
-
+class LineBreak extends Node {
+  
   public Object jjtAccept(KoaraVisitor visitor, Object data) {
 
     return

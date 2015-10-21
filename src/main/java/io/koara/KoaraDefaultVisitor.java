@@ -16,11 +16,11 @@ import io.koara.ast.Text;
 import io.koara.ast.Document;
 
 public class KoaraDefaultVisitor implements KoaraVisitor{
-  public Object defaultVisit(SimpleNode node, Object data){
+  public Object defaultVisit(Node node, Object data){
     node.childrenAccept(this, data);
     return data;
   }
-  public Object visit(SimpleNode node, Object data){
+  public Object visit(Node node, Object data){
     return defaultVisit(node, data);
   }
   public Object visit(Document node, Object data){

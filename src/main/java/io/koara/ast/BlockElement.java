@@ -1,19 +1,15 @@
 package io.koara.ast;
 
-import io.koara.SimpleNode;
+import io.koara.Node;
 
-public class BlockElement extends SimpleNode {
+public class BlockElement extends Node {
 
-	public BlockElement(int i) {
-		super(i);
-	}
-	
 	public boolean isNested() {
 		return !(parent instanceof Document);
 	}
 	
 	public boolean isSingleChild() {
-		return ((SimpleNode) this.parent).children.length == 1;
+		return ((Node) this.parent).children.length == 1;
 	}
 
 }
