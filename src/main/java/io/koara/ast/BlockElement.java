@@ -2,9 +2,9 @@ package io.koara.ast;
 
 import io.koara.SimpleNode;
 
-public class ASTBlockElement extends SimpleNode {
+public class BlockElement extends SimpleNode {
 
-	public ASTBlockElement(int i) {
+	public BlockElement(int i) {
 		super(i);
 	}
 	

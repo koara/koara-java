@@ -4,11 +4,11 @@ package io.koara.ast;
 
 import io.koara.KoaraVisitor;
 
-public class ASTList extends ASTBlockElement {
+public class List extends BlockElement {
 
 	private boolean ordered;
 
-	public ASTList(int id) {
+	public List(int id) {
 		super(id);
 	}
 

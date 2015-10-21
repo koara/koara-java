@@ -3,19 +3,19 @@ package io.koara.renderer;
 import java.util.Stack;
 
 import io.koara.KoaraDefaultVisitor;
-import io.koara.ast.ASTBlockquote;
-import io.koara.ast.ASTCode;
-import io.koara.ast.ASTCodeBlock;
-import io.koara.ast.ASTEm;
-import io.koara.ast.ASTHeading;
-import io.koara.ast.ASTImage;
-import io.koara.ast.ASTLineBreak;
-import io.koara.ast.ASTLink;
-import io.koara.ast.ASTList;
-import io.koara.ast.ASTListItem;
-import io.koara.ast.ASTParagraph;
-import io.koara.ast.ASTStrong;
-import io.koara.ast.ASTText;
+import io.koara.ast.Blockquote;
+import io.koara.ast.Code;
+import io.koara.ast.CodeBlock;
+import io.koara.ast.Em;
+import io.koara.ast.Heading;
+import io.koara.ast.Image;
+import io.koara.ast.LineBreak;
+import io.koara.ast.Link;
+import io.koara.ast.List;
+import io.koara.ast.ListItem;
+import io.koara.ast.Paragraph;
+import io.koara.ast.Strong;
+import io.koara.ast.Text;
 import io.koara.ast.Document;
 
 public class HtmlRenderer extends KoaraDefaultVisitor {
@@ -32,7 +32,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTHeading node, Object data) {
+	public Object visit(Heading node, Object data) {
 		out.append(indent() + "<h" + node.value + ">");
 		super.visit(node, data);
 		out.append("</h" + node.value + ">\n");
@@ -41,7 +41,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTBlockquote node, Object data) {
+	public Object visit(Blockquote node, Object data) {
 		out.append(indent() + "<blockquote>");
 		if(node.children != null && node.children.length > 0) { out.append("\n"); }
 		level++;
@@ -53,7 +53,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTList node, Object data) {
+	public Object visit(List node, Object data) {
 		listSequence.push(0);
 		String tag = node.isOrdered() ? "ol" : "ul";
 		out.append(indent() + "<" + tag + ">\n");
@@ -67,7 +67,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTListItem node, Object data) {
+	public Object visit(ListItem node, Object data) {
 		Integer seq = listSequence.peek() + 1;		
 		listSequence.set(listSequence.size() - 1, listSequence.peek() + 1);
 		out.append(indent() + "<li");
@@ -77,18 +77,18 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 		}
 		out.append(">");
 		if(node.children != null) {
-			if(node.children.length > 1 || !(node.children[0] instanceof ASTParagraph)) { out.append("\n"); }
+			if(node.children.length > 1 || !(node.children[0] instanceof Paragraph)) { out.append("\n"); }
 			level++;
 			super.visit(node, data);
 			level--;
-			if(node.children.length > 1 || !(node.children[0] instanceof ASTParagraph)) { out.append(indent()); }
+			if(node.children.length > 1 || !(node.children[0] instanceof Paragraph)) { out.append(indent()); }
 		}
 		out.append("</li>\n");
 		return null;
 	}
 	
 	@Override
-	public Object visit(ASTCodeBlock node, Object data) {
+	public Object visit(CodeBlock node, Object data) {
 		out.append(indent() + "<pre><code");
 		if(node.getLanguage() != null) {
 			out.append(" class=\"language-" + node.getLanguage() + "\"");
@@ -100,8 +100,8 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 		
 	@Override
-	public Object visit(ASTParagraph node, Object data) {
-		if(node.isNested() && (node.parent instanceof ASTListItem) && node.isSingleChild()) {
+	public Object visit(Paragraph node, Object data) {
+		if(node.isNested() && (node.parent instanceof ListItem) && node.isSingleChild()) {
 			super.visit(node, data);
 		} else {
 			out.append(indent() + "<p>");
@@ -113,7 +113,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 		
 	@Override
-	public Object visit(ASTImage node, Object data) {
+	public Object visit(Image node, Object data) {
 		out.append("<img src=\"" + escapeUrl(node.value.toString()) + "\" alt=\"");
 		super.visit(node, data);
 		out.append("\" />");
@@ -121,7 +121,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTLink node, Object data) {
+	public Object visit(Link node, Object data) {
 		out.append("<a href=\"" + escapeUrl(node.value.toString()) + "\">");
 		super.visit(node, data);
 		out.append("</a>");
@@ -129,7 +129,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTStrong node, Object data) {
+	public Object visit(Strong node, Object data) {
 		out.append("<strong>");
 		super.visit(node, data);
 		out.append("</strong>");
@@ -137,7 +137,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTEm node, Object data) {
+	public Object visit(Em node, Object data) {
 		out.append("<em>");
 		super.visit(node, data);
 		out.append("</em>");
@@ -145,7 +145,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTCode node, Object data) {
+	public Object visit(Code node, Object data) {
 		out.append("<code>");
 		super.visit(node, data);
 		out.append("</code>");
@@ -153,7 +153,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 		
 	@Override
-	public Object visit(ASTText node, Object data) {
+	public Object visit(Text node, Object data) {
 		out.append(escape(node.value.toString()));
 		return null;
 	}
@@ -166,7 +166,7 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 	}
 	
 	@Override
-	public Object visit(ASTLineBreak node, Object data) {
+	public Object visit(LineBreak node, Object data) {
 		out.append("<br>\n" + indent());
 		return super.visit(node, data);
 	}

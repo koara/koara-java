@@ -4,7 +4,7 @@ package io.koara;
 import java.util.Arrays;
 
 /** Token Manager. */
-@SuppressWarnings("unused")public class KoaraTokenManager implements KoaraConstants {
+@SuppressWarnings("unused")public class TokenManager implements KoaraConstants {
 
   /** Debug output. */
   public  java.io.PrintStream debugStream = System.out;
@@ -503,22 +503,22 @@ private void jjCheckNAddStates(int start, int end)
 }
 
     /** Constructor. */
-    public KoaraTokenManager(SimpleCharStream stream){
+    public TokenManager(CharStream stream){
 
-      if (SimpleCharStream.staticFlag)
+      if (CharStream.staticFlag)
             throw new Error("ERROR: Cannot use a static CharStream class with a non-static lexical analyzer.");
 
     input_stream = stream;
   }
 
   /** Constructor. */
-  public KoaraTokenManager (SimpleCharStream stream, int lexState){
+  public TokenManager (CharStream stream, int lexState){
     ReInit(stream);
     SwitchTo(lexState);
   }
 
   /** Reinitialise parser. */
-  public void ReInit(SimpleCharStream stream)
+  public void ReInit(CharStream stream)
   {
     jjmatchedPos = jjnewStateCnt = 0;
     curLexState = defaultLexState;
@@ -535,7 +535,7 @@ private void jjCheckNAddStates(int start, int end)
   }
 
   /** Reinitialise parser. */
-  public void ReInit(SimpleCharStream stream, int lexState)
+  public void ReInit(CharStream stream, int lexState)
   {
     ReInit(stream);
     SwitchTo(lexState);
@@ -554,7 +554,7 @@ private void jjCheckNAddStates(int start, int end)
 public static final String[] lexStateNames = {
    "DEFAULT",
 };
-    protected SimpleCharStream  input_stream;
+    protected CharStream  input_stream;
 
     private final int[] jjrounds = new int[8];
     private final int[] jjstateSet = new int[2 * 8];

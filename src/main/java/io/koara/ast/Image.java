@@ -5,12 +5,12 @@ import io.koara.Parser;
 import io.koara.SimpleNode;
 
 public
-class ASTImage extends SimpleNode {
-  public ASTImage(int id) {
+class Image extends SimpleNode {
+  public Image(int id) {
     super(id);
   }
 
-  public ASTImage(Parser p, int id) {
+  public Image(Parser p, int id) {
     super(p, id);
   }
 

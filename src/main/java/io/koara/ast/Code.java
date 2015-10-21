@@ -7,12 +7,12 @@ import io.koara.Parser;
 import io.koara.SimpleNode;
 
 public
-class ASTText extends SimpleNode {
-  public ASTText(int id) {
+class Code extends SimpleNode {
+  public Code(int id) {
     super(id);
   }
 
-  public ASTText(Parser p, int id) {
+  public Code(Parser p, int id) {
     super(p, id);
   }
 

@@ -7,7 +7,7 @@ package io.koara;
  * contain only ASCII characters (without unicode processing).
  */
 
-public class SimpleCharStream
+public class CharStream
 {
 /** Whether parser is static. */
   public static final boolean staticFlag = false;
@@ -251,7 +251,7 @@ public class SimpleCharStream
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.Reader dstream, int startline,
+  public CharStream(java.io.Reader dstream, int startline,
   int startcolumn, int buffersize)
   {
     inputStream = dstream;
@@ -265,14 +265,14 @@ public class SimpleCharStream
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.Reader dstream, int startline,
+  public CharStream(java.io.Reader dstream, int startline,
                           int startcolumn)
   {
     this(dstream, startline, startcolumn, 4096);
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.Reader dstream)
+  public CharStream(java.io.Reader dstream)
   {
     this(dstream, 1, 1, 4096);
   }
@@ -310,41 +310,41 @@ public class SimpleCharStream
     ReInit(dstream, 1, 1, 4096);
   }
   /** Constructor. */
-  public SimpleCharStream(java.io.InputStream dstream, String encoding, int startline,
+  public CharStream(java.io.InputStream dstream, String encoding, int startline,
   int startcolumn, int buffersize) throws java.io.UnsupportedEncodingException
   {
     this(encoding == null ? new java.io.InputStreamReader(dstream) : new java.io.InputStreamReader(dstream, encoding), startline, startcolumn, buffersize);
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.InputStream dstream, int startline,
+  public CharStream(java.io.InputStream dstream, int startline,
   int startcolumn, int buffersize)
   {
     this(new java.io.InputStreamReader(dstream), startline, startcolumn, buffersize);
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.InputStream dstream, String encoding, int startline,
+  public CharStream(java.io.InputStream dstream, String encoding, int startline,
                           int startcolumn) throws java.io.UnsupportedEncodingException
   {
     this(dstream, encoding, startline, startcolumn, 4096);
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.InputStream dstream, int startline,
+  public CharStream(java.io.InputStream dstream, int startline,
                           int startcolumn)
   {
     this(dstream, startline, startcolumn, 4096);
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException
+  public CharStream(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException
   {
     this(dstream, encoding, 1, 1, 4096);
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.InputStream dstream)
+  public CharStream(java.io.InputStream dstream)
   {
     this(dstream, 1, 1, 4096);
   }

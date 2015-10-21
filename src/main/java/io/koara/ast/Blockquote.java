@@ -4,11 +4,8 @@ package io.koara.ast;
 import io.koara.KoaraVisitor;
 
 public
-class ASTCodeBlock extends ASTBlockElement {
- 	
-  private String language;
-	
-  public ASTCodeBlock(int id) {
+class Blockquote extends BlockElement {
+  public Blockquote(int id) {
     super(id);
   }
 
@@ -16,13 +13,4 @@ class ASTCodeBlock extends ASTBlockElement {
   public Object jjtAccept(KoaraVisitor visitor, Object data) {
     return visitor.visit(this, data);
   }
-  
-  public String getLanguage() {
-	return language;
-}
-  
-  public void setLanguage(String language) {
-	this.language = language;
-}
-  
 }
