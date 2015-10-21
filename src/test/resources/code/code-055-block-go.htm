@@ -1,0 +1,160 @@
+<pre><code class="language-go">// Copyright 2015 Google Inc. All rights reserved
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package kati
+
+import &quot;strings&quot;
+
+type ast interface {
+    eval(*Evaluator) error
+    show()
+}
+
+type assignAST struct {
+    srcpos
+    lhs Value
+    rhs Value
+    op  string
+    opt string // &quot;override&quot;, &quot;export&quot;
+}
+
+func (ast *assignAST) eval(ev *Evaluator) error {
+    return ev.evalAssign(ast)
+}
+
+func (ast *assignAST) evalRHS(ev *Evaluator, lhs string) (Var, error) {
+    origin := &quot;file&quot;
+    if ast.filename == bootstrapMakefileName {
+        origin = &quot;default&quot;
+    }
+    if ast.opt == &quot;override&quot; {
+        origin = &quot;override&quot;
+    }
+    // TODO(ukai): handle ast.opt == &quot;export&quot;
+    switch ast.op {
+    case &quot;:=&quot;:
+        switch v := ast.rhs.(type) {
+        case literal:
+            return &amp;simpleVar{value: v.String(), origin: origin}, nil
+        case tmpval:
+            return &amp;simpleVar{value: v.String(), origin: origin}, nil
+        default:
+            var buf evalBuffer
+            buf.resetSep()
+            err := v.Eval(&amp;buf, ev)
+            if err != nil {
+                return nil, err
+            }
+            return &amp;simpleVar{value: buf.String(), origin: origin}, nil
+        }
+    case &quot;=&quot;:
+        return &amp;recursiveVar{expr: ast.rhs, origin: origin}, nil
+    case &quot;+=&quot;:
+        prev := ev.lookupVarInCurrentScope(lhs)
+        if !prev.IsDefined() {
+            return &amp;recursiveVar{expr: ast.rhs, origin: origin}, nil
+        }
+        return prev.AppendVar(ev, ast.rhs)
+    case &quot;?=&quot;:
+        prev := ev.lookupVarInCurrentScope(lhs)
+        if prev.IsDefined() {
+            return prev, nil
+        }
+        return &amp;recursiveVar{expr: ast.rhs, origin: origin}, nil
+    }
+    return nil, ast.errorf(&quot;unknown assign op: %q&quot;, ast.op)
+}
+
+func (ast *assignAST) show() {
+    logf(&quot;%s %s %s %q&quot;, ast.opt, ast.lhs, ast.op, ast.rhs)
+}
+
+// maybeRuleAST is an ast for rule line.
+// Note we cannot be sure what this is, until all variables in |expr|
+// are expanded.
+type maybeRuleAST struct {
+    srcpos
+    isRule bool // found literal ':'
+    expr   Value
+    assign *assignAST // target specific var
+    semi   []byte     // after ';' if ';' exists
+}
+
+func (ast *maybeRuleAST) eval(ev *Evaluator) error {
+    return ev.evalMaybeRule(ast)
+}
+
+func (ast *maybeRuleAST) show() {
+    logf(&quot;%s&quot;, ast.expr)
+}
+
+type commandAST struct {
+    srcpos
+    cmd string
+}
+
+func (ast *commandAST) eval(ev *Evaluator) error {
+    return ev.evalCommand(ast)
+}
+
+func (ast *commandAST) show() {
+    logf(&quot;\t%s&quot;, strings.Replace(ast.cmd, &quot;\n&quot;, `\n`, -1))
+}
+
+type includeAST struct {
+    srcpos
+    expr string
+    op   string
+}
+
+func (ast *includeAST) eval(ev *Evaluator) error {
+    return ev.evalInclude(ast)
+}
+
+func (ast *includeAST) show() {
+    logf(&quot;include %s&quot;, ast.expr)
+}
+
+type ifAST struct {
+    srcpos
+    op         string
+    lhs        Value
+    rhs        Value // Empty if |op| is ifdef or ifndef.
+    trueStmts  []ast
+    falseStmts []ast
+}
+
+func (ast *ifAST) eval(ev *Evaluator) error {
+    return ev.evalIf(ast)
+}
+
+func (ast *ifAST) show() {
+    // TODO
+    logf(&quot;if&quot;)
+}
+
+type exportAST struct {
+    srcpos
+    expr   []byte
+    export bool
+}
+
+func (ast *exportAST) eval(ev *Evaluator) error {
+    return ev.evalExport(ast)
+}
+
+func (ast *exportAST) show() {
+    // TODO
+    logf(&quot;export&quot;)
+}</code></pre>

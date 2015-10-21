@@ -1,0 +1,3 @@
+Between this sentence
+			  
+= and this heading there are spaces, so it is parsed as a blank line.
