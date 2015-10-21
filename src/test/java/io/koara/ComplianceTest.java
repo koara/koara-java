@@ -2,11 +2,10 @@ package io.koara;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -50,8 +49,8 @@ public class ComplianceTest {
 
 	@Test
 	public void output() throws Exception {
-		String html = readFile(TESTSUITE_FOLDER.resolve(module).resolve(testcase + ".htm"));
-		String kd = readFile(TESTSUITE_FOLDER.resolve(module).resolve(testcase + ".kd"));
+		String html = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".htm");
+		String kd = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".kd");
 		
 		Parser parser = new Parser();
 		Document document = parser.parse(kd); // Generate AST
@@ -60,9 +59,21 @@ public class ComplianceTest {
 		assertEquals(html, renderer.getOutput());
 	}
 	
-	private String readFile(Path path) throws IOException {
-    	byte[] encoded = Files.readAllBytes(path);
-    	return Charset.forName("UTF-8").decode(ByteBuffer.wrap(encoded)).toString();
+	private String readFile(String path) throws IOException {
+		BufferedReader reader = null;
+		try {
+			StringBuffer fileData = new StringBuffer();
+			reader = new BufferedReader(new FileReader(path));
+			char[] buf = new char[1024];
+	        int numRead=0;
+	        while((numRead=reader.read(buf)) != -1){
+	            String readData = String.valueOf(buf, 0, numRead);
+	            fileData.append(readData);
+	        }
+	        return fileData.toString();
+		} finally {
+			reader.close();
+		}
     }
 	
 	
