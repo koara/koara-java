@@ -1,5 +1,28 @@
 package io.koara;
 
+import static io.koara.TokenManager.ASTERISK;
+import static io.koara.TokenManager.BACKSLASH;
+import static io.koara.TokenManager.BACKTICK;
+import static io.koara.TokenManager.CHAR_SEQUENCE;
+import static io.koara.TokenManager.COLON;
+import static io.koara.TokenManager.DASH;
+import static io.koara.TokenManager.DIGITS;
+import static io.koara.TokenManager.DOT;
+import static io.koara.TokenManager.EOF;
+import static io.koara.TokenManager.EOL;
+import static io.koara.TokenManager.EQ;
+import static io.koara.TokenManager.ESCAPED_CHAR;
+import static io.koara.TokenManager.GT;
+import static io.koara.TokenManager.IMAGE_LABEL;
+import static io.koara.TokenManager.LBRACK;
+import static io.koara.TokenManager.LPAREN;
+import static io.koara.TokenManager.LT;
+import static io.koara.TokenManager.RBRACK;
+import static io.koara.TokenManager.RPAREN;
+import static io.koara.TokenManager.SPACE;
+import static io.koara.TokenManager.TAB;
+import static io.koara.TokenManager.UNDERSCORE;
+
 import java.io.StringReader;
 import java.util.Arrays;
 
@@ -18,7 +41,7 @@ import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
 import io.koara.ast.Text;
 
-public class Parser implements KoaraConstants {
+public class Parser {
     
 	protected TreeState jjtree = new TreeState();
     private int currentBlockLevel = 0;

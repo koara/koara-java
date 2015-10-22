@@ -1,37 +1,94 @@
 package io.koara;
 
+import java.io.Reader;
+
 public class CharStream {
 	
-	int bufsize;
-	int available;
-	int tokenBegin;
-	public int bufpos = -1;
-	protected int bufline[];
-	protected int bufcolumn[];
-
-	protected int column = 0;
-	protected int line = 1;
-
-	protected boolean prevCharIsCR = false;
-	protected boolean prevCharIsLF = false;
-
-	protected java.io.Reader inputStream;
-
-	protected char[] buffer;
-	protected int maxNextCharInd = 0;
-	protected int inBuf = 0;
-	protected int tabSize = 8;
-	protected boolean trackLineColumn = true;
-
-	public void setTabSize(int i) {
-		tabSize = i;
+	private int bufsize;
+	private int available;
+	private int tokenBegin;
+	private int bufpos = -1;
+	private int bufline[];
+	private int bufcolumn[];
+	private int column = 0;
+	private int line = 1;
+	private boolean prevCharIsCR = false;
+	private boolean prevCharIsLF = false;
+	private java.io.Reader inputStream;
+	private char[] buffer;
+	private int maxNextCharInd = 0;
+	private int inBuf = 0;
+	private int tabSize = 4;
+	
+	public CharStream(Reader dstream) {
+		inputStream = dstream;
+		line = 1;
+		column = 1 - 1;
+		available = bufsize = 4096;
+		buffer = new char[4096];
+		bufline = new int[4096];
+		bufcolumn = new int[4096];
 	}
-
-	public int getTabSize() {
-		return tabSize;
+	
+	public char beginToken() throws java.io.IOException {
+		tokenBegin = -1;
+		char c = readChar();
+		tokenBegin = bufpos;
+		return c;
 	}
+	
+	protected char readChar() throws java.io.IOException {
+		if (inBuf > 0) {
+			--inBuf;
+			if (++bufpos == bufsize) {
+				bufpos = 0;
+			}
+			return buffer[bufpos];
+		}
+		if (++bufpos >= maxNextCharInd) {
+			fillBuff();
+		}
+		char c = buffer[bufpos];
+		updateLineColumn(c);
+		return c;
+	}
+	
+	private void fillBuff() throws java.io.IOException {
+		if (maxNextCharInd == available) {
+			if (available == bufsize) {
+				if (tokenBegin > 2048) {
+					bufpos = maxNextCharInd = 0;
+					available = tokenBegin;
+				} else if (tokenBegin < 0)
+					bufpos = maxNextCharInd = 0;
+				else
+					expandBuff(false);
+			} else if (available > tokenBegin)
+				available = bufsize;
+			else if ((tokenBegin - available) < 2048)
+				expandBuff(true);
+			else
+				available = tokenBegin;
+		}
 
-	protected void ExpandBuff(boolean wrapAround) {
+		int i;
+		try {
+			if ((i = inputStream.read(buffer, maxNextCharInd, available - maxNextCharInd)) == -1) {
+				inputStream.close();
+				throw new java.io.IOException();
+			} else
+				maxNextCharInd += i;
+			return;
+		} catch (java.io.IOException e) {
+			--bufpos;
+			backup(0);
+			if (tokenBegin == -1)
+				tokenBegin = bufpos;
+			throw e;
+		}
+	}
+	
+	private void expandBuff(boolean wrapAround) {
 		char[] newbuffer = new char[bufsize + 2048];
 		int newbufline[] = new int[bufsize + 2048];
 		int newbufcolumn[] = new int[bufsize + 2048];
@@ -71,53 +128,16 @@ public class CharStream {
 		available = bufsize;
 		tokenBegin = 0;
 	}
-
-	protected void FillBuff() throws java.io.IOException {
-		if (maxNextCharInd == available) {
-			if (available == bufsize) {
-				if (tokenBegin > 2048) {
-					bufpos = maxNextCharInd = 0;
-					available = tokenBegin;
-				} else if (tokenBegin < 0)
-					bufpos = maxNextCharInd = 0;
-				else
-					ExpandBuff(false);
-			} else if (available > tokenBegin)
-				available = bufsize;
-			else if ((tokenBegin - available) < 2048)
-				ExpandBuff(true);
-			else
-				available = tokenBegin;
-		}
-
-		int i;
-		try {
-			if ((i = inputStream.read(buffer, maxNextCharInd, available - maxNextCharInd)) == -1) {
-				inputStream.close();
-				throw new java.io.IOException();
-			} else
-				maxNextCharInd += i;
-			return;
-		} catch (java.io.IOException e) {
-			--bufpos;
-			backup(0);
-			if (tokenBegin == -1)
-				tokenBegin = bufpos;
-			throw e;
+	
+	protected void backup(int amount) {
+		inBuf += amount;
+		if ((bufpos -= amount) < 0) {
+			bufpos += bufsize;
 		}
 	}
 
-	public char BeginToken() throws java.io.IOException {
-		tokenBegin = -1;
-		char c = readChar();
-		tokenBegin = bufpos;
-
-		return c;
-	}
-
-	protected void UpdateLineColumn(char c) {
+	private void updateLineColumn(char c) {
 		column++;
-
 		if (prevCharIsLF) {
 			prevCharIsLF = false;
 			line += (column = 1);
@@ -143,30 +163,18 @@ public class CharStream {
 		default:
 			break;
 		}
-
 		bufline[bufpos] = line;
 		bufcolumn[bufpos] = column;
 	}
-
-	public char readChar() throws java.io.IOException {
-		if (inBuf > 0) {
-			--inBuf;
-
-			if (++bufpos == bufsize)
-				bufpos = 0;
-
-			return buffer[bufpos];
+	
+	protected String getImage() {
+		if (bufpos >= tokenBegin) {
+			return new String(buffer, tokenBegin, bufpos - tokenBegin + 1);
+		} else {
+			return new String(buffer, tokenBegin, bufsize - tokenBegin) + new String(buffer, 0, bufpos + 1);
 		}
-
-		if (++bufpos >= maxNextCharInd)
-			FillBuff();
-
-		char c = buffer[bufpos];
-
-		UpdateLineColumn(c);
-		return c;
 	}
-
+	
 	public int getEndColumn() {
 		return bufcolumn[bufpos];
 	}
@@ -183,92 +191,4 @@ public class CharStream {
 		return bufline[tokenBegin];
 	}
 
-	public void backup(int amount) {
-
-		inBuf += amount;
-		if ((bufpos -= amount) < 0)
-			bufpos += bufsize;
-	}
-
-	public CharStream(java.io.Reader dstream) {
-		inputStream = dstream;
-		line = 1;
-		column = 1 - 1;
-
-		available = bufsize = 4096;
-		buffer = new char[4096];
-		bufline = new int[4096];
-		bufcolumn = new int[4096];
-	}
-
-	public String GetImage() {
-		if (bufpos >= tokenBegin)
-			return new String(buffer, tokenBegin, bufpos - tokenBegin + 1);
-		else
-			return new String(buffer, tokenBegin, bufsize - tokenBegin) + new String(buffer, 0, bufpos + 1);
-	}
-
-	public char[] GetSuffix(int len) {
-		char[] ret = new char[len];
-
-		if ((bufpos + 1) >= len)
-			System.arraycopy(buffer, bufpos - len + 1, ret, 0, len);
-		else {
-			System.arraycopy(buffer, bufsize - (len - bufpos - 1), ret, 0, len - bufpos - 1);
-			System.arraycopy(buffer, 0, ret, len - bufpos - 1, bufpos + 1);
-		}
-
-		return ret;
-	}
-
-	public void Done() {
-		buffer = null;
-		bufline = null;
-		bufcolumn = null;
-	}
-
-	public void adjustBeginLineColumn(int newLine, int newCol) {
-		int start = tokenBegin;
-		int len;
-
-		if (bufpos >= tokenBegin) {
-			len = bufpos - tokenBegin + inBuf + 1;
-		} else {
-			len = bufsize - tokenBegin + bufpos + 1 + inBuf;
-		}
-
-		int i = 0, j = 0, k = 0;
-		int nextColDiff = 0, columnDiff = 0;
-
-		while (i < len && bufline[j = start % bufsize] == bufline[k = ++start % bufsize]) {
-			bufline[j] = newLine;
-			nextColDiff = columnDiff + bufcolumn[k] - bufcolumn[j];
-			bufcolumn[j] = newCol + columnDiff;
-			columnDiff = nextColDiff;
-			i++;
-		}
-
-		if (i < len) {
-			bufline[j] = newLine++;
-			bufcolumn[j] = newCol + columnDiff;
-
-			while (i++ < len) {
-				if (bufline[j = start % bufsize] != bufline[++start % bufsize])
-					bufline[j] = newLine++;
-				else
-					bufline[j] = newLine;
-			}
-		}
-
-		line = bufline[j];
-		column = bufcolumn[j];
-	}
-
-	boolean getTrackLineColumn() {
-		return trackLineColumn;
-	}
-
-	void setTrackLineColumn(boolean tlc) {
-		trackLineColumn = tlc;
-	}
 }

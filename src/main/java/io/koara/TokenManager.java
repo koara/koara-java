@@ -1,6 +1,30 @@
 package io.koara;
 
-public class TokenManager implements KoaraConstants {
+public class TokenManager {
+
+	public static final int EOF = 0;
+	public static final int ASTERISK = 1;
+	public static final int BACKSLASH = 2;
+	public static final int BACKTICK = 3;
+	public static final int CHAR_SEQUENCE = 4;
+	public static final int COLON = 5;
+	public static final int DASH = 6;
+	public static final int DIGITS = 7;
+	public static final int DOT = 8;
+	public static final int EOL = 9;
+	public static final int EQ = 10;
+	public static final int ESCAPED_CHAR = 11;
+	public static final int GT = 12;
+	public static final int IMAGE_LABEL = 13;
+	public static final int LBRACK = 14;
+	public static final int LPAREN = 15;
+	public static final int LT = 16;
+	public static final int RBRACK = 17;
+	public static final int RPAREN = 18;
+	public static final int SPACE = 19;
+	public static final int TAB = 20;
+	public static final int UNDERSCORE = 21;
+	public static final int DEFAULT = 0;
 
 	private final int jjStopStringLiteralDfa_0(int pos, long active0) {
 		switch (pos) {
@@ -387,7 +411,7 @@ public class TokenManager implements KoaraConstants {
 		final int beginColumn;
 		final int endColumn;
 		String im = jjstrLiteralImages[jjmatchedKind];
-		curTokenImage = (im == null) ? input_stream.GetImage() : im;
+		curTokenImage = (im == null) ? input_stream.getImage() : im;
 		beginLine = input_stream.getBeginLine();
 		beginColumn = input_stream.getBeginColumn();
 		endLine = input_stream.getEndLine();
@@ -416,7 +440,7 @@ public class TokenManager implements KoaraConstants {
 
 		EOFLoop: for (;;) {
 			try {
-				curChar = input_stream.BeginToken();
+				curChar = input_stream.beginToken();
 			} catch (java.io.IOException e) {
 				jjmatchedKind = 0;
 				jjmatchedPos = -1;
@@ -442,7 +466,7 @@ public class TokenManager implements KoaraConstants {
 				input_stream.backup(1);
 			} catch (java.io.IOException e1) {
 				EOFSeen = true;
-				error_after = curPos <= 1 ? "" : input_stream.GetImage();
+				error_after = curPos <= 1 ? "" : input_stream.getImage();
 				if (curChar == '\n' || curChar == '\r') {
 					error_line++;
 					error_column = 0;
@@ -451,7 +475,7 @@ public class TokenManager implements KoaraConstants {
 			}
 			if (!EOFSeen) {
 				input_stream.backup(1);
-				error_after = curPos <= 1 ? "" : input_stream.GetImage();
+				error_after = curPos <= 1 ? "" : input_stream.getImage();
 			}
 			throw new TokenMgrError(EOFSeen, curLexState, error_line, error_column, error_after, curChar,
 					TokenMgrError.LEXICAL_ERROR);
