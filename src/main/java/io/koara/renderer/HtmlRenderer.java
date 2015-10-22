@@ -2,7 +2,6 @@ package io.koara.renderer;
 
 import java.util.Stack;
 
-import io.koara.Node;
 import io.koara.ast.Blockquote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;

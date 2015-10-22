@@ -1,16 +1,21 @@
 package io.koara;
 
-public class TreeState {
-  private java.util.List<Node> nodes;
-  private java.util.List<Integer> marks;
+import java.util.ArrayList;
+import java.util.List;
 
+import io.koara.ast.Node;
+
+public class TreeState {
+	
+  private List<Node> nodes;
+  private List<Integer> marks;
   private int nodesOnStack;
   private int currentMark;
   private boolean node_created;
 
   public TreeState() {
-    nodes = new java.util.ArrayList<Node>();
-    marks = new java.util.ArrayList<Integer>();
+    nodes = new ArrayList<Node>();
+    marks = new ArrayList<Integer>();
     nodesOnStack = 0;
     currentMark = 0;
   }

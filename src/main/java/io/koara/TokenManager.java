@@ -1,15 +1,6 @@
 package io.koara;
 
-import java.util.Arrays;
-
-@SuppressWarnings("unused")
 public class TokenManager implements KoaraConstants {
-
-	public java.io.PrintStream debugStream = System.out;
-
-	public void setDebugStream(java.io.PrintStream ds) {
-		debugStream = ds;
-	}
 
 	private final int jjStopStringLiteralDfa_0(int pos, long active0) {
 		switch (pos) {
@@ -474,17 +465,6 @@ public class TokenManager implements KoaraConstants {
 		}
 	}
 
-	private void jjAddStates(int start, int end) {
-		do {
-			jjstateSet[jjnewStateCnt++] = jjnextStates[start];
-		} while (start++ != end);
-	}
-
-	private void jjCheckNAddTwoStates(int state1, int state2) {
-		jjCheckNAdd(state1);
-		jjCheckNAdd(state2);
-	}
-
 	private void jjCheckNAddStates(int start, int end) {
 		do {
 			jjCheckNAdd(jjnextStates[start]);
@@ -492,10 +472,6 @@ public class TokenManager implements KoaraConstants {
 	}
 
 	public TokenManager(CharStream stream) {
-
-		if (CharStream.staticFlag)
-			throw new Error("ERROR: Cannot use a static CharStream class with a non-static lexical analyzer.");
-
 		input_stream = stream;
 	}
 
@@ -524,9 +500,7 @@ public class TokenManager implements KoaraConstants {
 
 	public static final String[] lexStateNames = { "DEFAULT", };
 	protected CharStream input_stream;
-
 	private final int[] jjrounds = new int[8];
 	private final int[] jjstateSet = new int[2 * 8];
-
 	protected char curChar;
 }

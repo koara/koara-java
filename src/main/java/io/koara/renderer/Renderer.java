@@ -1,9 +1,9 @@
 package io.koara.renderer;
 
-import io.koara.Node;
 import io.koara.ast.Blockquote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;
+import io.koara.ast.Document;
 import io.koara.ast.Em;
 import io.koara.ast.Heading;
 import io.koara.ast.Image;
@@ -14,11 +14,8 @@ import io.koara.ast.ListItem;
 import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
 import io.koara.ast.Text;
-import io.koara.ast.Document;
 
 public interface Renderer {
-	
-	//void visit(Node node);
 
 	void visit(Document node);
 

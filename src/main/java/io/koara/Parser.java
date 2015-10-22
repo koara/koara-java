@@ -6,6 +6,7 @@ import java.util.Arrays;
 import io.koara.ast.Blockquote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;
+import io.koara.ast.Document;
 import io.koara.ast.Em;
 import io.koara.ast.Heading;
 import io.koara.ast.Image;
@@ -16,9 +17,8 @@ import io.koara.ast.ListItem;
 import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
 import io.koara.ast.Text;
-import io.koara.ast.Document;
 
-public class Parser implements KoaraTreeConstants, KoaraConstants {
+public class Parser implements KoaraConstants {
     
 	protected TreeState jjtree = new TreeState();
     private int currentBlockLevel = 0;
@@ -28,15 +28,13 @@ public class Parser implements KoaraTreeConstants, KoaraConstants {
     }
     
 	public Document parse(String text) throws ParseException {
-	      jj_input_stream = new CharStream(new StringReader(text));
-	      token_source = new TokenManager(jj_input_stream);
-	      token = new Token();
-	      jj_ntk = -1;
-	      jj_gen = 0;
-	      for (int i = 0; i < 46; i++) jj_la1[i] = -1;
-	      for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-		
-		
+	    jj_input_stream = new CharStream(new StringReader(text));
+	    token_source = new TokenManager(jj_input_stream);
+	    token = new Token();
+	    jj_ntk = -1;
+	    jj_gen = 0;
+	    for (int i = 0; i < 46; i++) jj_la1[i] = -1;
+	    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
 		return Document();
 	}
 	
@@ -169,7 +167,6 @@ public class Parser implements KoaraTreeConstants, KoaraConstants {
               } else if(t.kind != SPACE && t.kind != TAB) {
                   return quoteLevel;
               }
-
           }
     }
 

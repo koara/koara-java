@@ -6,10 +6,6 @@ public class List extends BlockElement {
 
 	private boolean ordered;
 
-	public void accept(Renderer renderer) {
-		renderer.visit(this);
-	}
-
 	public boolean isOrdered() {
 		return ordered;
 	}
@@ -18,4 +14,8 @@ public class List extends BlockElement {
 		this.ordered = ordered;
 	}
 
+	public void accept(Renderer renderer) {
+		renderer.visit(this);
+	}
+	
 }

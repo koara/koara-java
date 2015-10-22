@@ -1,6 +1,5 @@
 package io.koara.ast;
 
-import io.koara.Node;
 import io.koara.renderer.Renderer;
 
 public class Link extends Node {
