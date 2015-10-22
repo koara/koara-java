@@ -1,11 +1,11 @@
 package io.koara.ast;
 
-import io.koara.KoaraVisitor;
+import io.koara.renderer.Renderer;
 
 public
 class Blockquote extends BlockElement {
   
-  public Object jjtAccept(KoaraVisitor visitor, Object data) {
-    return visitor.visit(this, data);
+  public void accept(Renderer renderer) {
+     renderer.visit(this);
   }
 }

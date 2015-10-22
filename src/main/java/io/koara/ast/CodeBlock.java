@@ -1,14 +1,15 @@
 package io.koara.ast;
 
-import io.koara.KoaraVisitor;
+import io.koara.renderer.HtmlRenderer;
+import io.koara.renderer.Renderer;
 
 public
 class CodeBlock extends BlockElement {
  	
   private String language;
 
-  public Object jjtAccept(KoaraVisitor visitor, Object data) {
-    return visitor.visit(this, data);
+  public void jjtAccept(HtmlRenderer renderer) {
+     renderer.visit(this);
   }
   
   public String getLanguage() {
@@ -17,6 +18,11 @@ class CodeBlock extends BlockElement {
   
   public void setLanguage(String language) {
 	this.language = language;
+}
+
+@Override
+public void accept(Renderer renderer) {
+	renderer.visit(this);
 }
   
 }

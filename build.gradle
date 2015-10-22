@@ -16,15 +16,13 @@ apply plugin: "signing"
 group = "io.koara"
 jar.baseName = 'koara'
 
-sourceCompatibility = 1.6
-
 repositories {
 	mavenCentral()
 }
 
+
 signing {
 	required = true
-	//required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
 	sign configurations.archives
 }
 
@@ -61,7 +59,7 @@ uploadArchives {
 			pom.project {
 				name 'koara'
 				packaging 'jar'
-				description ''
+				description 'Koara to HTML parser written in Java'
 				url 'http://www.koara.io'
 
 				scm {

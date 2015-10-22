@@ -2,10 +2,11 @@ package io.koara.renderer;
 
 import java.util.Stack;
 
-import io.koara.KoaraDefaultVisitor;
+import io.koara.Node;
 import io.koara.ast.Blockquote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;
+import io.koara.ast.Document;
 import io.koara.ast.Em;
 import io.koara.ast.Heading;
 import io.koara.ast.Image;
@@ -16,58 +17,49 @@ import io.koara.ast.ListItem;
 import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
 import io.koara.ast.Text;
-import io.koara.ast.Document;
 
-public class HtmlRenderer extends KoaraDefaultVisitor {
+public class HtmlRenderer implements Renderer {
 
 	private StringBuffer out;
 	private int level;
 	private Stack<Integer> listSequence = new Stack<Integer>();
 
-	@Override
-	public Object visit(Document node, Object data) {
+	public void visit(Document node) {
 		out = new StringBuffer();
-		node.childrenAccept(this, data);
-		return null;
+		node.childrenAccept(this);
 	}
 	
-	@Override
-	public Object visit(Heading node, Object data) {
+	public void visit(Heading node) {
 		out.append(indent() + "<h" + node.value + ">");
-		super.visit(node, data);
+		node.childrenAccept(this);
 		out.append("</h" + node.value + ">\n");
 		if(!node.isNested()) { out.append("\n"); }
-		return null;
 	}
 	
-	@Override
-	public Object visit(Blockquote node, Object data) {
+	public void visit(Blockquote node) {
 		out.append(indent() + "<blockquote>");
 		if(node.children != null && node.children.length > 0) { out.append("\n"); }
 		level++;
-		super.visit(node, data);
+		node.childrenAccept(this);
 		level--;
 		out.append(indent() + "</blockquote>\n");
 		if(!node.isNested()) { out.append("\n"); }
-		return null;
 	}
 	
-	@Override
-	public Object visit(List node, Object data) {
+	public void visit(List node) {
 		listSequence.push(0);
 		String tag = node.isOrdered() ? "ol" : "ul";
 		out.append(indent() + "<" + tag + ">\n");
 		level++;
-		super.visit(node, data);
+		node.childrenAccept(this);
 		level--;
 		out.append(indent() + "</" + tag + ">\n");
 		if(!node.isNested()) { out.append("\n"); }
 		listSequence.pop();
-		return null;
 	}
 	
 	@Override
-	public Object visit(ListItem node, Object data) {
+	public void visit(ListItem node) {
 		Integer seq = listSequence.peek() + 1;		
 		listSequence.set(listSequence.size() - 1, listSequence.peek() + 1);
 		out.append(indent() + "<li");
@@ -79,16 +71,14 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 		if(node.children != null) {
 			if(node.children.length > 1 || !(node.children[0] instanceof Paragraph)) { out.append("\n"); }
 			level++;
-			super.visit(node, data);
+			node.childrenAccept(this);
 			level--;
 			if(node.children.length > 1 || !(node.children[0] instanceof Paragraph)) { out.append(indent()); }
 		}
 		out.append("</li>\n");
-		return null;
 	}
 	
-	@Override
-	public Object visit(CodeBlock node, Object data) {
+	public void visit(CodeBlock node) {
 		out.append(indent() + "<pre><code");
 		if(node.getLanguage() != null) {
 			out.append(" class=\"language-" + node.getLanguage() + "\"");
@@ -96,66 +86,51 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 		out.append(">");
 		out.append(escape(node.value.toString()) + "</code></pre>\n");
 		if(!node.isNested()) { out.append("\n"); }
-		return null;
 	}
-		
-	@Override
-	public Object visit(Paragraph node, Object data) {
+
+	public void visit(Paragraph node) {
 		if(node.isNested() && (node.parent instanceof ListItem) && node.isSingleChild()) {
-			super.visit(node, data);
+			node.childrenAccept(this);
 		} else {
 			out.append(indent() + "<p>");
-			super.visit(node, data);
+			node.childrenAccept(this);
 			out.append("</p>\n");
 			if(!node.isNested()) { out.append("\n"); }
 		}
-		return null;
 	}
 		
-	@Override
-	public Object visit(Image node, Object data) {
+	public void visit(Image node) {
 		out.append("<img src=\"" + escapeUrl(node.value.toString()) + "\" alt=\"");
-		super.visit(node, data);
+		node.childrenAccept(this);
 		out.append("\" />");
-		return null;
 	}
 	
-	@Override
-	public Object visit(Link node, Object data) {
+	public void visit(Link node) {
 		out.append("<a href=\"" + escapeUrl(node.value.toString()) + "\">");
-		super.visit(node, data);
+		node.childrenAccept(this);
 		out.append("</a>");
-		return null;
 	}
 	
-	@Override
-	public Object visit(Strong node, Object data) {
+	public void visit(Strong node) {
 		out.append("<strong>");
-		super.visit(node, data);
+		node.childrenAccept(this);
 		out.append("</strong>");
-		return null;
 	}
 	
-	@Override
-	public Object visit(Em node, Object data) {
+	public void visit(Em node) {
 		out.append("<em>");
-		super.visit(node, data);
+		node.childrenAccept(this);
 		out.append("</em>");
-		return null;
 	}
 	
-	@Override
-	public Object visit(Code node, Object data) {
+	public void visit(Code node) {
 		out.append("<code>");
-		super.visit(node, data);
+		node.childrenAccept(this);
 		out.append("</code>");
-		return null;
 	}
 		
-	@Override
-	public Object visit(Text node, Object data) {
+	public void visit(Text node) {
 		out.append(escape(node.value.toString()));
-		return null;
 	}
 	
 	public String escape(String text) {
@@ -165,10 +140,9 @@ public class HtmlRenderer extends KoaraDefaultVisitor {
 				.replaceAll("\"", "&quot;");
 	}
 	
-	@Override
-	public Object visit(LineBreak node, Object data) {
+	public void visit(LineBreak node) {
 		out.append("<br>\n" + indent());
-		return super.visit(node, data);
+		node.childrenAccept(this);
 	}
 	
 	public String escapeUrl(String text) {

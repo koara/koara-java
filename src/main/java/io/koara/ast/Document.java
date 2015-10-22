@@ -1,14 +1,15 @@
 package io.koara.ast;
 
-import io.koara.KoaraVisitor;
 import io.koara.Node;
+import io.koara.renderer.Renderer;
 
 public class Document extends Node {
   
 
-  public Object accept(KoaraVisitor visitor) {
+  public void accept(Renderer renderer) {
 
-    return
-    visitor.visit(this, null);
+     renderer.visit(this);
   }
+
+
 }

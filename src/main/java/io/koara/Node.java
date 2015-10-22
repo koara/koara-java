@@ -1,5 +1,7 @@
 package io.koara;
 
+import io.koara.renderer.Renderer;
+
 public abstract class Node {
 
   public Node parent;
@@ -39,19 +41,15 @@ public abstract class Node {
   public void jjtSetValue(Object value) { this.value = value; }
   public Object jjtGetValue() { return value; }
 
-  public Object jjtAccept(KoaraVisitor visitor, Object data)
-{
-    return visitor.visit(this, data);
-  }
+  public abstract void accept(Renderer renderer);
 
-  public Object childrenAccept(KoaraVisitor visitor, Object data)
+  public void childrenAccept(Renderer renderer)
 {
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
-        children[i].jjtAccept(visitor, data);
+        children[i].accept(renderer);
       }
     }
-    return data;
   }
 
   public String toString() {

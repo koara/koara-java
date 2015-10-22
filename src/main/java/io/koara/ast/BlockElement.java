@@ -2,7 +2,7 @@ package io.koara.ast;
 
 import io.koara.Node;
 
-public class BlockElement extends Node {
+public abstract class BlockElement extends Node {
 
 	public boolean isNested() {
 		return !(parent instanceof Document);
