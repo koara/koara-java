@@ -477,8 +477,7 @@ public class TokenManager {
 				input_stream.backup(1);
 				error_after = curPos <= 1 ? "" : input_stream.getImage();
 			}
-			throw new TokenMgrError(EOFSeen, curLexState, error_line, error_column, error_after, curChar,
-					TokenMgrError.LEXICAL_ERROR);
+			throw new RuntimeException();
 		}
 	}
 
@@ -516,8 +515,7 @@ public class TokenManager {
 
 	public void SwitchTo(int lexState) {
 		if (lexState >= 1 || lexState < 0)
-			throw new TokenMgrError("Error: Ignoring invalid lexical state : " + lexState + ". State unchanged.",
-					TokenMgrError.INVALID_LEXICAL_STATE);
+			throw new RuntimeException();
 		else
 			curLexState = lexState;
 	}

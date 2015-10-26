@@ -1,43 +1,38 @@
 package io.koara;
 
+import java.io.IOException;
 import java.io.Reader;
 
 public class CharStream {
 	
-	private int bufsize;
-	private int available;
+	private int available = 4096;
+	private int bufsize = 4096;
 	private int tokenBegin;
+	private int bufcolumn[] = new int[4096];;
 	private int bufpos = -1;
-	private int bufline[];
-	private int bufcolumn[];
+	private int bufline[] = new int[4096];
 	private int column = 0;
 	private int line = 1;
 	private boolean prevCharIsCR = false;
 	private boolean prevCharIsLF = false;
-	private java.io.Reader inputStream;
-	private char[] buffer;
+	private Reader reader;
+	private char[] buffer = new char[4096];
 	private int maxNextCharInd = 0;
 	private int inBuf = 0;
 	private int tabSize = 4;
 	
-	public CharStream(Reader dstream) {
-		inputStream = dstream;
-		line = 1;
-		column = 1 - 1;
-		available = bufsize = 4096;
-		buffer = new char[4096];
-		bufline = new int[4096];
-		bufcolumn = new int[4096];
+	public CharStream(Reader reader) {
+		this.reader = reader;
 	}
 	
-	public char beginToken() throws java.io.IOException {
+	public char beginToken() throws IOException {
 		tokenBegin = -1;
 		char c = readChar();
 		tokenBegin = bufpos;
 		return c;
 	}
 	
-	protected char readChar() throws java.io.IOException {
+	protected char readChar() throws IOException {
 		if (inBuf > 0) {
 			--inBuf;
 			if (++bufpos == bufsize) {
@@ -53,37 +48,39 @@ public class CharStream {
 		return c;
 	}
 	
-	private void fillBuff() throws java.io.IOException {
+	private void fillBuff() throws IOException {
 		if (maxNextCharInd == available) {
 			if (available == bufsize) {
 				if (tokenBegin > 2048) {
 					bufpos = maxNextCharInd = 0;
 					available = tokenBegin;
-				} else if (tokenBegin < 0)
+				} else if (tokenBegin < 0) {
 					bufpos = maxNextCharInd = 0;
-				else
+				} else {
 					expandBuff(false);
-			} else if (available > tokenBegin)
+				}
+			} else if (available > tokenBegin) {
 				available = bufsize;
-			else if ((tokenBegin - available) < 2048)
+			} else if ((tokenBegin - available) < 2048) {
 				expandBuff(true);
-			else
+			} else {
 				available = tokenBegin;
+			}
 		}
-
 		int i;
 		try {
-			if ((i = inputStream.read(buffer, maxNextCharInd, available - maxNextCharInd)) == -1) {
-				inputStream.close();
-				throw new java.io.IOException();
-			} else
+			if ((i = reader.read(buffer, maxNextCharInd, available - maxNextCharInd)) == -1) {
+				reader.close();
+				throw new IOException();
+			} else {
 				maxNextCharInd += i;
-			return;
-		} catch (java.io.IOException e) {
+			}
+		} catch (IOException e) {
 			--bufpos;
 			backup(0);
-			if (tokenBegin == -1)
+			if (tokenBegin == -1) {
 				tokenBegin = bufpos;
+			}
 			throw e;
 		}
 	}
@@ -145,8 +142,9 @@ public class CharStream {
 			prevCharIsCR = false;
 			if (c == '\n') {
 				prevCharIsLF = true;
-			} else
+			} else {
 				line += (column = 1);
+			}
 		}
 
 		switch (c) {
