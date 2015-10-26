@@ -44,20 +44,16 @@ public class TreeState {
 		n.jjtOpen();
 	}
 
-	protected void closeNodeScope(Node n, boolean condition) {
-		if (condition) {
-			int a = nodeArity();
-			currentMark = marks.remove(marks.size() - 1);
-			while (a-- > 0) {
-				Node c = popNode();
-				c.jjtSetParent(n);
-				n.jjtAddChild(c, a);
-			}
-			n.jjtClose();
-			pushNode(n);
-		} else {
-			currentMark = marks.remove(marks.size() - 1);
+	protected void closeNodeScope(Node n) {
+		int a = nodeArity();
+		currentMark = marks.remove(marks.size() - 1);
+		while (a-- > 0) {
+			Node c = popNode();
+			c.jjtSetParent(n);
+			n.jjtAddChild(c, a);
 		}
+		n.jjtClose();
+		pushNode(n);
 	}
 
 	private int nodeArity() {
