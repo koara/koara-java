@@ -422,9 +422,8 @@ public class Parser {
 	}
 
 	private void orderedListItem() {
-		ListItem jjtn000 = new ListItem();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		ListItem listItem = new ListItem();
+		tree.openNodeScope(listItem);
 		Token t;
 		try {
 			t = consumeToken(DIGITS);
@@ -461,37 +460,15 @@ public class Parser {
 			} else {
 				;
 			}
-			tree.closeNodeScope(jjtn000);
-			jjtc000 = false;
-			jjtn000.setNumber(Integer.valueOf(Integer.valueOf(t.image)));
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
+			listItem.setNumber(Integer.valueOf(Integer.valueOf(t.image)));
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(listItem);
 		}
 	}
 
 	private void fencedCodeBlock() {
-		CodeBlock jjtn000 = new CodeBlock();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		CodeBlock codeBlock = new CodeBlock();
+		tree.openNodeScope(codeBlock);
 		Token t;
 		String language;
 		StringBuilder s = new StringBuilder();
@@ -517,7 +494,7 @@ public class Parser {
 			case BACKTICK:
 			case CHAR_SEQUENCE: {
 				language = codeLanguage();
-				jjtn000.setLanguage(language);
+				codeBlock.setLanguage(language);
 				break;
 			}
 			default:
@@ -676,30 +653,9 @@ public class Parser {
 			} else {
 				;
 			}
-			tree.closeNodeScope(jjtn000);
-			jjtc000 = false;
-			jjtn000.jjtSetValue(s.toString());
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
+			codeBlock.jjtSetValue(s.toString());
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(codeBlock);
 		}
 	}
 
@@ -762,17 +718,12 @@ public class Parser {
 				break label_25;
 			}
 		}
-		{
-			if ("" != null)
-				return s.toString();
-		}
-		throw new Error("Missing return statement in function");
+		return s.toString();
 	}
 
 	private void paragraph() {
-		Paragraph jjtn000 = new Paragraph();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Paragraph paragraph = new Paragraph();
+		tree.openNodeScope(paragraph);
 		try {
 			inline();
 			label_26: while (true) {
@@ -798,27 +749,8 @@ public class Parser {
 				}
 				inline();
 			}
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(paragraph);
 		}
 	}
 
@@ -860,9 +792,8 @@ public class Parser {
 	}
 
 	private void image() {
-		Image jjtn000 = new Image();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Image image = new Image();
+		tree.openNodeScope(image);
 		String ref = "";
 		try {
 			consumeToken(LBRACK);
@@ -900,37 +831,15 @@ public class Parser {
 			} else {
 				;
 			}
-			tree.closeNodeScope(jjtn000);
-			jjtc000 = false;
-			jjtn000.jjtSetValue(ref);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
+			image.jjtSetValue(ref);
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(image);
 		}
 	}
 
 	private void link() {
-		Link jjtn000 = new Link();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Link link = new Link();
+		tree.openNodeScope(link);
 		String ref = "";
 		try {
 			consumeToken(LBRACK);
@@ -974,37 +883,15 @@ public class Parser {
 			} else {
 				;
 			}
-			tree.closeNodeScope(jjtn000);
-			jjtc000 = false;
-			jjtn000.jjtSetValue(ref);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
+			link.jjtSetValue(ref);
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(link);
 		}
 	}
 
 	private void resourceText() {
-		Text jjtn000 = new Text();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Text text = new Text();
+		tree.openNodeScope(text);
 		Token t;
 		StringBuilder s = new StringBuilder();
 		try {
@@ -1105,13 +992,9 @@ public class Parser {
 					break label_31;
 				}
 			}
-			tree.closeNodeScope(jjtn000);
-			jjtc000 = false;
-			jjtn000.jjtSetValue(s.toString());
+			text.jjtSetValue(s.toString());
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(text);
 		}
 	}
 
@@ -1122,20 +1005,14 @@ public class Parser {
 		ref = resourceUrlText();
 		whiteSpace();
 		consumeToken(RPAREN);
-		{
-			if ("" != null)
-				return ref;
-		}
-		throw new Error("Missing return statement in function");
+		return ref;
 	}
 
 	private String resourceUrlText() {
 		Token t;
 		StringBuilder s = new StringBuilder();
 		label_32: while (true) {
-			if (jj_2_33(1)) {
-				;
-			} else {
+			if (!jj_2_33(1)) {
 				break label_32;
 			}
 			switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
@@ -1249,17 +1126,12 @@ public class Parser {
 				}
 			}
 		}
-		{
-			if ("" != null)
-				return s.toString();
-		}
-		throw new Error("Missing return statement in function");
+		return s.toString();
 	}
 
 	private void strongMultiline() {
-		Strong jjtn000 = new Strong();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Strong strong = new Strong();
+		tree.openNodeScope(strong);
 		try {
 			consumeToken(ASTERISK);
 			strongMultilineContent();
@@ -1273,27 +1145,8 @@ public class Parser {
 				strongMultilineContent();
 			}
 			consumeToken(ASTERISK);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(strong);
 		}
 	}
 
@@ -1491,9 +1344,8 @@ public class Parser {
 	}
 
 	private void strong() {
-		Strong jjtn000 = new Strong();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Strong strong = new Strong();
+		tree.openNodeScope(strong);
 		Token t;
 		try {
 			consumeToken(ASTERISK);
@@ -1564,41 +1416,19 @@ public class Parser {
 						throw new RuntimeException();
 					}
 				}
-				if (jj_2_49(1)) {
-					;
-				} else {
+				if (!jj_2_49(1)) {
 					break label_37;
 				}
 			}
 			consumeToken(ASTERISK);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(strong);
 		}
 	}
 
 	private void strongWithinEm() {
-		Strong jjtn000 = new Strong();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Strong strong = new Strong();
+		tree.openNodeScope(strong);
 		Token t;
 		try {
 			consumeToken(ASTERISK);
@@ -1674,34 +1504,14 @@ public class Parser {
 				}
 			}
 			consumeToken(ASTERISK);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(strong);
 		}
 	}
 
 	private void emMultiline() {
-		Em jjtn000 = new Em();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Em em = new Em();
+		tree.openNodeScope(em);
 		try {
 			consumeToken(UNDERSCORE);
 			emMultilineContent();
@@ -1715,27 +1525,8 @@ public class Parser {
 				emMultilineContent();
 			}
 			consumeToken(UNDERSCORE);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(em);
 		}
 	}
 
@@ -1817,9 +1608,8 @@ public class Parser {
 	}
 
 	private void emWithinStrongMultiline() {
-		Em jjtn000 = new Em();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Em em = new Em();
+		tree.openNodeScope(em);
 		try {
 			consumeToken(UNDERSCORE);
 			emWithinStrongMultilineContent();
@@ -1833,27 +1623,8 @@ public class Parser {
 				emWithinStrongMultilineContent();
 			}
 			consumeToken(UNDERSCORE);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(em);
 		}
 	}
 
@@ -1933,9 +1704,8 @@ public class Parser {
 	}
 
 	private void em() {
-		Em jjtn000 = new Em();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Em em = new Em();
+		tree.openNodeScope(em);
 		Token t;
 		try {
 			consumeToken(UNDERSCORE);
@@ -2013,34 +1783,14 @@ public class Parser {
 				}
 			}
 			consumeToken(UNDERSCORE);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(em);
 		}
 	}
 
 	private void emWithinStrong() {
-		Em jjtn000 = new Em();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Em em = new Em();
+		tree.openNodeScope(em);
 		Token t;
 		try {
 			consumeToken(UNDERSCORE);
@@ -2116,34 +1866,14 @@ public class Parser {
 				}
 			}
 			consumeToken(UNDERSCORE);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(em);
 		}
 	}
 
 	private void codeMultiline() {
-		Code jjtn000 = new Code();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Code code = new Code();
+		tree.openNodeScope(code);
 		try {
 			consumeToken(BACKTICK);
 			codeText();
@@ -2171,66 +1901,26 @@ public class Parser {
 				codeText();
 			}
 			consumeToken(BACKTICK);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(code);
 		}
 	}
 
 	private void code() {
-		Code jjtn000 = new Code();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Code code = new Code();
+		tree.openNodeScope(code);
 		try {
 			consumeToken(BACKTICK);
 			codeText();
 			consumeToken(BACKTICK);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(code);
 		}
 	}
 
 	private void codeText() {
-		Text jjtn000 = new Text();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Text text = new Text();
+		tree.openNodeScope(text);
 		Token t;
 		StringBuffer s = new StringBuffer();
 		try {
@@ -2351,20 +2041,15 @@ public class Parser {
 					break label_47;
 				}
 			}
-			tree.closeNodeScope(jjtn000);
-			jjtc000 = false;
-			jjtn000.jjtSetValue(s.toString());
+			text.jjtSetValue(s.toString());
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(text);
 		}
 	}
 
 	private void text() {
-		Text jjtn000 = new Text();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Text text = new Text();
+		tree.openNodeScope(text);
 		Token t;
 		StringBuffer s = new StringBuffer();
 		try {
@@ -2470,20 +2155,15 @@ public class Parser {
 					break label_48;
 				}
 			}
-			tree.closeNodeScope(jjtn000);
-			jjtc000 = false;
-			jjtn000.jjtSetValue(s.toString());
+			text.jjtSetValue(s.toString());
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(text);
 		}
 	}
 
 	private void looseChar() {
-		Text jjtn000 = new Text();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Text text = new Text();
+		tree.openNodeScope(text);
 		Token t;
 		try {
 			switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
@@ -2508,20 +2188,15 @@ public class Parser {
 				consumeToken(-1);
 				throw new RuntimeException();
 			}
-			tree.closeNodeScope(jjtn000);
-			jjtc000 = false;
-			jjtn000.jjtSetValue(t.image);
+			text.jjtSetValue(t.image);
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(text);
 		}
 	}
 
 	private void lineBreak() {
-		LineBreak jjtn000 = new LineBreak();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		LineBreak linebreak = new LineBreak();
+		tree.openNodeScope(linebreak);
 		try {
 			label_49: while (true) {
 				switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
@@ -2551,9 +2226,7 @@ public class Parser {
 			}
 			consumeToken(EOL);
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(linebreak);
 		}
 	}
 
