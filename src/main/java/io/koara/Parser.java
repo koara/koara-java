@@ -45,8 +45,8 @@ import io.koara.ast.Text;
 public class Parser {
 
 	private TreeState tree = new TreeState();
-	private int currentBlockLevel = 0;
-	private int currentQuoteLevel = 0;
+	private int currentBlockLevel;
+	private int currentQuoteLevel;
 	private JJCalls[] jj_2_rtns = new JJCalls[77];
 	private boolean jj_rescan = false;
 	private int jj_gc = 0;
@@ -110,7 +110,6 @@ public class Parser {
 						whiteSpace();
 						switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 						case EOL: {
-							;
 							break;
 						}
 						default:
@@ -123,7 +122,6 @@ public class Parser {
 				label_4: while (true) {
 					switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 					case EOL: {
-						;
 						break;
 					}
 					default:
@@ -133,10 +131,8 @@ public class Parser {
 					consumeToken(EOL);
 				}
 				whiteSpace();
-			} else {
-				;
-			}
-			consumeToken(0);
+			} 
+			consumeToken(EOF);
 		} finally {
 			tree.closeNodeScope(document);
 		}
@@ -187,7 +183,6 @@ public class Parser {
 
 	private void heading() {
 		Heading heading = new Heading();
-		boolean jjtc000 = true;
 		tree.openNodeScope(heading);
 		Token t;
 		int headingLevel = 0;
@@ -197,7 +192,6 @@ public class Parser {
 				headingLevel++;
 				switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 				case EQ: {
-					;
 					break;
 				}
 				default:
@@ -207,9 +201,7 @@ public class Parser {
 			}
 			whiteSpace();
 			label_6: while (true) {
-				if (jj_2_5(1)) {
-					;
-				} else {
+				if (!jj_2_5(1)) {
 					break label_6;
 				}
 				if (jj_2_6(1)) {
@@ -240,7 +232,7 @@ public class Parser {
 					}
 				}
 			}
-			heading.jjtSetValue(headingLevel);
+			heading.setValue(headingLevel);
 		} finally {
 			tree.closeNodeScope(heading);
 		}
@@ -253,9 +245,7 @@ public class Parser {
 		try {
 			consumeToken(GT);
 			label_7: while (true) {
-				if (jj_2_12(2147483647)) {
-					;
-				} else {
+				if (!jj_2_12(2147483647)) {
 					break label_7;
 				}
 				blockquoteEmptyLine();
@@ -264,9 +254,7 @@ public class Parser {
 			if (jj_2_13(1)) {
 				blockElement();
 				label_8: while (true) {
-					if (blockAhead()) {
-						;
-					} else {
+					if (!blockAhead()) {
 						break label_8;
 					}
 					label_9: while (true) {
@@ -275,7 +263,6 @@ public class Parser {
 						blockquotePrefix();
 						switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 						case EOL: {
-							;
 							break;
 						}
 						default:
@@ -285,13 +272,9 @@ public class Parser {
 					}
 					blockElement();
 				}
-			} else {
-				;
 			}
 			label_10: while (true) {
-				if (jj_2_14(2147483647)) {
-					;
-				} else {
+				if (!jj_2_14(2147483647)) {
 					break label_10;
 				}
 				blockquoteEmptyLine();
@@ -307,9 +290,7 @@ public class Parser {
 		label_11: while (true) {
 			consumeToken(GT);
 			whiteSpace();
-			if (++i < currentQuoteLevel) {
-				;
-			} else {
+			if (++i >= currentQuoteLevel) {
 				break label_11;
 			}
 		}
@@ -323,7 +304,6 @@ public class Parser {
 			whiteSpace();
 			switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 			case GT: {
-				;
 				break;
 			}
 			default:
@@ -339,16 +319,13 @@ public class Parser {
 		try {
 			unorderedListItem();
 			label_13: while (true) {
-				if (listItemAhead(false)) {
-					;
-				} else {
+				if (!listItemAhead(false)) {
 					break label_13;
 				}
 				label_14: while (true) {
 					consumeToken(EOL);
 					switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 					case EOL: {
-						;
 						break;
 					}
 					default:
@@ -373,9 +350,7 @@ public class Parser {
 			if (jj_2_15(1)) {
 				blockElement();
 				label_15: while (true) {
-					if (blockAhead()) {
-						;
-					} else {
+					if (!blockAhead()) {
 						break label_15;
 					}
 					label_16: while (true) {
@@ -383,12 +358,9 @@ public class Parser {
 						whiteSpace();
 						if (currentQuoteLevel > 0) {
 							blockquotePrefix();
-						} else {
-							;
 						}
 						switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 						case EOL: {
-							;
 							break;
 						}
 						default:
@@ -417,7 +389,6 @@ public class Parser {
 					consumeToken(EOL);
 					switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 					case EOL: {
-						;
 						break;
 					}
 					default:
@@ -445,9 +416,7 @@ public class Parser {
 			if (jj_2_16(1)) {
 				blockElement();
 				label_19: while (true) {
-					if (blockAhead()) {
-						;
-					} else {
+					if (!blockAhead()) {
 						break label_19;
 					}
 					label_20: while (true) {
@@ -455,12 +424,9 @@ public class Parser {
 						whiteSpace();
 						if (currentQuoteLevel > 0) {
 							blockquotePrefix();
-						} else {
-							;
 						}
 						switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 						case EOL: {
-							;
 							break;
 						}
 						default:
@@ -470,8 +436,6 @@ public class Parser {
 					}
 					blockElement();
 				}
-			} else {
-				;
 			}
 			listItem.setNumber(Integer.valueOf(Integer.valueOf(t.image)));
 		} finally {
@@ -494,7 +458,6 @@ public class Parser {
 				consumeToken(BACKTICK);
 				switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 				case BACKTICK: {
-					;
 					break;
 				}
 				default:
@@ -512,18 +475,13 @@ public class Parser {
 			}
 			default:
 				jj_la1[13] = jj_gen;
-				;
 			}
 			if (getToken(1).kind != EOF && !fencesAhead()) {
 				consumeToken(EOL);
 				levelWhiteSpace(beginColumn);
-			} else {
-				;
 			}
 			label_22: while (true) {
-				if (jj_2_17(1)) {
-					;
-				} else {
+				if (!jj_2_17(1)) {
 					break label_22;
 				}
 				switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
@@ -655,7 +613,6 @@ public class Parser {
 					consumeToken(BACKTICK);
 					switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 					case BACKTICK: {
-						;
 						break;
 					}
 					default:
@@ -663,10 +620,8 @@ public class Parser {
 						break label_23;
 					}
 				}
-			} else {
-				;
 			}
-			codeBlock.jjtSetValue(s.toString());
+			codeBlock.setValue(s.toString());
 		} finally {
 			tree.closeNodeScope(codeBlock);
 		}
@@ -676,9 +631,7 @@ public class Parser {
 		Token t;
 		int currentPos = 1;
 		label_24: while (true) {
-			if ((getToken(1).kind == SPACE || getToken(1).kind == TAB) && currentPos < (threshold - 1)) {
-				;
-			} else {
+			if (!((getToken(1).kind == SPACE || getToken(1).kind == TAB) && currentPos < (threshold - 1))) {
 				break label_24;
 			}
 			switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
@@ -723,7 +676,6 @@ public class Parser {
 			switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 			case BACKTICK:
 			case CHAR_SEQUENCE: {
-				;
 				break;
 			}
 			default:
@@ -740,9 +692,7 @@ public class Parser {
 		try {
 			inline();
 			label_26: while (true) {
-				if (textAhead()) {
-					;
-				} else {
+				if (!textAhead()) {
 					break label_26;
 				}
 				lineBreak();
@@ -750,7 +700,6 @@ public class Parser {
 				label_27: while (true) {
 					switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 					case GT: {
-						;
 						break;
 					}
 					default:
@@ -796,9 +745,7 @@ public class Parser {
 					throw new RuntimeException();
 				}
 			}
-			if (jj_2_21(1)) {
-				;
-			} else {
+			if (!jj_2_21(1)) {
 				break label_28;
 			}
 		}
@@ -831,9 +778,7 @@ public class Parser {
 						throw new RuntimeException();
 					}
 				}
-				if (jj_2_23(1)) {
-					;
-				} else {
+				if (!jj_2_23(1)) {
 					break label_29;
 				}
 			}
@@ -841,10 +786,8 @@ public class Parser {
 			consumeToken(RBRACK);
 			if (jj_2_24(2147483647)) {
 				ref = resourceUrl();
-			} else {
-				;
 			}
-			image.jjtSetValue(ref);
+			image.setValue(ref);
 		} finally {
 			tree.closeNodeScope(image);
 		}
@@ -883,9 +826,7 @@ public class Parser {
 						throw new RuntimeException();
 					}
 				}
-				if (jj_2_30(1)) {
-					;
-				} else {
+				if (!jj_2_30(1)) {
 					break label_30;
 				}
 			}
@@ -893,10 +834,8 @@ public class Parser {
 			consumeToken(RBRACK);
 			if (jj_2_31(2147483647)) {
 				ref = resourceUrl();
-			} else {
-				;
 			}
-			link.jjtSetValue(ref);
+			link.setValue(ref);
 		} finally {
 			tree.closeNodeScope(link);
 		}
@@ -1005,17 +944,16 @@ public class Parser {
 					break label_31;
 				}
 			}
-			text.jjtSetValue(s.toString());
+			text.setValue(s.toString());
 		} finally {
 			tree.closeNodeScope(text);
 		}
 	}
 
 	private String resourceUrl() {
-		String ref = "";
 		consumeToken(LPAREN);
 		whiteSpace();
-		ref = resourceUrlText();
+		String ref = resourceUrlText();
 		whiteSpace();
 		consumeToken(RPAREN);
 		return ref;
@@ -1149,9 +1087,7 @@ public class Parser {
 			consumeToken(ASTERISK);
 			strongMultilineContent();
 			label_33: while (true) {
-				if (textAhead()) {
-					;
-				} else {
+				if (!textAhead()) {
 					break label_33;
 				}
 				lineBreak();
@@ -1186,7 +1122,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn001);
 						jjtc001 = false;
-						jjtn001.jjtSetValue(t.image);
+						jjtn001.setValue(t.image);
 					} finally {
 						if (jjtc001) {
 							tree.closeNodeScope(jjtn001);
@@ -1202,7 +1138,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn002);
 						jjtc002 = false;
-						jjtn002.jjtSetValue(t.image);
+						jjtn002.setValue(t.image);
 					} finally {
 						if (jjtc002) {
 							tree.closeNodeScope(jjtn002);
@@ -1218,7 +1154,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn003);
 						jjtc003 = false;
-						jjtn003.jjtSetValue(t.image);
+						jjtn003.setValue(t.image);
 					} finally {
 						if (jjtc003) {
 							tree.closeNodeScope(jjtn003);
@@ -1232,18 +1168,15 @@ public class Parser {
 					throw new RuntimeException();
 				}
 			}
-			if (jj_2_39(1)) {
-				;
-			} else {
+			if (!jj_2_39(1)) {
 				break label_34;
 			}
 		}
 	}
 
 	private void strongWithinEmMultiline() {
-		Strong jjtn000 = new Strong();
-		boolean jjtc000 = true;
-		tree.openNodeScope(jjtn000);
+		Strong strong = new Strong();
+		tree.openNodeScope(strong);
 		try {
 			consumeToken(ASTERISK);
 			strongWithinEmMultilineContent();
@@ -1257,27 +1190,8 @@ public class Parser {
 				strongWithinEmMultilineContent();
 			}
 			consumeToken(ASTERISK);
-		} catch (Throwable jjte000) {
-			if (jjtc000) {
-				tree.clearNodeScope(jjtn000);
-				jjtc000 = false;
-			} else {
-				tree.popNode();
-			}
-			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
-			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
 		} finally {
-			if (jjtc000) {
-				tree.closeNodeScope(jjtn000);
-			}
+			tree.closeNodeScope(strong);
 		}
 	}
 
@@ -1302,7 +1216,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn001);
 						jjtc001 = false;
-						jjtn001.jjtSetValue(t.image);
+						jjtn001.setValue(t.image);
 					} finally {
 						if (jjtc001) {
 							tree.closeNodeScope(jjtn001);
@@ -1318,7 +1232,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn002);
 						jjtc002 = false;
-						jjtn002.jjtSetValue(t.image);
+						jjtn002.setValue(t.image);
 					} finally {
 						if (jjtc002) {
 							tree.closeNodeScope(jjtn002);
@@ -1334,7 +1248,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn003);
 						jjtc003 = false;
-						jjtn003.jjtSetValue(t.image);
+						jjtn003.setValue(t.image);
 					} finally {
 						if (jjtc003) {
 							tree.closeNodeScope(jjtn003);
@@ -1348,9 +1262,7 @@ public class Parser {
 					throw new RuntimeException();
 				}
 			}
-			if (jj_2_44(1)) {
-				;
-			} else {
+			if (!jj_2_44(1)) {
 				break label_36;
 			}
 		}
@@ -1383,7 +1295,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn001);
 							jjtc001 = false;
-							jjtn001.jjtSetValue(t.image);
+							jjtn001.setValue(t.image);
 						} finally {
 							if (jjtc001) {
 								tree.closeNodeScope(jjtn001);
@@ -1399,7 +1311,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn002);
 							jjtc002 = false;
-							jjtn002.jjtSetValue(t.image);
+							jjtn002.setValue(t.image);
 						} finally {
 							if (jjtc002) {
 								tree.closeNodeScope(jjtn002);
@@ -1415,7 +1327,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn003);
 							jjtc003 = false;
-							jjtn003.jjtSetValue(t.image);
+							jjtn003.setValue(t.image);
 						} finally {
 							if (jjtc003) {
 								tree.closeNodeScope(jjtn003);
@@ -1464,7 +1376,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn001);
 							jjtc001 = false;
-							jjtn001.jjtSetValue(t.image);
+							jjtn001.setValue(t.image);
 						} finally {
 							if (jjtc001) {
 								tree.closeNodeScope(jjtn001);
@@ -1480,7 +1392,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn002);
 							jjtc002 = false;
-							jjtn002.jjtSetValue(t.image);
+							jjtn002.setValue(t.image);
 						} finally {
 							if (jjtc002) {
 								tree.closeNodeScope(jjtn002);
@@ -1496,7 +1408,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn003);
 							jjtc003 = false;
-							jjtn003.jjtSetValue(t.image);
+							jjtn003.setValue(t.image);
 						} finally {
 							if (jjtc003) {
 								tree.closeNodeScope(jjtn003);
@@ -1529,9 +1441,7 @@ public class Parser {
 			consumeToken(UNDERSCORE);
 			emMultilineContent();
 			label_39: while (true) {
-				if (textAhead()) {
-					;
-				} else {
+				if (!textAhead()) {
 					break label_39;
 				}
 				lineBreak();
@@ -1566,7 +1476,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn001);
 						jjtc001 = false;
-						jjtn001.jjtSetValue(t.image);
+						jjtn001.setValue(t.image);
 					} finally {
 						if (jjtc001) {
 							tree.closeNodeScope(jjtn001);
@@ -1582,7 +1492,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn002);
 						jjtc002 = false;
-						jjtn002.jjtSetValue(t.image);
+						jjtn002.setValue(t.image);
 					} finally {
 						if (jjtc002) {
 							tree.closeNodeScope(jjtn002);
@@ -1598,7 +1508,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn003);
 						jjtc003 = false;
-						jjtn003.jjtSetValue(t.image);
+						jjtn003.setValue(t.image);
 					} finally {
 						if (jjtc003) {
 							tree.closeNodeScope(jjtn003);
@@ -1612,9 +1522,7 @@ public class Parser {
 					throw new RuntimeException();
 				}
 			}
-			if (jj_2_59(1)) {
-				;
-			} else {
+			if (!jj_2_59(1)) {
 				break label_40;
 			}
 		}
@@ -1627,9 +1535,7 @@ public class Parser {
 			consumeToken(UNDERSCORE);
 			emWithinStrongMultilineContent();
 			label_41: while (true) {
-				if (textAhead()) {
-					;
-				} else {
+				if (!textAhead()) {
 					break label_41;
 				}
 				lineBreak();
@@ -1662,7 +1568,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn001);
 						jjtc001 = false;
-						jjtn001.jjtSetValue(t.image);
+						jjtn001.setValue(t.image);
 					} finally {
 						if (jjtc001) {
 							tree.closeNodeScope(jjtn001);
@@ -1678,7 +1584,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn002);
 						jjtc002 = false;
-						jjtn002.jjtSetValue(t.image);
+						jjtn002.setValue(t.image);
 					} finally {
 						if (jjtc002) {
 							tree.closeNodeScope(jjtn002);
@@ -1694,7 +1600,7 @@ public class Parser {
 					try {
 						tree.closeNodeScope(jjtn003);
 						jjtc003 = false;
-						jjtn003.jjtSetValue(t.image);
+						jjtn003.setValue(t.image);
 					} finally {
 						if (jjtc003) {
 							tree.closeNodeScope(jjtn003);
@@ -1708,9 +1614,7 @@ public class Parser {
 					throw new RuntimeException();
 				}
 			}
-			if (jj_2_64(1)) {
-				;
-			} else {
+			if (!jj_2_64(1)) {
 				break label_42;
 			}
 		}
@@ -1743,7 +1647,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn001);
 							jjtc001 = false;
-							jjtn001.jjtSetValue(t.image);
+							jjtn001.setValue(t.image);
 						} finally {
 							if (jjtc001) {
 								tree.closeNodeScope(jjtn001);
@@ -1759,7 +1663,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn002);
 							jjtc002 = false;
-							jjtn002.jjtSetValue(t.image);
+							jjtn002.setValue(t.image);
 						} finally {
 							if (jjtc002) {
 								tree.closeNodeScope(jjtn002);
@@ -1775,7 +1679,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn003);
 							jjtc003 = false;
-							jjtn003.jjtSetValue(t.image);
+							jjtn003.setValue(t.image);
 						} finally {
 							if (jjtc003) {
 								tree.closeNodeScope(jjtn003);
@@ -1826,7 +1730,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn001);
 							jjtc001 = false;
-							jjtn001.jjtSetValue(t.image);
+							jjtn001.setValue(t.image);
 						} finally {
 							if (jjtc001) {
 								tree.closeNodeScope(jjtn001);
@@ -1842,7 +1746,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn002);
 							jjtc002 = false;
-							jjtn002.jjtSetValue(t.image);
+							jjtn002.setValue(t.image);
 						} finally {
 							if (jjtc002) {
 								tree.closeNodeScope(jjtn002);
@@ -1858,7 +1762,7 @@ public class Parser {
 						try {
 							tree.closeNodeScope(jjtn003);
 							jjtc003 = false;
-							jjtn003.jjtSetValue(t.image);
+							jjtn003.setValue(t.image);
 						} finally {
 							if (jjtc003) {
 								tree.closeNodeScope(jjtn003);
@@ -1872,9 +1776,7 @@ public class Parser {
 						throw new RuntimeException();
 					}
 				}
-				if (jj_2_75(1)) {
-					;
-				} else {
+				if (!jj_2_75(1)) {
 					break label_44;
 				}
 			}
@@ -1891,9 +1793,7 @@ public class Parser {
 			consumeToken(BACKTICK);
 			codeText();
 			label_45: while (true) {
-				if (textAhead()) {
-					;
-				} else {
+				if (!textAhead()) {
 					break label_45;
 				}
 				lineBreak();
@@ -1901,7 +1801,6 @@ public class Parser {
 				label_46: while (true) {
 					switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 					case GT: {
-						;
 						break;
 					}
 					default:
@@ -2048,13 +1947,11 @@ public class Parser {
 						throw new RuntimeException();
 					}
 				}
-				if (jj_2_76(1)) {
-					;
-				} else {
+				if (!jj_2_76(1)) {
 					break label_47;
 				}
 			}
-			text.jjtSetValue(s.toString());
+			text.setValue(s.toString());
 		} finally {
 			tree.closeNodeScope(text);
 		}
@@ -2166,7 +2063,7 @@ public class Parser {
 					break label_48;
 				}
 			}
-			text.jjtSetValue(s.toString());
+			text.setValue(s.toString());
 		} finally {
 			tree.closeNodeScope(text);
 		}
@@ -2199,7 +2096,7 @@ public class Parser {
 				consumeToken(-1);
 				throw new RuntimeException();
 			}
-			text.jjtSetValue(t.image);
+			text.setValue(t.image);
 		} finally {
 			tree.closeNodeScope(text);
 		}
@@ -2213,7 +2110,6 @@ public class Parser {
 				switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 				case SPACE:
 				case TAB: {
-					;
 					break;
 				}
 				default:
@@ -2246,7 +2142,6 @@ public class Parser {
 			switch ((nextTokenKind == -1) ? getNextTokenKind() : nextTokenKind) {
 			case SPACE:
 			case TAB: {
-				;
 				break;
 			}
 			default:
@@ -3182,30 +3077,25 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_3R_273() {
-		if (scanToken(GT))
-			return true;
-		return jj_3R_228();
-	}
-
 	private boolean jj_3R_259() {
 		Token xsp;
 		xsp = jj_scanpos;
 		if (scanToken(SPACE)) {
 			jj_scanpos = xsp;
-			if (scanToken(TAB))
+			if (scanToken(TAB)) {
 				return true;
+			}
 		}
 		return false;
 	}
 
 	private boolean jj_3R_228() {
 		Token xsp;
-		while (true) {
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3R_259()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -3216,19 +3106,20 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (scanToken(SPACE)) {
 			jj_scanpos = xsp;
-			if (scanToken(TAB))
+			if (scanToken(TAB)) {
 				return true;
+			}
 		}
 		return false;
 	}
 
 	private boolean jj_3R_262() {
 		Token xsp;
-		while (true) {
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3R_267()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return scanToken(EOL);
@@ -3243,8 +3134,9 @@ public class Parser {
 				jj_scanpos = xsp;
 				if (scanToken(LBRACK)) {
 					jj_scanpos = xsp;
-					if (scanToken(UNDERSCORE))
+					if (scanToken(UNDERSCORE)) {
 						return true;
+					}
 				}
 			}
 		}
@@ -3256,8 +3148,9 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (scanToken(SPACE)) {
 			jj_scanpos = xsp;
-			if (scanToken(TAB))
+			if (scanToken(TAB)) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -3317,13 +3210,14 @@ public class Parser {
 
 	private boolean jj_3R_61() {
 		Token xsp;
-		if (jj_3_77())
+		if (jj_3_77()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_77()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -3334,23 +3228,26 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (scanToken(SPACE)) {
 			jj_scanpos = xsp;
-			if (scanToken(TAB))
+			if (scanToken(TAB)) {
 				return true;
+			}
 		}
 		return false;
 	}
 	
 	private boolean jj_3R_272() {
-		if (jj_3R_262())
+		if (jj_3R_262()) {
 			return true;
-		if (jj_3R_228())
+		}
+		if (jj_3R_228()) {
 			return true;
+		}
 		Token xsp;
-		while (true) {
+		loop: while (true) {
 			xsp = jj_scanpos;
-			if (jj_3R_273()) {
+			if (scanToken(GT)) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return jj_3R_236();
@@ -3420,8 +3317,9 @@ public class Parser {
 
 	private boolean jj_3R_236() {
 		Token xsp;
-		if (jj_3_76())
+		if (jj_3_76()) {
 			return true;
+		}
 		while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_76()) {
@@ -3433,20 +3331,25 @@ public class Parser {
 	}
 
 	private boolean jj_3R_66() {
-		if (scanToken(BACKTICK))
+		if (scanToken(BACKTICK)) {
 			return true;
-		if (jj_3R_236())
+		}
+		if (jj_3R_236()) {
 			return true;
-		if (scanToken(BACKTICK))
+		}
+		if (scanToken(BACKTICK)) {
 			return true;
+		}
 		return false;
 	}
 
 	private boolean jj_3R_242() {
-		if (scanToken(BACKTICK))
+		if (scanToken(BACKTICK)) {
 			return true;
-		if (jj_3R_236())
+		}
+		if (jj_3R_236()) {
 			return true;
+		}
 		Token xsp;
 		while (true) {
 			xsp = jj_scanpos;
@@ -3455,17 +3358,17 @@ public class Parser {
 				break;
 			}
 		}
-		if (scanToken(BACKTICK))
+		if (scanToken(BACKTICK)) {
 			return true;
+		}
 		return false;
 	}
 	
 	private boolean jj_3R_249() {
-		if (jj_3R_262())
+		if (jj_3R_262()) {
 			return true;
-		if (jj_3R_248())
-			return true;
-		return false;
+		}
+		return jj_3R_248();
 	}
 
 	private boolean jj_3_75() {
@@ -3495,16 +3398,18 @@ public class Parser {
 	}
 
 	private boolean jj_3R_148() {
-		if (scanToken(UNDERSCORE))
+		if (scanToken(UNDERSCORE)) {
 			return true;
+		}
 		Token xsp;
-		if (jj_3_75())
+		if (jj_3_75()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_75()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return scanToken(UNDERSCORE);
@@ -3540,11 +3445,13 @@ public class Parser {
 	}
 
 	private boolean jj_3R_65() {
-		if (scanToken(UNDERSCORE))
+		if (scanToken(UNDERSCORE)) {
 			return true;
+		}
 		Token xsp;
-		if (jj_3_70())
+		if (jj_3_70()) {
 			return true;
+		}
 		while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_70()) {
@@ -3596,10 +3503,12 @@ public class Parser {
 	}
 
 	private boolean jj_3R_134() {
-		if (scanToken(UNDERSCORE))
+		if (scanToken(UNDERSCORE)) {
 			return true;
-		if (jj_3R_248())
+		}
+		if (jj_3R_248()) {
 			return true;
+		}
 		Token xsp;
 		while (true) {
 			xsp = jj_scanpos;
@@ -3674,11 +3583,13 @@ public class Parser {
 	}
 
 	private boolean jj_3R_176() {
-		if (scanToken(ASTERISK))
+		if (scanToken(ASTERISK)) {
 			return true;
+		}
 		Token xsp;
-		if (jj_3_54())
+		if (jj_3_54()) {
 			return true;
+		}
 		while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_54()) {
@@ -3722,21 +3633,21 @@ public class Parser {
 	}
 	
 	private boolean jj_3R_64() {
-		if (scanToken(ASTERISK))
+		if (scanToken(ASTERISK)) {
 			return true;
+		}
 		Token xsp;
-		if (jj_3_49())
+		if (jj_3_49()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_49()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
-		if (scanToken(ASTERISK))
-			return true;
-		return false;
+		return scanToken(ASTERISK);
 	}
 
 	private boolean jj_3_44() {
@@ -3767,29 +3678,32 @@ public class Parser {
 
 	private boolean jj_3R_250() {
 		Token xsp;
-		if (jj_3_44())
+		if (jj_3_44()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_44()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
 	}
 
 	private boolean jj_3R_162() {
-		if (scanToken(ASTERISK))
+		if (scanToken(ASTERISK)) {
 			return true;
-		if (jj_3R_250())
+		}
+		if (jj_3R_250()) {
 			return true;
+		}
 		Token xsp;
-		while (true) {
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3R_251()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return scanToken(ASTERISK);
@@ -3812,8 +3726,9 @@ public class Parser {
 								jj_scanpos = xsp;
 								if (scanToken(LBRACK)) {
 									jj_scanpos = xsp;
-									if (scanToken(UNDERSCORE))
+									if (scanToken(UNDERSCORE)) {
 										return true;
+									}
 								}
 							}
 						}
@@ -3829,8 +3744,9 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (scanToken(SPACE)) {
 			jj_scanpos = xsp;
-			if (scanToken(TAB))
+			if (scanToken(TAB)) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -3875,8 +3791,9 @@ public class Parser {
 																			jj_lookingAhead = true;
 																			jj_semLA = !nextAfterSpace(RPAREN);
 																			jj_lookingAhead = false;
-																			if (!jj_semLA || jj_3R_133())
+																			if (!jj_semLA || jj_3R_133()) {
 																				return true;
+																			}
 																		}
 																	}
 																}
@@ -3902,36 +3819,39 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (jj_3R_94()) {
 			jj_scanpos = xsp;
-			if (jj_3R_233())
+			if (jj_3R_233()) {
 				return true;
+			}
 		}
 		return false;
 	}
 	
 	private boolean jj_3R_243() {
 		Token xsp;
-		while (true) {
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_33()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
 	}
 
 	private boolean jj_3R_96() {
-		if (scanToken(LPAREN))
+		if (scanToken(LPAREN)) {
 			return true;
-		if (jj_3R_228())
+		}
+		if (jj_3R_228()) {
 			return true;
-		if (jj_3R_243())
+		}
+		if (jj_3R_243()) {
 			return true;
-		if (jj_3R_228())
+		}
+		if (jj_3R_228()) {
 			return true;
-		if (scanToken(RPAREN))
-			return true;
-		return false;
+		}
+		return scanToken(RPAREN);
 	}
 
 	private boolean jj_3R_115() {
@@ -3939,8 +3859,9 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (scanToken(SPACE)) {
 			jj_scanpos = xsp;
-			if (scanToken(TAB))
+			if (scanToken(TAB)) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -4020,69 +3941,84 @@ public class Parser {
 
 	private boolean jj_3R_94() {
 		Token xsp;
-		if (jj_3_32())
+		if (jj_3_32()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_32()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
 	}
 
 	private boolean jj_3R_63() {
-		if (scanToken(LBRACK))
+		if (scanToken(LBRACK)) {
 			return true;
-		if (jj_3R_228())
+		}
+		if (jj_3R_228()) {
 			return true;
+		}
 		Token xsp;
-		if (jj_3_30())
+		if (jj_3_30()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_30()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
-		if (jj_3R_228())
+		if (jj_3R_228()) {
 			return true;
-		if (scanToken(RBRACK))
+		}
+		if (scanToken(RBRACK)) {
 			return true;
+		}
 		xsp = jj_scanpos;
-		if (jj_3R_96())
+		if (jj_3R_96()) {
 			jj_scanpos = xsp;
+		}
 		return false;
 	}
 
 	private boolean jj_3R_62() {
-		if (scanToken(LBRACK))
+		if (scanToken(LBRACK)) {
 			return true;
-		if (jj_3R_228())
+		}
+		if (jj_3R_228()) {
 			return true;
-		if (scanToken(IMAGE_LABEL))
+		}
+		if (scanToken(IMAGE_LABEL)) {
 			return true;
-		if (jj_3R_228())
+		}
+		if (jj_3R_228()) {
 			return true;
+		}
 		Token xsp;
-		if (jj_3_23())
+		if (jj_3_23()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_23()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
-		if (jj_3R_228())
+		if (jj_3R_228()) {
 			return true;
-		if (scanToken(RBRACK))
+		}
+		if (scanToken(RBRACK)) {
 			return true;
+		}
 		xsp = jj_scanpos;
-		if (jj_3R_96())
+		if (jj_3R_96()) {
 			jj_scanpos = xsp;
+		}
 		return false;
 	}
 
@@ -4123,13 +4059,14 @@ public class Parser {
 	
 	private boolean jj_3R_232() {
 		Token xsp;
-		if (jj_3_21())
+		if (jj_3_21()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_21()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -4140,21 +4077,23 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (scanToken(CHAR_SEQUENCE)) {
 			jj_scanpos = xsp;
-			if (scanToken(BACKTICK))
+			if (scanToken(BACKTICK)) {
 				return true;
+			}
 		}
 		return false;
 	}
 
 	private boolean jj_3R_260() {
 		Token xsp;
-		if (jj_3R_265())
+		if (jj_3R_265()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3R_265()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -4172,19 +4111,20 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (scanToken(SPACE)) {
 			jj_scanpos = xsp;
-			if (scanToken(TAB))
+			if (scanToken(TAB)) {
 				return true;
+			}
 		}
 		return false;
 	}
 
 	private boolean jj_3R_261() {
 		Token xsp;
-		while (true) {
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3R_266()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -4195,24 +4135,30 @@ public class Parser {
 		xsp = jj_scanpos;
 		if (scanToken(SPACE)) {
 			jj_scanpos = xsp;
-			if (scanToken(TAB))
+			if (scanToken(TAB)) {
 				return true;
+			}
 		}
 		return false;
 	}
 
 	private boolean jj_3R_231() {
-		if (scanToken(EOL))
+		if (scanToken(EOL)) {
 			return true;
-		if (jj_3R_228())
+		}
+		if (jj_3R_228()) {
 			return true;
-		if (scanToken(BACKTICK))
+		}
+		if (scanToken(BACKTICK)) {
 			return true;
-		if (scanToken(BACKTICK))
+		}
+		if (scanToken(BACKTICK)) {
 			return true;
+		}
 		Token xsp;
-		if (scanToken(BACKTICK))
+		if (scanToken(BACKTICK)) {
 			return true;
+		}
 		while (true) {
 			xsp = jj_scanpos;
 			if (scanToken(BACKTICK)) {
@@ -4302,13 +4248,16 @@ public class Parser {
 	}
 
 	private boolean jj_3R_53() {
-		if (scanToken(BACKTICK))
+		if (scanToken(BACKTICK)) {
 			return true;
-		if (scanToken(BACKTICK))
+		}
+		if (scanToken(BACKTICK)) {
 			return true;
+		}
 		Token xsp;
-		if (scanToken(BACKTICK))
+		if (scanToken(BACKTICK)) {
 			return true;
+		}
 		while (true) {
 			xsp = jj_scanpos;
 			if (scanToken(BACKTICK)) {
@@ -4316,14 +4265,17 @@ public class Parser {
 				break;
 			}
 		}
-		if (jj_3R_228())
+		if (jj_3R_228()) {
 			return true;
+		}
 		xsp = jj_scanpos;
-		if (jj_3R_260())
+		if (jj_3R_260()) {
 			jj_scanpos = xsp;
+		}
 		xsp = jj_scanpos;
-		if (jj_3R_230())
+		if (jj_3R_230()) {
 			jj_scanpos = xsp;
+		}
 		while (true) {
 			xsp = jj_scanpos;
 			if (jj_3_17()) {
@@ -4338,42 +4290,42 @@ public class Parser {
 	}
 
 	private boolean jj_3R_237() {
-		if (scanToken(GT))
+		if (scanToken(GT)) {
 			return true;
-		if (jj_3R_228())
-			return true;
-		return false;
+		}
+		return jj_3R_228();
 	}
 
 	private boolean jj_3R_227() {
-		if (scanToken(DIGITS))
+		if (scanToken(DIGITS)) {
 			return true;
-		if (scanToken(DOT))
-			return true;
-		return false;
+		}
+		return scanToken(DOT);
 	}
 
 	private boolean jj_3_14() {
-		if (jj_3R_67())
+		if (jj_3R_67()) {
 			return true;
-		if (scanToken(EOL))
-			return true;
-		return false;
+		}
+		return scanToken(EOL);
 	}
 
 	private boolean jj_3R_67() {
-		if (scanToken(EOL))
+		if (scanToken(EOL)) {
 			return true;
-		if (jj_3R_228())
+		}
+		if (jj_3R_228()) {
 			return true;
+		}
 		Token xsp;
-		if (jj_3R_237())
+		if (jj_3R_237()) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (jj_3R_237()) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -4408,13 +4360,14 @@ public class Parser {
 
 	private boolean jj_3R_256() {
 		Token xsp;
-		if (scanToken(EQ))
+		if (scanToken(EQ)) {
 			return true;
-		while (true) {
+		}
+		loop: while (true) {
 			xsp = jj_scanpos;
 			if (scanToken(EQ)) {
 				jj_scanpos = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -4449,10 +4402,11 @@ public class Parser {
 
 	private Token consumeToken(int kind) {
 		Token oldToken;
-		if ((oldToken = token).next != null)
+		if ((oldToken = token).next != null) {
 			token = token.next;
-		else
+		} else {
 			token = token.next = tm.getNextToken();
+		}
 		nextTokenKind = -1;
 		if (token.kind == kind) {
 			jj_gen++;
@@ -4491,23 +4445,27 @@ public class Parser {
 				i++;
 				tok = tok.next;
 			}
-			if (tok != null)
+			if (tok != null) {
 				jj_add_error_token(kind, i);
+			}
 		}
-		if (jj_scanpos.kind != kind)
+		if (jj_scanpos.kind != kind) {
 			return true;
-		if (jj_la == 0 && jj_scanpos == jj_lastpos)
+		}
+		if (jj_la == 0 && jj_scanpos == jj_lastpos) {
 			throw jj_ls;
+		}
 		return false;
 	}
 
 	private Token getToken(int index) {
 		Token t = jj_lookingAhead ? jj_scanpos : token;
 		for (int i = 0; i < index; i++) {
-			if (t.next != null)
+			if (t.next != null) {
 				t = t.next;
-			else
+			} else {
 				t = t.next = tm.getNextToken();
+			}
 		}
 		return t;
 	}
@@ -4520,8 +4478,9 @@ public class Parser {
 	}
 
 	private void jj_add_error_token(int kind, int pos) {
-		if (pos >= 100)
+		if (pos >= 100) {
 			return;
+		}
 		if (pos == jj_endpos + 1) {
 			jj_lasttokens[jj_endpos++] = kind;
 		} else if (jj_endpos != 0) {
@@ -4529,20 +4488,21 @@ public class Parser {
 			for (int i = 0; i < jj_endpos; i++) {
 				jj_expentry[i] = jj_lasttokens[i];
 			}
-			jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {
+			loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {
 				int[] oldentry = (int[]) (it.next());
 				if (oldentry.length == jj_expentry.length) {
 					for (int i = 0; i < jj_expentry.length; i++) {
 						if (oldentry[i] != jj_expentry[i]) {
-							continue jj_entries_loop;
+							continue loop;
 						}
 					}
 					jj_expentries.add(jj_expentry);
-					break jj_entries_loop;
+					break loop;
 				}
 			}
-			if (pos != 0)
+			if (pos != 0) {
 				jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+			}
 		}
 	}
 

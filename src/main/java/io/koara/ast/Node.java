@@ -42,7 +42,7 @@ public abstract class Node {
 		return (children == null) ? 0 : children.length;
 	}
 
-	public void jjtSetValue(Object value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 
