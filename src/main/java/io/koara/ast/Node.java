@@ -4,26 +4,11 @@ import io.koara.renderer.Renderer;
 
 public abstract class Node {
 
-	public Node parent;
-	public Node[] children;
-	protected int id;
-	public Object value;
+	private Node parent;
+	private Node[] children;
+	private Object value;
 
-	public void jjtOpen() {
-	}
-
-	public void jjtClose() {
-	}
-
-	public void jjtSetParent(Node n) {
-		parent = n;
-	}
-
-	public Node jjtGetParent() {
-		return parent;
-	}
-
-	public void jjtAddChild(Node n, int i) {
+	public void addChild(Node n, int i) {
 		if (children == null) {
 			children = new Node[i + 1];
 		} else if (i >= children.length) {
@@ -34,24 +19,6 @@ public abstract class Node {
 		children[i] = n;
 	}
 
-	public Node jjtGetChild(int i) {
-		return children[i];
-	}
-
-	public int jjtGetNumChildren() {
-		return (children == null) ? 0 : children.length;
-	}
-
-	public void setValue(Object value) {
-		this.value = value;
-	}
-
-	public Object jjtGetValue() {
-		return value;
-	}
-
-	public abstract void accept(Renderer renderer);
-
 	public void childrenAccept(Renderer renderer) {
 		if (children != null) {
 			for (int i = 0; i < children.length; ++i) {
@@ -59,24 +26,31 @@ public abstract class Node {
 			}
 		}
 	}
+	
+	public abstract void accept(Renderer renderer);
 
-	public String toString(String prefix) {
-		return prefix + toString();
+	public Node[] getChildren() {
+		return children;
+	}
+	
+	public void setChildren(Node[] children) {
+		this.children = children;
+	}
+	
+	public Node getParent() {
+		return parent;
+	}
+	
+	public void setParent(Node parent) {
+		this.parent = parent;
 	}
 
-	public void dump(String prefix) {
-		System.out.println(toString(prefix));
-		if (children != null) {
-			for (int i = 0; i < children.length; ++i) {
-				Node n = (Node) children[i];
-				if (n != null) {
-					n.dump(prefix + " ");
-				}
-			}
-		}
+	public Object getValue() {
+		return value;
 	}
-
-	public int getId() {
-		return id;
+	
+	public void setValue(Object value) {
+		this.value = value;
 	}
+	
 }

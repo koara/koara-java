@@ -29,15 +29,15 @@ public class HtmlRenderer implements Renderer {
 	}
 	
 	public void visit(Heading node) {
-		out.append(indent() + "<h" + node.value + ">");
+		out.append(indent() + "<h" + node.getValue() + ">");
 		node.childrenAccept(this);
-		out.append("</h" + node.value + ">\n");
+		out.append("</h" + node.getValue() + ">\n");
 		if(!node.isNested()) { out.append("\n"); }
 	}
 	
 	public void visit(Blockquote node) {
 		out.append(indent() + "<blockquote>");
-		if(node.children != null && node.children.length > 0) { out.append("\n"); }
+		if(node.getChildren() != null && node.getChildren().length > 0) { out.append("\n"); }
 		level++;
 		node.childrenAccept(this);
 		level--;
@@ -67,12 +67,12 @@ public class HtmlRenderer implements Renderer {
 			listSequence.set(listSequence.size() - 1, node.getNumber());
 		}
 		out.append(">");
-		if(node.children != null) {
-			if(node.children.length > 1 || !(node.children[0] instanceof Paragraph)) { out.append("\n"); }
+		if(node.getChildren() != null) {
+			if(node.getChildren().length > 1 || !(node.getChildren()[0] instanceof Paragraph)) { out.append("\n"); }
 			level++;
 			node.childrenAccept(this);
 			level--;
-			if(node.children.length > 1 || !(node.children[0] instanceof Paragraph)) { out.append(indent()); }
+			if(node.getChildren().length > 1 || !(node.getChildren()[0] instanceof Paragraph)) { out.append(indent()); }
 		}
 		out.append("</li>\n");
 	}
@@ -83,12 +83,12 @@ public class HtmlRenderer implements Renderer {
 			out.append(" class=\"language-" + node.getLanguage() + "\"");
 		}
 		out.append(">");
-		out.append(escape(node.value.toString()) + "</code></pre>\n");
+		out.append(escape(node.getValue().toString()) + "</code></pre>\n");
 		if(!node.isNested()) { out.append("\n"); }
 	}
 
 	public void visit(Paragraph node) {
-		if(node.isNested() && (node.parent instanceof ListItem) && node.isSingleChild()) {
+		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
 			node.childrenAccept(this);
 		} else {
 			out.append(indent() + "<p>");
@@ -99,13 +99,13 @@ public class HtmlRenderer implements Renderer {
 	}
 		
 	public void visit(Image node) {
-		out.append("<img src=\"" + escapeUrl(node.value.toString()) + "\" alt=\"");
+		out.append("<img src=\"" + escapeUrl(node.getValue().toString()) + "\" alt=\"");
 		node.childrenAccept(this);
 		out.append("\" />");
 	}
 	
 	public void visit(Link node) {
-		out.append("<a href=\"" + escapeUrl(node.value.toString()) + "\">");
+		out.append("<a href=\"" + escapeUrl(node.getValue().toString()) + "\">");
 		node.childrenAccept(this);
 		out.append("</a>");
 	}
@@ -129,7 +129,7 @@ public class HtmlRenderer implements Renderer {
 	}
 		
 	public void visit(Text node) {
-		out.append(escape(node.value.toString()));
+		out.append(escape(node.getValue().toString()));
 	}
 	
 	public String escape(String text) {

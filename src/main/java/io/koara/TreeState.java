@@ -19,45 +19,37 @@ public class TreeState {
 		currentMark = 0;
 	}
 
-	private void pushNode(Node n) {
-		nodes.add(n);
-		++nodesOnStack;
-	}
-
-	protected Node popNode() {
-		if (--nodesOnStack < currentMark) {
-			currentMark = marks.remove(marks.size() - 1);
-		}
-		return nodes.remove(nodes.size() - 1);
-	}
-
-	protected void clearNodeScope(Node n) {
-		while (nodesOnStack > currentMark) {
-			popNode();
-		}
-		currentMark = marks.remove(marks.size() - 1);
-	}
-
-	protected void openNodeScope(Node n) {
+	public void openScope(Node n) {
 		marks.add(currentMark);
 		currentMark = nodesOnStack;
-		n.jjtOpen();
 	}
 
-	protected void closeNodeScope(Node n) {
+	public void closeScope(Node n) {
 		int a = nodeArity();
 		currentMark = marks.remove(marks.size() - 1);
 		while (a-- > 0) {
 			Node c = popNode();
-			c.jjtSetParent(n);
-			n.jjtAddChild(c, a);
+			c.setParent(n);
+			n.addChild(c, a);
 		}
-		n.jjtClose();
 		pushNode(n);
 	}
 
 	private int nodeArity() {
 		return nodesOnStack - currentMark;
 	}
+	
+	private Node popNode() {
+		if (--nodesOnStack < currentMark) {
+			currentMark = marks.remove(marks.size() - 1);
+		}
+		return nodes.remove(nodes.size() - 1);
+	}
+	
+	private void pushNode(Node n) {
+		nodes.add(n);
+		++nodesOnStack;
+	}
+
 	
 }
