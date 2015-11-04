@@ -48,26 +48,17 @@ import io.koara.ast.Text;
 
 public class Parser {
 
-	
 	private CharStream cs;
-	private TreeState tree = new TreeState();
+	private Token token, nextToken, scanPosition, lastPosition;
 	private TokenManager tm;
+	private TreeState tree = new TreeState();
 	private int currentBlockLevel;
 	private int currentQuoteLevel;
-	
-	
-	
-	private Token token;
-	
-	
-	private Token jj_nt;
 	private int nextTokenKind;
-	private Token scanPosition, jj_lastpos;
-	private int jjLookAhead;
+	private int lookAhead;
 	private boolean lookingAhead = false;
-	private boolean jj_semLA;
-	private int jjGen;
-	private int[] jjLookaheadArray = new int[46];
+	private boolean semanticLookAhead;
+
 	private java.util.List<int[]> jj_expentries = new ArrayList<int[]>();
 	private int[] jj_expentry;
 	private int[] jj_lasttokens = new int[100];
@@ -87,7 +78,7 @@ public class Parser {
 		tm = new TokenManager(cs);
 		token = new Token();
 		nextTokenKind = -1;
-		jjGen = 0;
+		//jjGen = 0;
 		return document();
 	}
 	
@@ -130,8 +121,8 @@ public class Parser {
 	}
 	
 	private boolean hasAnyBlockElementsAhead() {
-		jjLookAhead = 1;
-		jj_lastpos = scanPosition = token;
+		lookAhead = 1;
+		lastPosition = scanPosition = token;
 		try {
 			return !scanForBlockElement();
 		} catch (LookaheadSuccess ls) {
@@ -157,7 +148,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[3] = jjGen;
+				//jjLookaheadArray[3] = jjGen;
 				if (jj_2_2(2)) {
 					orderedList();
 				} else if (jj_2_3(2147483647)) {
@@ -185,7 +176,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[4] = jjGen;
+					//jjLookaheadArray[4] = jjGen;
 					break equalsChars;
 				}
 			}
@@ -216,7 +207,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[5] = jjGen;
+						//jjLookaheadArray[5] = jjGen;
 						consumeToken(-1);
 						throw new RuntimeException();
 					}
@@ -256,7 +247,7 @@ public class Parser {
 							break;
 						}
 						default:
-							jjLookaheadArray[6] = jjGen;
+							//jjLookaheadArray[6] = jjGen;
 							break label_9;
 						}
 					}
@@ -297,7 +288,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[7] = jjGen;
+				//jjLookaheadArray[7] = jjGen;
 				break loop;
 			}
 		}
@@ -319,7 +310,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[8] = jjGen;
+						//jjLookaheadArray[8] = jjGen;
 						break label_14;
 					}
 				}
@@ -354,7 +345,7 @@ public class Parser {
 							break;
 						}
 						default:
-							jjLookaheadArray[9] = jjGen;
+							//jjLookaheadArray[9] = jjGen;
 							break label_16;
 						}
 					}
@@ -382,7 +373,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[10] = jjGen;
+						//jjLookaheadArray[10] = jjGen;
 						break label_18;
 					}
 				}
@@ -420,7 +411,7 @@ public class Parser {
 							break;
 						}
 						default:
-							jjLookaheadArray[11] = jjGen;
+							//jjLookaheadArray[11] = jjGen;
 							break label_20;
 						}
 					}
@@ -451,7 +442,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[12] = jjGen;
+					//jjLookaheadArray[12] = jjGen;
 					break label_21;
 				}
 			}
@@ -464,7 +455,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[13] = jjGen;
+				//jjLookaheadArray[13] = jjGen;
 			}
 			if (getToken(1).kind != EOF && !fencesAhead()) {
 				consumeToken(EOL);
@@ -566,7 +557,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[15] = jjGen;
+					//jjLookaheadArray[15] = jjGen;
 					if (!nextAfterSpace(EOL, EOF)) {
 						switch (getNextTokenKind()) {
 						case SPACE: {
@@ -580,7 +571,7 @@ public class Parser {
 							break;
 						}
 						default:
-							jjLookaheadArray[14] = jjGen;
+							//jjLookaheadArray[14] = jjGen;
 							consumeToken(-1);
 							throw new RuntimeException();
 						}
@@ -606,7 +597,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[16] = jjGen;
+						//jjLookaheadArray[16] = jjGen;
 						break label_23;
 					}
 				}
@@ -636,7 +627,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[17] = jjGen;
+				//jjLookaheadArray[17] = jjGen;
 				consumeToken(-1);
 				throw new RuntimeException();
 			}
@@ -659,7 +650,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[18] = jjGen;
+				//jjLookaheadArray[18] = jjGen;
 				consumeToken(-1);
 				throw new RuntimeException();
 			}
@@ -669,7 +660,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[19] = jjGen;
+				//jjLookaheadArray[19] = jjGen;
 				break label_25;
 			}
 		}
@@ -693,7 +684,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[20] = jjGen;
+						//jjLookaheadArray[20] = jjGen;
 						break label_27;
 					}
 					consumeToken(GT);
@@ -730,7 +721,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[21] = jjGen;
+					//jjLookaheadArray[21] = jjGen;
 					consumeToken(-1);
 					throw new RuntimeException();
 				}
@@ -763,7 +754,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[22] = jjGen;
+						//jjLookaheadArray[22] = jjGen;
 						consumeToken(-1);
 						throw new RuntimeException();
 					}
@@ -811,7 +802,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[23] = jjGen;
+						//jjLookaheadArray[23] = jjGen;
 						consumeToken(-1);
 						throw new RuntimeException();
 					}
@@ -905,7 +896,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[25] = jjGen;
+					//jjLookaheadArray[25] = jjGen;
 					if (!nextAfterSpace(RBRACK)) {
 						switch (getNextTokenKind()) {
 						case SPACE: {
@@ -919,7 +910,7 @@ public class Parser {
 							break;
 						}
 						default:
-							jjLookaheadArray[24] = jjGen;
+							//jjLookaheadArray[24] = jjGen;
 							consumeToken(-1);
 							throw new RuntimeException();
 						}
@@ -1043,7 +1034,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[27] = jjGen;
+				//jjLookaheadArray[27] = jjGen;
 				if (!nextAfterSpace(RPAREN)) {
 					switch (getNextTokenKind()) {
 					case SPACE: {
@@ -1057,7 +1048,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[26] = jjGen;
+						//jjLookaheadArray[26] = jjGen;
 						consumeToken(-1);
 						throw new RuntimeException();
 					}
@@ -1153,7 +1144,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[28] = jjGen;
+					//jjLookaheadArray[28] = jjGen;
 					consumeToken(-1);
 					throw new RuntimeException();
 				}
@@ -1247,7 +1238,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[29] = jjGen;
+					//jjLookaheadArray[29] = jjGen;
 					consumeToken(-1);
 					throw new RuntimeException();
 				}
@@ -1326,7 +1317,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[30] = jjGen;
+						//jjLookaheadArray[30] = jjGen;
 						consumeToken(-1);
 						throw new RuntimeException();
 					}
@@ -1407,7 +1398,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[31] = jjGen;
+						//jjLookaheadArray[31] = jjGen;
 						consumeToken(-1);
 						throw new RuntimeException();
 					}
@@ -1507,7 +1498,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[32] = jjGen;
+					//jjLookaheadArray[32] = jjGen;
 					consumeToken(-1);
 					throw new RuntimeException();
 				}
@@ -1599,7 +1590,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[33] = jjGen;
+					//jjLookaheadArray[33] = jjGen;
 					consumeToken(-1);
 					throw new RuntimeException();
 				}
@@ -1678,7 +1669,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[34] = jjGen;
+						//jjLookaheadArray[34] = jjGen;
 						consumeToken(-1);
 						throw new RuntimeException();
 					}
@@ -1761,7 +1752,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[35] = jjGen;
+						//jjLookaheadArray[35] = jjGen;
 						consumeToken(-1);
 						throw new RuntimeException();
 					}
@@ -1794,7 +1785,7 @@ public class Parser {
 						break;
 					}
 					default:
-						jjLookaheadArray[36] = jjGen;
+						//jjLookaheadArray[36] = jjGen;
 						break label_46;
 					}
 					consumeToken(GT);
@@ -1914,7 +1905,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[38] = jjGen;
+					//jjLookaheadArray[38] = jjGen;
 					if (!nextAfterSpace(EOL, EOF)) {
 						switch (getNextTokenKind()) {
 						case SPACE: {
@@ -1928,7 +1919,7 @@ public class Parser {
 							break;
 						}
 						default:
-							jjLookaheadArray[37] = jjGen;
+							//jjLookaheadArray[37] = jjGen;
 							consumeToken(-1);
 							throw new RuntimeException();
 						}
@@ -2026,7 +2017,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[40] = jjGen;
+					//jjLookaheadArray[40] = jjGen;
 					if (!nextAfterSpace(EOL, EOF)) {
 						switch (getNextTokenKind()) {
 						case SPACE: {
@@ -2040,7 +2031,7 @@ public class Parser {
 							break;
 						}
 						default:
-							jjLookaheadArray[39] = jjGen;
+							//jjLookaheadArray[39] = jjGen;
 							consumeToken(-1);
 							throw new RuntimeException();
 						}
@@ -2082,7 +2073,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[41] = jjGen;
+				//jjLookaheadArray[41] = jjGen;
 				consumeToken(-1);
 				throw new RuntimeException();
 			}
@@ -2103,7 +2094,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[42] = jjGen;
+					//jjLookaheadArray[42] = jjGen;
 					break label_49;
 				}
 				switch (getNextTokenKind()) {
@@ -2116,7 +2107,7 @@ public class Parser {
 					break;
 				}
 				default:
-					jjLookaheadArray[43] = jjGen;
+					//jjLookaheadArray[43] = jjGen;
 					consumeToken(-1);
 					throw new RuntimeException();
 				}
@@ -2135,7 +2126,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[44] = jjGen;
+				//jjLookaheadArray[44] = jjGen;
 				break label_50;
 			}
 			switch (getNextTokenKind()) {
@@ -2148,7 +2139,7 @@ public class Parser {
 				break;
 			}
 			default:
-				jjLookaheadArray[45] = jjGen;
+				//jjLookaheadArray[45] = jjGen;
 				consumeToken(-1);
 				throw new RuntimeException();
 			}
@@ -2156,8 +2147,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_2(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_227();
 		} catch (LookaheadSuccess ls) {
@@ -2168,8 +2159,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_3(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_53();
 		} catch (LookaheadSuccess ls) {
@@ -2180,8 +2171,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_4(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_232();
 		} catch (LookaheadSuccess ls) {
@@ -2192,8 +2183,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_5(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_5();
 		} catch (LookaheadSuccess ls) {
@@ -2204,8 +2195,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_6(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2216,8 +2207,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_7(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2228,8 +2219,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_8(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2240,8 +2231,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_9(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_64();
 		} catch (LookaheadSuccess ls) {
@@ -2252,8 +2243,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_10(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_65();
 		} catch (LookaheadSuccess ls) {
@@ -2264,8 +2255,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_11(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
@@ -2276,8 +2267,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_12(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_67();
 		} catch (LookaheadSuccess ls) {
@@ -2288,8 +2279,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_13(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !scanForBlockElement();
 		} catch (LookaheadSuccess ls) {
@@ -2300,8 +2291,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_14(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_14();
 		} catch (LookaheadSuccess ls) {
@@ -2312,8 +2303,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_15(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !scanForBlockElement();
 		} catch (LookaheadSuccess ls) {
@@ -2324,8 +2315,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_16(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !scanForBlockElement();
 		} catch (LookaheadSuccess ls) {
@@ -2336,8 +2327,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_17(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_17();
 		} catch (LookaheadSuccess ls) {
@@ -2348,8 +2339,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_18(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2360,8 +2351,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_19(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2372,8 +2363,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_20(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2384,8 +2375,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_21(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_21();
 		} catch (LookaheadSuccess ls) {
@@ -2396,8 +2387,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_22(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_94();
 		} catch (LookaheadSuccess ls) {
@@ -2408,8 +2399,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_23(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_23();
 		} catch (LookaheadSuccess ls) {
@@ -2420,8 +2411,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_24(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_96();
 		} catch (LookaheadSuccess ls) {
@@ -2432,8 +2423,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_25(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2444,8 +2435,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_26(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_64();
 		} catch (LookaheadSuccess ls) {
@@ -2456,8 +2447,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_27(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_65();
 		} catch (LookaheadSuccess ls) {
@@ -2468,8 +2459,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_28(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
@@ -2480,8 +2471,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_29(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_94();
 		} catch (LookaheadSuccess ls) {
@@ -2492,8 +2483,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_30(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_30();
 		} catch (LookaheadSuccess ls) {
@@ -2504,8 +2495,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_31(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_96();
 		} catch (LookaheadSuccess ls) {
@@ -2516,8 +2507,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_32(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_32();
 		} catch (LookaheadSuccess ls) {
@@ -2528,8 +2519,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_33(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_33();
 		} catch (LookaheadSuccess ls) {
@@ -2540,8 +2531,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_34(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2552,8 +2543,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_35(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2564,8 +2555,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_36(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2576,8 +2567,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_37(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
@@ -2588,8 +2579,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_38(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_134();
 		} catch (LookaheadSuccess ls) {
@@ -2600,8 +2591,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_39(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_39();
 		} catch (LookaheadSuccess ls) {
@@ -2612,8 +2603,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_40(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2624,8 +2615,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_41(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2636,8 +2627,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_42(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2648,8 +2639,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_43(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
@@ -2660,8 +2651,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_44(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_44();
 		} catch (LookaheadSuccess ls) {
@@ -2672,8 +2663,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_45(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2684,8 +2675,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_46(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2696,8 +2687,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_47(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2708,8 +2699,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_48(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_148();
 		} catch (LookaheadSuccess ls) {
@@ -2720,8 +2711,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_49(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_49();
 		} catch (LookaheadSuccess ls) {
@@ -2732,8 +2723,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_50(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2744,8 +2735,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_51(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2756,8 +2747,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_52(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2768,8 +2759,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_53(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
@@ -2780,8 +2771,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_54(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_54();
 		} catch (LookaheadSuccess ls) {
@@ -2792,8 +2783,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_55(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2804,8 +2795,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_56(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2816,8 +2807,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_57(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2828,8 +2819,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_58(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_162();
 		} catch (LookaheadSuccess ls) {
@@ -2840,8 +2831,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_59(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_59();
 		} catch (LookaheadSuccess ls) {
@@ -2852,8 +2843,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_60(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2864,8 +2855,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_61(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2876,8 +2867,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_62(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2888,8 +2879,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_63(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
@@ -2900,8 +2891,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_64(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_64();
 		} catch (LookaheadSuccess ls) {
@@ -2912,8 +2903,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_65(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2924,8 +2915,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_66(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -2936,8 +2927,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_67(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -2948,8 +2939,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_68(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
@@ -2960,8 +2951,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_69(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_176();
 		} catch (LookaheadSuccess ls) {
@@ -2972,8 +2963,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_70(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_70();
 		} catch (LookaheadSuccess ls) {
@@ -2984,8 +2975,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_71(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
@@ -2996,8 +2987,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_72(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
@@ -3008,8 +2999,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_73(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
@@ -3020,8 +3011,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_74(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
@@ -3032,8 +3023,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_75(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_75();
 		} catch (LookaheadSuccess ls) {
@@ -3044,8 +3035,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_76(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_76();
 		} catch (LookaheadSuccess ls) {
@@ -3056,8 +3047,8 @@ public class Parser {
 	}
 
 	private boolean jj_2_77(int xla) {
-		jjLookAhead = xla;
-		jj_lastpos = scanPosition = token;
+		lookAhead = xla;
+		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_77();
 		} catch (LookaheadSuccess ls) {
@@ -3177,9 +3168,9 @@ public class Parser {
 															if (scanToken(RPAREN)) {
 																scanPosition = xsp;
 																lookingAhead = true;
-																jj_semLA = !nextAfterSpace(EOL, EOF);
+																semanticLookAhead = !nextAfterSpace(EOL, EOF);
 																lookingAhead = false;
-																if (!jj_semLA || jj_3R_222())
+																if (!semanticLookAhead || jj_3R_222())
 																	return true;
 															}
 														}
@@ -3281,9 +3272,9 @@ public class Parser {
 																		if (scanToken(UNDERSCORE)) {
 																			scanPosition = xsp;
 																			lookingAhead = true;
-																			jj_semLA = !nextAfterSpace(EOL, EOF);
+																			semanticLookAhead = !nextAfterSpace(EOL, EOF);
 																			lookingAhead = false;
-																			if (!jj_semLA || jj_3R_207())
+																			if (!semanticLookAhead || jj_3R_207())
 																				return true;
 																		}
 																	}
@@ -3520,9 +3511,9 @@ public class Parser {
 				if (jj_3R_63()) {
 					scanPosition = xsp;
 					lookingAhead = true;
-					jj_semLA = multilineAhead(BACKTICK);
+					semanticLookAhead = multilineAhead(BACKTICK);
 					lookingAhead = false;
-					if (!jj_semLA || jj_3R_242()) {
+					if (!semanticLookAhead || jj_3R_242()) {
 						scanPosition = xsp;
 						if (jj_3R_162()) {
 							scanPosition = xsp;
@@ -3600,9 +3591,9 @@ public class Parser {
 				if (jj_3R_63()) {
 					scanPosition = xsp;
 					lookingAhead = true;
-					jj_semLA = multilineAhead(BACKTICK);
+					semanticLookAhead = multilineAhead(BACKTICK);
 					lookingAhead = false;
-					if (!jj_semLA || jj_3R_242()) {
+					if (!semanticLookAhead || jj_3R_242()) {
 						scanPosition = xsp;
 						if (jj_3R_148()) {
 							scanPosition = xsp;
@@ -3779,9 +3770,9 @@ public class Parser {
 																		if (scanToken(UNDERSCORE)) {
 																			scanPosition = xsp;
 																			lookingAhead = true;
-																			jj_semLA = !nextAfterSpace(RPAREN);
+																			semanticLookAhead = !nextAfterSpace(RPAREN);
 																			lookingAhead = false;
-																			if (!jj_semLA || jj_3R_133()) {
+																			if (!semanticLookAhead || jj_3R_133()) {
 																				return true;
 																			}
 																		}
@@ -3909,9 +3900,9 @@ public class Parser {
 														if (scanToken(RPAREN)) {
 															scanPosition = xsp;
 															lookingAhead = true;
-															jj_semLA = !nextAfterSpace(RBRACK);
+															semanticLookAhead = !nextAfterSpace(RBRACK);
 															lookingAhead = false;
-															if (!jj_semLA || jj_3R_115())
+															if (!semanticLookAhead || jj_3R_115())
 																return true;
 														}
 													}
@@ -4022,19 +4013,19 @@ public class Parser {
 				if (jj_3R_63()) {
 					scanPosition = xsp;
 					lookingAhead = true;
-					jj_semLA = multilineAhead(ASTERISK);
+					semanticLookAhead = multilineAhead(ASTERISK);
 					lookingAhead = false;
-					if (!jj_semLA || scanToken(ASTERISK)) {
+					if (!semanticLookAhead || scanToken(ASTERISK)) {
 						scanPosition = xsp;
 						lookingAhead = true;
-						jj_semLA = multilineAhead(UNDERSCORE);
+						semanticLookAhead = multilineAhead(UNDERSCORE);
 						lookingAhead = false;
-						if (!jj_semLA || scanToken(UNDERSCORE)) {
+						if (!semanticLookAhead || scanToken(UNDERSCORE)) {
 							scanPosition = xsp;
 							lookingAhead = true;
-							jj_semLA = multilineAhead(BACKTICK);
+							semanticLookAhead = multilineAhead(BACKTICK);
 							lookingAhead = false;
-							if (!jj_semLA || jj_3R_242()) {
+							if (!semanticLookAhead || jj_3R_242()) {
 								scanPosition = xsp;
 								if (jj_3R_233())
 									return true;
@@ -4199,14 +4190,14 @@ public class Parser {
 																			if (scanToken(BACKTICK)) {
 																				scanPosition = xsp;
 																				lookingAhead = true;
-																				jj_semLA = !nextAfterSpace(EOL, EOF);
+																				semanticLookAhead = !nextAfterSpace(EOL, EOF);
 																				lookingAhead = false;
-																				if (!jj_semLA || jj_3R_86()) {
+																				if (!semanticLookAhead || jj_3R_86()) {
 																					scanPosition = xsp;
 																					lookingAhead = true;
-																					jj_semLA = !fencesAhead();
+																					semanticLookAhead = !fencesAhead();
 																					lookingAhead = false;
-																					if (!jj_semLA || jj_3R_87())
+																					if (!semanticLookAhead || jj_3R_87())
 																						return true;
 																				}
 																			}
@@ -4368,9 +4359,9 @@ public class Parser {
 		Token xsp;
 		xsp = scanPosition;
 		lookingAhead = true;
-		jj_semLA = headingAhead(1);
+		semanticLookAhead = headingAhead(1);
 		lookingAhead = false;
-		if (!jj_semLA || jj_3R_256()) {
+		if (!semanticLookAhead || jj_3R_256()) {
 			scanPosition = xsp;
 			if (scanToken(GT)) {
 				scanPosition = xsp;
@@ -4399,18 +4390,6 @@ public class Parser {
 		}
 		nextTokenKind = -1;
 		if (token.kind == kind) {
-			jjGen++;
-//			if (++jj_gc > 100) {
-//				jj_gc = 0;
-//				for (int i = 0; i < jj2Rtns.length; i++) {
-//					JJCalls c = jj2Rtns[i];
-//					while (c != null) {
-//						if (c.gen < jjGen)
-//							c.first = null;
-//						c = c.next;
-//					}
-//				}
-//			}
 			return token;
 		}
 		token = oldToken;
@@ -4418,12 +4397,12 @@ public class Parser {
 	}
 
 	private boolean scanToken(int kind) {
-		if (scanPosition == jj_lastpos) {
-			jjLookAhead--;
+		if (scanPosition == lastPosition) {
+			lookAhead--;
 			if (scanPosition.next == null) {
-				jj_lastpos = scanPosition = scanPosition.next = tm.getNextToken();
+				lastPosition = scanPosition = scanPosition.next = tm.getNextToken();
 			} else {
-				jj_lastpos = scanPosition = scanPosition.next;
+				lastPosition = scanPosition = scanPosition.next;
 			}
 		} else {
 			scanPosition = scanPosition.next;
@@ -4431,7 +4410,7 @@ public class Parser {
 		if (scanPosition.kind != kind) {
 			return true;
 		}
-		if (jjLookAhead == 0 && scanPosition == jj_lastpos) {
+		if (lookAhead == 0 && scanPosition == lastPosition) {
 			throw jj_ls;
 		}
 		return false;
@@ -4451,39 +4430,10 @@ public class Parser {
 
 	private int getNextTokenKind() {
 		if(nextTokenKind != -1) { return nextTokenKind; }
-		if ((jj_nt = token.next) == null) {
+		if ((nextToken = token.next) == null) {
 			return (nextTokenKind = (token.next = tm.getNextToken()).kind);
 		}
-		return (nextTokenKind = jj_nt.kind);
-	}
-
-	private void jj_add_error_token(int kind, int pos) {
-		if (pos >= 100) {
-			return;
-		}
-		if (pos == jj_endpos + 1) {
-			jj_lasttokens[jj_endpos++] = kind;
-		} else if (jj_endpos != 0) {
-			jj_expentry = new int[jj_endpos];
-			for (int i = 0; i < jj_endpos; i++) {
-				jj_expentry[i] = jj_lasttokens[i];
-			}
-			loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {
-				int[] oldentry = (int[]) (it.next());
-				if (oldentry.length == jj_expentry.length) {
-					for (int i = 0; i < jj_expentry.length; i++) {
-						if (oldentry[i] != jj_expentry[i]) {
-							continue loop;
-						}
-					}
-					jj_expentries.add(jj_expentry);
-					break loop;
-				}
-			}
-			if (pos != 0) {
-				jj_lasttokens[(jj_endpos = pos) - 1] = kind;
-			}
-		}
+		return (nextTokenKind = nextToken.kind);
 	}
 
 	private boolean blockAhead() {
