@@ -494,9 +494,9 @@ public class Parser {
 	private void levelWhiteSpace(int threshold) {
 		Token t;
 		int currentPos = 1;
-		label_24: while (true) {
+		loop: while (true) {
 			if (!((getNextTokenKind() == SPACE || getNextTokenKind() == TAB) && currentPos < (threshold - 1))) {
-				break label_24;
+				break loop;
 			}
 			switch (getNextTokenKind()) {
 			case SPACE: {
@@ -594,7 +594,7 @@ public class Parser {
 		whiteSpace();
 		consumeToken(IMAGE_LABEL);
 		whiteSpace();
-		label_29: while (true) {
+		loop: while (true) {
 			if (jj_2_22(1)) {
 				resourceText();
 			} else {
@@ -609,7 +609,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_23(1)) {
-				break label_29;
+				break loop;
 			}
 		}
 		whiteSpace();
@@ -627,7 +627,7 @@ public class Parser {
 		String ref = "";
 		consumeToken(LBRACK);
 		whiteSpace();
-		label_30: while (true) {
+		loop: while (true) {
 			if (jj_2_25(2147483647)) {
 				image();
 			} else if (jj_2_26(2147483647)) {
@@ -650,7 +650,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_30(1)) {
-				break label_30;
+				break loop;
 			}
 		}
 		whiteSpace();
@@ -666,7 +666,7 @@ public class Parser {
 		Text text = new Text();
 		tree.openScope(text);
 		StringBuilder s = new StringBuilder();
-		label_31: while (true) {
+		loop: while (true) {
 			switch (getNextTokenKind()) {
 			case BACKSLASH: {
 				s.append(consumeToken(BACKSLASH).image);
@@ -736,7 +736,7 @@ public class Parser {
 				} 
 			}
 			if (!jj_2_32(2)) {
-				break label_31;
+				break loop;
 			}
 		}
 		text.setValue(s.toString());
@@ -754,9 +754,9 @@ public class Parser {
 
 	private String resourceUrlText() {
 		StringBuilder s = new StringBuilder();
-		label_32: while (true) {
+		loop: while (true) {
 			if (!jj_2_33(1)) {
-				break label_32;
+				break loop;
 			}
 			switch (getNextTokenKind()) {
 			case ASTERISK: {
@@ -851,9 +851,9 @@ public class Parser {
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
 		strongMultilineContent();
-		label_33: while (true) {
+		loop: while (true) {
 			if (!textAhead()) {
-				break label_33;
+				break loop;
 			}
 			lineBreak();
 			strongMultilineContent();
@@ -863,7 +863,7 @@ public class Parser {
 	}
 
 	private void strongMultilineContent() {
-		label_34: while (true) {
+		loop: while (true) {
 			if (jj_2_34(1)) {
 				text();
 			} else if (jj_2_35(2147483647)) {
@@ -900,7 +900,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_39(1)) {
-				break label_34;
+				break loop;
 			}
 		}
 	}
@@ -910,11 +910,9 @@ public class Parser {
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
 		strongWithinEmMultilineContent();
-		label_35: while (true) {
-			if (textAhead()) {
-				;
-			} else {
-				break label_35;
+		loop: while (true) {
+			if (!textAhead()) {
+				break loop;
 			}
 			lineBreak();
 			strongWithinEmMultilineContent();
@@ -925,7 +923,7 @@ public class Parser {
 	}
 
 	private void strongWithinEmMultilineContent() {
-		label_36: while (true) {
+		loop: while (true) {
 			if (jj_2_40(1)) {
 				text();
 			} else if (jj_2_41(2147483647)) {
@@ -960,7 +958,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_44(1)) {
-				break label_36;
+				break loop;
 			}
 		}
 	}
@@ -969,7 +967,7 @@ public class Parser {
 		Strong strong = new Strong();
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
-		label_37: while (true) {
+		loop: while (true) {
 			if (jj_2_45(1)) {
 				text();
 			} else if (jj_2_46(2147483647)) {
@@ -1006,7 +1004,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_49(1)) {
-				break label_37;
+				break loop;
 			}
 		}
 		consumeToken(ASTERISK);
@@ -1018,7 +1016,7 @@ public class Parser {
 		Strong strong = new Strong();
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
-		label_38: while (true) {
+		loop: while (true) {
 			if (jj_2_50(1)) {
 				text();
 			} else if (jj_2_51(2147483647)) {
@@ -1053,7 +1051,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_54(1)) {
-				break label_38;
+				break loop;
 			}
 		}
 		consumeToken(ASTERISK);
@@ -1065,9 +1063,9 @@ public class Parser {
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
 		emMultilineContent();
-		label_39: while (true) {
+		loop: while (true) {
 			if (!textAhead()) {
-				break label_39;
+				break loop;
 			}
 			lineBreak();
 			emMultilineContent();
@@ -1077,7 +1075,7 @@ public class Parser {
 	}
 
 	private void emMultilineContent() {
-		label_40: while (true) {
+		loop: while (true) {
 			if (jj_2_55(1)) {
 				text();
 			} else if (jj_2_56(2147483647)) {
@@ -1114,7 +1112,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_59(1)) {
-				break label_40;
+				break loop;
 			}
 		}
 	}
@@ -1124,9 +1122,9 @@ public class Parser {
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
 		emWithinStrongMultilineContent();
-		label_41: while (true) {
+		loop: while (true) {
 			if (!textAhead()) {
-				break label_41;
+				break loop;
 			}
 			lineBreak();
 			emWithinStrongMultilineContent();
@@ -1136,7 +1134,7 @@ public class Parser {
 	}
 
 	private void emWithinStrongMultilineContent() {
-		label_42: while (true) {
+		loop: while (true) {
 			if (jj_2_60(1)) {
 				text();
 			} else if (jj_2_61(2147483647)) {
@@ -1171,7 +1169,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_64(1)) {
-				break label_42;
+				break loop;
 			}
 		}
 	}
@@ -1180,7 +1178,7 @@ public class Parser {
 		Em em = new Em();
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
-		label_43: while (true) {
+		loop: while (true) {
 			if (jj_2_65(1)) {
 				text();
 			} else if (jj_2_66(2147483647)) {
@@ -1217,7 +1215,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_70(1)) {
-				break label_43;
+				break loop;
 			}
 		}
 		consumeToken(UNDERSCORE);
@@ -1228,7 +1226,7 @@ public class Parser {
 		Em em = new Em();
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
-		label_44: while (true) {
+		loop: while (true) {
 			if (jj_2_71(1)) {
 				text();
 			} else if (jj_2_72(2147483647)) {
@@ -1263,7 +1261,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_75(1)) {
-				break label_44;
+				break loop;
 			}
 		}
 		consumeToken(UNDERSCORE);
@@ -1307,7 +1305,7 @@ public class Parser {
 		Text text = new Text();
 		tree.openScope(text);
 		StringBuffer s = new StringBuffer();
-		label_47: while (true) {
+		loop: while (true) {
 			switch (getNextTokenKind()) {
 			case ASTERISK: {
 				s.append(consumeToken(ASTERISK).image);
@@ -1393,7 +1391,7 @@ public class Parser {
 				} 
 			}
 			if (!jj_2_76(1)) {
-				break label_47;
+				break loop;
 			}
 		}
 		text.setValue(s.toString());
@@ -1404,7 +1402,7 @@ public class Parser {
 		Text text = new Text();
 		tree.openScope(text);
 		StringBuffer s = new StringBuffer();
-		label_48: while (true) {
+		loop: while (true) {
 			switch (getNextTokenKind()) {
 			case BACKSLASH: {
 				s.append(consumeToken(BACKSLASH).image);
@@ -1478,7 +1476,7 @@ public class Parser {
 				}
 			}
 			if (!jj_2_77(1)) {
-				break label_48;
+				break loop;
 			}
 		}
 		text.setValue(s.toString());
@@ -1514,9 +1512,9 @@ public class Parser {
 	private void lineBreak() {
 		LineBreak linebreak = new LineBreak();
 		tree.openScope(linebreak);
-		label_49: while (true) {
+		loop: while (true) {
 			if(getNextTokenKind() != SPACE && getNextTokenKind() != TAB) {
-				break label_49;
+				break loop;
 			}
 			consumeToken(getNextTokenKind());
 		}
@@ -2526,11 +2524,11 @@ public class Parser {
 		if (jj_3_76()) {
 			return true;
 		}
-		while (true) {
+		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_76()) {
 				scanPosition = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -2543,10 +2541,7 @@ public class Parser {
 		if (jj_3R_236()) {
 			return true;
 		}
-		if (scanToken(BACKTICK)) {
-			return true;
-		}
-		return false;
+		return scanToken(BACKTICK);
 	}
 
 	private boolean jj_3R_242() {
@@ -2557,17 +2552,14 @@ public class Parser {
 			return true;
 		}
 		Token xsp;
-		while (true) {
+		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3R_272()) {
 				scanPosition = xsp;
-				break;
+				break loop;
 			}
 		}
-		if (scanToken(BACKTICK)) {
-			return true;
-		}
-		return false;
+		return scanToken(BACKTICK);
 	}
 	
 	private boolean jj_3R_249() {
@@ -2658,11 +2650,11 @@ public class Parser {
 		if (jj_3_70()) {
 			return true;
 		}
-		while (true) {
+		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_70()) {
 				scanPosition = xsp;
-				break;
+				break loop;
 			}
 		}
 		return scanToken(UNDERSCORE);
@@ -2698,11 +2690,11 @@ public class Parser {
 		Token xsp;
 		if (jj_3_64())
 			return true;
-		while (true) {
+		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_64()) {
 				scanPosition = xsp;
-				break;
+				break loop;
 			}
 		}
 		return false;
@@ -2716,11 +2708,11 @@ public class Parser {
 			return true;
 		}
 		Token xsp;
-		while (true) {
+		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3R_249()) {
 				scanPosition = xsp;
-				break;
+				break loop;
 			}
 		}
 		return scanToken(UNDERSCORE);
@@ -2796,11 +2788,11 @@ public class Parser {
 		if (jj_3_54()) {
 			return true;
 		}
-		while (true) {
+		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_54()) {
 				scanPosition = xsp;
-				break;
+				break loop;
 			}
 		}
 		return scanToken(ASTERISK);
