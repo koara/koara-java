@@ -477,7 +477,6 @@ public class TokenManager {
 				input_stream.backup(1);
 				error_after = curPos <= 1 ? "" : input_stream.getImage();
 			}
-			throw new RuntimeException();
 		}
 	}
 
@@ -503,7 +502,7 @@ public class TokenManager {
 		curLexState = defaultLexState;
 		input_stream = stream;
 		ReInitRounds();
-		SwitchTo(lexState);
+		curLexState = lexState;
 	}
 
 	private void ReInitRounds() {
@@ -511,13 +510,6 @@ public class TokenManager {
 		jjround = 0x80000001;
 		for (i = 8; i-- > 0;)
 			jjrounds[i] = 0x80000000;
-	}
-
-	public void SwitchTo(int lexState) {
-		if (lexState >= 1 || lexState < 0)
-			throw new RuntimeException();
-		else
-			curLexState = lexState;
 	}
 
 	public static final String[] lexStateNames = { "DEFAULT", };

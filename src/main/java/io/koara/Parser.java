@@ -486,17 +486,11 @@ public class Parser {
 						s.append("    ");
 						break;
 					}
-					default:
-						consumeToken(-1);
-						throw new RuntimeException();
 					}
 				} else if (!fencesAhead()) {
 					t = consumeToken(EOL);
 					s.append("\u005cn");
 					levelWhiteSpace(beginColumn);
-				} else {
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 		}
@@ -775,14 +769,8 @@ public class Parser {
 						s.append("    ");
 						break;
 					}
-					default:
-						consumeToken(-1);
-						throw new RuntimeException();
 					}
-				} else {
-					consumeToken(-1);
-					throw new RuntimeException();
-				}
+				} 
 			}
 			if (jj_2_32(2)) {
 				;
@@ -971,9 +959,6 @@ public class Parser {
 					tree.closeScope(text);
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_39(1)) {
@@ -1088,9 +1073,6 @@ public class Parser {
 					tree.closeScope(text);
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_49(1)) {
@@ -1142,9 +1124,6 @@ public class Parser {
 					tree.closeScope(text);
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (jj_2_54(1)) {
@@ -1212,9 +1191,6 @@ public class Parser {
 					tree.closeScope(text);
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_59(1)) {
@@ -1276,9 +1252,6 @@ public class Parser {
 					tree.closeScope(text);
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_64(1)) {
@@ -1329,9 +1302,6 @@ public class Parser {
 					tree.closeScope(text);
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (jj_2_70(1)) {
@@ -1384,9 +1354,6 @@ public class Parser {
 					tree.closeScope(text);
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_75(1)) {
