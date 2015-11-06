@@ -50,7 +50,7 @@ public class Parser {
 	private CharStream cs;
 	private Token token, nextToken, scanPosition, lastPosition;
 	private TokenManager tm;
-	private TreeState tree = new TreeState();
+	private TreeState tree;
 	private int currentBlockLevel;
 	private int currentQuoteLevel;
 	private int nextTokenKind;
@@ -71,6 +71,7 @@ public class Parser {
 		cs = new CharStream(reader);
 		tm = new TokenManager(cs);
 		token = new Token();
+		tree = new TreeState();
 		nextTokenKind = -1;
 		
 		Document document = new Document();
@@ -126,24 +127,16 @@ public class Parser {
 			heading();
 		} else {
 			switch (getNextTokenKind()) {
-			case GT: {
-				blockquote();
-				break;
-			}
-			case DASH: {
-				unorderedList();
-				break;
-			}
+			case GT: blockquote(); break;
+			case DASH: unorderedList(); break;
 			default:
-				if (jj_2_2(2)) {
+				if (orderedListAhead(2)) {
 					orderedList();
-				} else if (jj_2_3(2147483647)) {
+				} else if (fencedCodeBlockAhead(2147483647)) {
 					fencedCodeBlock();
-				} else if (jj_2_4(1)) {
-					paragraph();
 				} else {
-					consumeToken(-1);
-				}
+					paragraph();
+				} 
 			}
 		}
 		currentBlockLevel--;
@@ -157,11 +150,7 @@ public class Parser {
 		equalsChars: while (true) {
 			consumeToken(EQ);
 			headingLevel++;
-			switch (getNextTokenKind()) {
-			case EQ: {
-				break;
-			}
-			default:
+			if(getNextTokenKind() != EQ) { 
 				break equalsChars;
 			}
 		}
@@ -191,9 +180,6 @@ public class Parser {
 					looseChar();
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 		}
@@ -223,11 +209,7 @@ public class Parser {
 					consumeToken(EOL);
 					whiteSpace();
 					blockquotePrefix();
-					switch (getNextTokenKind()) {
-					case EOL: {
-						break;
-					}
-					default:
+					if(getNextTokenKind() != EOL) {
 						break label_9;
 					}
 				}
@@ -261,11 +243,7 @@ public class Parser {
 		loop: while (true) {
 			consumeToken(GT);
 			whiteSpace();
-			switch (getNextTokenKind()) {
-			case GT: {
-				break;
-			}
-			default:
+			if(getNextTokenKind() != GT) {
 				break loop;
 			}
 		}
@@ -281,11 +259,7 @@ public class Parser {
 			}
 			label_14: while (true) {
 				consumeToken(EOL);
-				switch (getNextTokenKind()) {
-				case EOL: {
-					break;
-				}
-				default:
+				if(getNextTokenKind() != EOL) {
 					break label_14;
 				}
 			}
@@ -313,11 +287,7 @@ public class Parser {
 					if (currentQuoteLevel > 0) {
 						blockquotePrefix();
 					}
-					switch (getNextTokenKind()) {
-					case EOL: {
-						break;
-					}
-					default:
+					if(getNextTokenKind() != EOL) {
 						break label_16;
 					}
 				}
@@ -336,12 +306,8 @@ public class Parser {
 				break label_17;
 			}
 			label_18: while (true) {
-				consumeToken(EOL);
-				switch (getNextTokenKind()) {
-				case EOL: {
-					break;
-				}
-				default:
+				consumeToken(EOL);				
+				if(getNextTokenKind() != EOL) {
 					break label_18;
 				}
 			}
@@ -370,12 +336,8 @@ public class Parser {
 					whiteSpace();
 					if (currentQuoteLevel > 0) {
 						blockquotePrefix();
-					}
-					switch (getNextTokenKind()) {
-					case EOL: {
-						break;
-					}
-					default:
+					}					
+					if(getNextTokenKind() != EOL) {
 						break label_20;
 					}
 				}
@@ -398,11 +360,7 @@ public class Parser {
 		consumeToken(BACKTICK);
 		label_21: while (true) {
 			consumeToken(BACKTICK);
-			switch (getNextTokenKind()) {
-			case BACKTICK: {
-				break;
-			}
-			default:
+			if(getNextTokenKind() != BACKTICK) {
 				break label_21;
 			}
 		}
@@ -549,11 +507,7 @@ public class Parser {
 			consumeToken(BACKTICK);
 			label_23: while (true) {
 				consumeToken(BACKTICK);
-				switch (getNextTokenKind()) {
-				case BACKTICK: {
-					break;
-				}
-				default:
+				if(getNextTokenKind() != BACKTICK) {
 					break label_23;
 				}
 			}
@@ -580,9 +534,6 @@ public class Parser {
 				currentPos = t.beginColumn;
 				break;
 			}
-			default:
-				consumeToken(-1);
-				throw new RuntimeException();
 			}
 		}
 	}
@@ -602,16 +553,8 @@ public class Parser {
 				s.append(t.image);
 				break;
 			}
-			default:
-				consumeToken(-1);
-				throw new RuntimeException();
 			}
-			switch (getNextTokenKind()) {
-			case BACKTICK:
-			case CHAR_SEQUENCE: {
-				break;
-			}
-			default:
+			if(getNextTokenKind() != BACKTICK && getNextTokenKind() != CHAR_SEQUENCE) {
 				break label_25;
 			}
 		}
@@ -629,11 +572,7 @@ public class Parser {
 			lineBreak();
 			whiteSpace();
 			label_27: while (true) {
-				switch (getNextTokenKind()) {
-				case GT: {
-					break;
-				}
-				default:
+				if(getNextTokenKind() != GT) {
 					break label_27;
 				}
 				consumeToken(GT);
@@ -667,9 +606,6 @@ public class Parser {
 					looseChar();
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_21(1)) {
@@ -698,9 +634,6 @@ public class Parser {
 					looseChar();
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_23(1)) {
@@ -742,9 +675,6 @@ public class Parser {
 					looseChar();
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_30(1)) {
@@ -979,14 +909,8 @@ public class Parser {
 						s.append("    ");
 						break;
 					}
-					default:
-						consumeToken(-1);
-						throw new RuntimeException();
 					}
-				} else {
-					consumeToken(-1);
-					throw new RuntimeException();
-				}
+				} 
 			}
 		}
 		return s.toString();
@@ -1114,9 +1038,6 @@ public class Parser {
 					tree.closeScope(text);
 					break;
 				}
-				default:
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_44(1)) {
@@ -1488,11 +1409,7 @@ public class Parser {
 			lineBreak();
 			whiteSpace();
 			label_46: while (true) {
-				switch (getNextTokenKind()) {
-				case GT: {
-					break;
-				}
-				default:
+				if(getNextTokenKind() != GT) {
 					break label_46;
 				}
 				consumeToken(GT);
@@ -1618,14 +1535,8 @@ public class Parser {
 						s.append("    ");
 						break;
 					}
-					default:
-						consumeToken(-1);
-						throw new RuntimeException();
 					}
-				} else {
-					consumeToken(-1);
-					throw new RuntimeException();
-				}
+				} 
 			}
 			if (!jj_2_76(1)) {
 				break label_47;
@@ -1725,13 +1636,7 @@ public class Parser {
 						s.append("    ");
 						break;
 					}
-					default:
-						consumeToken(-1);
-						throw new RuntimeException();
 					}
-				} else {
-					consumeToken(-1);
-					throw new RuntimeException();
 				}
 			}
 			if (!jj_2_77(1)) {
@@ -1745,7 +1650,7 @@ public class Parser {
 	private void looseChar() {
 		Text text = new Text();
 		tree.openScope(text);
-		Token t;
+		Token t = null;
 		switch (getNextTokenKind()) {
 		case ASTERISK: {
 			t = consumeToken(ASTERISK);
@@ -1763,9 +1668,6 @@ public class Parser {
 			t = consumeToken(UNDERSCORE);
 			break;
 		}
-		default:
-			consumeToken(-1);
-			throw new RuntimeException();
 		}
 		text.setValue(t.image);
 		tree.closeScope(text);
@@ -1775,59 +1677,25 @@ public class Parser {
 		LineBreak linebreak = new LineBreak();
 		tree.openScope(linebreak);
 		label_49: while (true) {
-			switch (getNextTokenKind()) {
-			case SPACE:
-			case TAB: {
-				break;
-			}
-			default:
+			if(getNextTokenKind() != SPACE && getNextTokenKind() != TAB) {
 				break label_49;
 			}
-			switch (getNextTokenKind()) {
-			case SPACE: {
-				consumeToken(SPACE);
-				break;
-			}
-			case TAB: {
-				consumeToken(TAB);
-				break;
-			}
-			default:
-				consumeToken(-1);
-				throw new RuntimeException();
-			}
+			consumeToken(getNextTokenKind());
 		}
 		consumeToken(EOL);
 		tree.closeScope(linebreak);
 	}
 
 	private void whiteSpace() {
-		label_50: while (true) {
-			switch (getNextTokenKind()) {
-			case SPACE:
-			case TAB: {
-				break;
+		loop: while (true) {
+			if(getNextTokenKind() != SPACE && getNextTokenKind() != TAB) {
+				break loop;
 			}
-			default:
-				break label_50;
-			}
-			switch (getNextTokenKind()) {
-			case SPACE: {
-				consumeToken(SPACE);
-				break;
-			}
-			case TAB: {
-				consumeToken(TAB);
-				break;
-			}
-			default:
-				consumeToken(-1);
-				throw new RuntimeException();
-			}
+			consumeToken(getNextTokenKind());
 		}
 	}
 
-	private boolean jj_2_2(int xla) {
+	private boolean orderedListAhead(int xla) {
 		lookAhead = xla;
 		lastPosition = scanPosition = token;
 		try {
@@ -1837,21 +1705,11 @@ public class Parser {
 		} 
 	}
 
-	private boolean jj_2_3(int xla) {
+	private boolean fencedCodeBlockAhead(int xla) {
 		lookAhead = xla;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_53();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		} 
-	}
-
-	private boolean jj_2_4(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_232();
 		} catch (LookaheadSuccess ls) {
 			return true;
 		} 
