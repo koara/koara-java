@@ -384,111 +384,92 @@ public class Parser {
 			}
 			switch (getNextTokenKind()) {
 			case ASTERISK: {
-				t = consumeToken(ASTERISK);
-				s.append(t.image);
+				s.append(consumeToken(ASTERISK).image);
 				break;
 			}
 			case BACKSLASH: {
-				t = consumeToken(BACKSLASH);
-				s.append(t.image);
+				s.append(consumeToken(BACKSLASH).image);
 				break;
 			}
 			case CHAR_SEQUENCE: {
-				t = consumeToken(CHAR_SEQUENCE);
-				s.append(t.image);
+				s.append(consumeToken(CHAR_SEQUENCE).image);
 				break;
 			}
 			case COLON: {
-				t = consumeToken(COLON);
-				s.append(t.image);
+				s.append(consumeToken(COLON).image);
 				break;
 			}
 			case DASH: {
-				t = consumeToken(DASH);
-				s.append(t.image);
+				s.append(consumeToken(DASH).image);
 				break;
 			}
 			case DIGITS: {
-				t = consumeToken(DIGITS);
-				s.append(t.image);
+				s.append(consumeToken(DIGITS).image);
 				break;
 			}
 			case DOT: {
-				t = consumeToken(DOT);
-				s.append(t.image);
+				s.append(consumeToken(DOT).image);
 				break;
 			}
 			case EQ: {
-				t = consumeToken(EQ);
-				s.append(t.image);
+				s.append(consumeToken(EQ).image);
 				break;
 			}
 			case ESCAPED_CHAR: {
-				t = consumeToken(ESCAPED_CHAR);
-				s.append(t.image);
+				s.append(consumeToken(ESCAPED_CHAR).image);
 				break;
 			}
 			case IMAGE_LABEL: {
-				t = consumeToken(IMAGE_LABEL);
-				s.append(t.image);
+				s.append(consumeToken(IMAGE_LABEL).image);
 				break;
 			}
 			case LT: {
-				t = consumeToken(LT);
-				s.append(t.image);
+				s.append(consumeToken(LT).image);
 				break;
 			}
 			case GT: {
-				t = consumeToken(GT);
-				s.append(t.image);
+				s.append(consumeToken(GT).image);
 				break;
 			}
 			case LBRACK: {
-				t = consumeToken(LBRACK);
-				s.append(t.image);
+				s.append(consumeToken(LBRACK).image);
 				break;
 			}
 			case RBRACK: {
-				t = consumeToken(RBRACK);
-				s.append(t.image);
+				s.append(consumeToken(RBRACK).image);
 				break;
 			}
 			case LPAREN: {
-				t = consumeToken(LPAREN);
-				s.append(t.image);
+				s.append(consumeToken(LPAREN).image);
 				break;
 			}
 			case RPAREN: {
-				t = consumeToken(RPAREN);
-				s.append(t.image);
+				s.append(consumeToken(RPAREN).image);
 				break;
 			}
 			case UNDERSCORE: {
-				t = consumeToken(UNDERSCORE);
-				s.append(t.image);
+				s.append(consumeToken(UNDERSCORE).image);
 				break;
 			}
 			case BACKTICK: {
-				t = consumeToken(BACKTICK);
-				s.append(t.image);
+				s.append(consumeToken(BACKTICK).image);
 				break;
 			}
 			default:
 				if (!nextAfterSpace(EOL, EOF)) {
 					switch (getNextTokenKind()) {
 					case SPACE: {
-						t = consumeToken(SPACE);
-						s.append(t.image);
+						s.append(consumeToken(SPACE).image);
 						break;
 					}
 					case TAB: {
-						t = consumeToken(TAB);
+						consumeToken(TAB);
 						s.append("    ");
 						break;
 					}
 					}
 				} else if (!fencesAhead()) {
-					t = consumeToken(EOL);
+					consumeToken(EOL);
 					s.append("\u005cn");
 					levelWhiteSpace(beginColumn);
 				}
@@ -514,7 +495,7 @@ public class Parser {
 		Token t;
 		int currentPos = 1;
 		label_24: while (true) {
-			if (!((getToken(1).kind == SPACE || getToken(1).kind == TAB) && currentPos < (threshold - 1))) {
+			if (!((getNextTokenKind() == SPACE || getNextTokenKind() == TAB) && currentPos < (threshold - 1))) {
 				break label_24;
 			}
 			switch (getNextTokenKind()) {
@@ -533,23 +514,20 @@ public class Parser {
 	}
 
 	private String codeLanguage() {
-		Token t;
 		StringBuilder s = new StringBuilder();
-		label_25: while (true) {
+		loop: while (true) {
 			switch (getNextTokenKind()) {
 			case CHAR_SEQUENCE: {
-				t = consumeToken(CHAR_SEQUENCE);
-				s.append(t.image);
+				s.append(consumeToken(CHAR_SEQUENCE).image);
 				break;
 			}
 			case BACKTICK: {
-				t = consumeToken(BACKTICK);
-				s.append(t.image);
+				s.append(consumeToken(BACKTICK).image);
 				break;
 			}
 			}
 			if(getNextTokenKind() != BACKTICK && getNextTokenKind() != CHAR_SEQUENCE) {
-				break label_25;
+				break loop;
 			}
 		}
 		return s.toString();
@@ -687,94 +665,77 @@ public class Parser {
 	private void resourceText() {
 		Text text = new Text();
 		tree.openScope(text);
-		Token t;
 		StringBuilder s = new StringBuilder();
 		label_31: while (true) {
 			switch (getNextTokenKind()) {
 			case BACKSLASH: {
-				t = consumeToken(BACKSLASH);
-				s.append(t.image);
+				s.append(consumeToken(BACKSLASH).image);
 				break;
 			}
 			case COLON: {
-				t = consumeToken(COLON);
-				s.append(t.image);
+				s.append(consumeToken(COLON).image);
 				break;
 			}
 			case CHAR_SEQUENCE: {
-				t = consumeToken(CHAR_SEQUENCE);
-				s.append(t.image);
+				s.append(consumeToken(CHAR_SEQUENCE).image);
 				break;
 			}
 			case DASH: {
-				t = consumeToken(DASH);
-				s.append(t.image);
+				s.append(consumeToken(DASH).image);
 				break;
 			}
 			case DIGITS: {
-				t = consumeToken(DIGITS);
-				s.append(t.image);
+				s.append(consumeToken(DIGITS).image);
 				break;
 			}
 			case DOT: {
-				t = consumeToken(DOT);
-				s.append(t.image);
+				s.append(consumeToken(DOT).image);
 				break;
 			}
 			case EQ: {
-				t = consumeToken(EQ);
-				s.append(t.image);
+				s.append(consumeToken(EQ).image);
 				break;
 			}
 			case ESCAPED_CHAR: {
-				t = consumeToken(ESCAPED_CHAR);
-				s.append(t.image.substring(1));
+				s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
 				break;
 			}
 			case IMAGE_LABEL: {
-				t = consumeToken(IMAGE_LABEL);
-				s.append(t.image);
+				s.append(consumeToken(IMAGE_LABEL).image);
 				break;
 			}
 			case GT: {
-				t = consumeToken(GT);
-				s.append(t.image);
+				s.append(consumeToken(GT).image);
 				break;
 			}
 			case LPAREN: {
-				t = consumeToken(LPAREN);
-				s.append(t.image);
+				s.append(consumeToken(LPAREN).image);
 				break;
 			}
 			case LT: {
-				t = consumeToken(LT);
-				s.append(t.image);
+				s.append(consumeToken(LT).image);
 				break;
 			}
 			case RPAREN: {
-				t = consumeToken(RPAREN);
-				s.append(t.image);
+				s.append(consumeToken(RPAREN).image);
 				break;
 			}
 			default:
 				if (!nextAfterSpace(RBRACK)) {
 					switch (getNextTokenKind()) {
 					case SPACE: {
-						t = consumeToken(SPACE);
-						s.append(t.image);
+						s.append(consumeToken(SPACE).image);
 						break;
 					}
 					case TAB: {
-						t = consumeToken(TAB);
+						consumeToken(TAB);
 						s.append("    ");
 						break;
 					}
 					}
 				} 
 			}
-			if (jj_2_32(2)) {
-				;
-			} else {
+			if (!jj_2_32(2)) {
 				break label_31;
 			}
 		}
@@ -792,7 +753,6 @@ public class Parser {
 	}
 
 	private String resourceUrlText() {
-		Token t;
 		StringBuilder s = new StringBuilder();
 		label_32: while (true) {
 			if (!jj_2_33(1)) {
@@ -800,100 +760,82 @@ public class Parser {
 			}
 			switch (getNextTokenKind()) {
 			case ASTERISK: {
-				t = consumeToken(ASTERISK);
-				s.append(t.image);
+				s.append(consumeToken(ASTERISK).image);
 				break;
 			}
 			case BACKSLASH: {
-				t = consumeToken(BACKSLASH);
-				s.append(t.image);
+				s.append(consumeToken(BACKSLASH).image);
 				break;
 			}
 			case BACKTICK: {
-				t = consumeToken(BACKTICK);
-				s.append(t.image);
+				s.append(consumeToken(BACKTICK).image);
 				break;
 			}
 			case CHAR_SEQUENCE: {
-				t = consumeToken(CHAR_SEQUENCE);
-				s.append(t.image);
+				s.append(consumeToken(CHAR_SEQUENCE).image);
 				break;
 			}
 			case COLON: {
-				t = consumeToken(COLON);
-				s.append(t.image);
+				s.append(consumeToken(COLON).image);
 				break;
 			}
 			case DASH: {
-				t = consumeToken(DASH);
-				s.append(t.image);
+				s.append(consumeToken(DASH).image);
 				break;
 			}
 			case DIGITS: {
-				t = consumeToken(DIGITS);
-				s.append(t.image);
+				s.append(consumeToken(DIGITS).image);
 				break;
 			}
 			case DOT: {
-				t = consumeToken(DOT);
-				s.append(t.image);
+				s.append(consumeToken(DOT).image);
 				break;
 			}
 			case EQ: {
-				t = consumeToken(EQ);
-				s.append(t.image);
+				s.append(consumeToken(EQ).image);
 				break;
 			}
 			case ESCAPED_CHAR: {
-				t = consumeToken(ESCAPED_CHAR);
-				s.append(t.image.substring(1));
+				s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
 				break;
 			}
 			case IMAGE_LABEL: {
-				t = consumeToken(IMAGE_LABEL);
-				s.append(t.image);
+				s.append(consumeToken(IMAGE_LABEL).image);
 				break;
 			}
 			case GT: {
-				t = consumeToken(GT);
-				s.append(t.image);
+				s.append(consumeToken(GT).image);
 				break;
 			}
 			case LBRACK: {
-				t = consumeToken(LBRACK);
-				s.append(t.image);
+				s.append(consumeToken(LBRACK).image);
 				break;
 			}
 			case LPAREN: {
-				t = consumeToken(LPAREN);
-				s.append(t.image);
+				s.append(consumeToken(LPAREN).image);
 				break;
 			}
 			case LT: {
-				t = consumeToken(LT);
-				s.append(t.image);
+				s.append(consumeToken(LT).image);
 				break;
 			}
 			case RBRACK: {
-				t = consumeToken(RBRACK);
-				s.append(t.image);
+				s.append(consumeToken(RBRACK).image);
 				break;
 			}
 			case UNDERSCORE: {
-				t = consumeToken(UNDERSCORE);
-				s.append(t.image);
+				s.append(consumeToken(UNDERSCORE).image);
 				break;
 			}
 			default:
 				if (!nextAfterSpace(RPAREN)) {
 					switch (getNextTokenKind()) {
 					case SPACE: {
-						t = consumeToken(SPACE);
-						s.append(t.image);
+						s.append(consumeToken(SPACE).image);
 						break;
 					}
 					case TAB: {
-						t = consumeToken(TAB);
+						consumeToken(TAB);
 						s.append("    ");
 						break;
 					}
@@ -921,7 +863,6 @@ public class Parser {
 	}
 
 	private void strongMultilineContent() {
-		Token t;
 		label_34: while (true) {
 			if (jj_2_34(1)) {
 				text();
@@ -936,26 +877,23 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case BACKTICK: {
-					t = consumeToken(BACKTICK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(BACKTICK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case LBRACK: {
-					t = consumeToken(LBRACK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(LBRACK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case UNDERSCORE: {
-					t = consumeToken(UNDERSCORE);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(UNDERSCORE).image);
 					tree.closeScope(text);
 					break;
 				}
@@ -987,7 +925,6 @@ public class Parser {
 	}
 
 	private void strongWithinEmMultilineContent() {
-		Token t;
 		label_36: while (true) {
 			if (jj_2_40(1)) {
 				text();
@@ -1000,26 +937,23 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case BACKTICK: {
-					t = consumeToken(BACKTICK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(BACKTICK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case LBRACK: {
-					t = consumeToken(LBRACK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(LBRACK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case UNDERSCORE: {
-					t = consumeToken(UNDERSCORE);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(UNDERSCORE).image);
 					tree.closeScope(text);
 					break;
 				}
@@ -1034,7 +968,6 @@ public class Parser {
 	private void strong() {
 		Strong strong = new Strong();
 		tree.openScope(strong);
-		Token t;
 		consumeToken(ASTERISK);
 		label_37: while (true) {
 			if (jj_2_45(1)) {
@@ -1050,26 +983,23 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case BACKTICK: {
-					t = consumeToken(BACKTICK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(BACKTICK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case LBRACK: {
-					t = consumeToken(LBRACK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(LBRACK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case UNDERSCORE: {
-					t = consumeToken(UNDERSCORE);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(UNDERSCORE).image);
 					tree.closeScope(text);
 					break;
 				}
@@ -1087,7 +1017,6 @@ public class Parser {
 	private void strongWithinEm() {
 		Strong strong = new Strong();
 		tree.openScope(strong);
-		Token t;
 		consumeToken(ASTERISK);
 		label_38: while (true) {
 			if (jj_2_50(1)) {
@@ -1101,34 +1030,29 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case BACKTICK: {
-					t = consumeToken(BACKTICK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(BACKTICK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case LBRACK: {
-					t = consumeToken(LBRACK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(LBRACK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case UNDERSCORE: {
-					t = consumeToken(UNDERSCORE);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(UNDERSCORE).image);
 					tree.closeScope(text);
 					break;
 				}
 				}
 			}
-			if (jj_2_54(1)) {
-				;
-			} else {
+			if (!jj_2_54(1)) {
 				break label_38;
 			}
 		}
@@ -1153,7 +1077,6 @@ public class Parser {
 	}
 
 	private void emMultilineContent() {
-		Token t;
 		label_40: while (true) {
 			if (jj_2_55(1)) {
 				text();
@@ -1168,26 +1091,23 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case ASTERISK: {
-					t = consumeToken(ASTERISK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(ASTERISK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case BACKTICK: {
-					t = consumeToken(BACKTICK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(BACKTICK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case LBRACK: {
-					t = consumeToken(LBRACK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(LBRACK).image);
 					tree.closeScope(text);
 					break;
 				}
@@ -1216,7 +1136,6 @@ public class Parser {
 	}
 
 	private void emWithinStrongMultilineContent() {
-		Token t;
 		label_42: while (true) {
 			if (jj_2_60(1)) {
 				text();
@@ -1229,26 +1148,23 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case ASTERISK: {
-					t = consumeToken(ASTERISK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(ASTERISK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case BACKTICK: {
-					t = consumeToken(BACKTICK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(BACKTICK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case LBRACK: {
-					t = consumeToken(LBRACK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(LBRACK).image);
 					tree.closeScope(text);
 					break;
 				}
@@ -1263,7 +1179,6 @@ public class Parser {
 	private void em() {
 		Em em = new Em();
 		tree.openScope(em);
-		Token t;
 		consumeToken(UNDERSCORE);
 		label_43: while (true) {
 			if (jj_2_65(1)) {
@@ -1279,34 +1194,29 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case ASTERISK: {
-					t = consumeToken(ASTERISK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(ASTERISK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case BACKTICK: {
-					t = consumeToken(BACKTICK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(BACKTICK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case LBRACK: {
-					t = consumeToken(LBRACK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(LBRACK).image);
 					tree.closeScope(text);
 					break;
 				}
 				}
 			}
-			if (jj_2_70(1)) {
-				;
-			} else {
+			if (!jj_2_70(1)) {
 				break label_43;
 			}
 		}
@@ -1317,7 +1227,6 @@ public class Parser {
 	private void emWithinStrong() {
 		Em em = new Em();
 		tree.openScope(em);
-		Token t;
 		consumeToken(UNDERSCORE);
 		label_44: while (true) {
 			if (jj_2_71(1)) {
@@ -1331,26 +1240,23 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case ASTERISK: {
-					t = consumeToken(ASTERISK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(ASTERISK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case BACKTICK: {
-					t = consumeToken(BACKTICK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(BACKTICK).image);
 					tree.closeScope(text);
 					break;
 				}
 				case LBRACK: {
-					t = consumeToken(LBRACK);
 					Text text = new Text();
 					tree.openScope(text);
-					text.setValue(t.image);
+					text.setValue(consumeToken(LBRACK).image);
 					tree.closeScope(text);
 					break;
 				}
@@ -1400,105 +1306,86 @@ public class Parser {
 	private void codeText() {
 		Text text = new Text();
 		tree.openScope(text);
-		Token t;
 		StringBuffer s = new StringBuffer();
 		label_47: while (true) {
 			switch (getNextTokenKind()) {
 			case ASTERISK: {
-				t = consumeToken(ASTERISK);
-				s.append(t.image);
+				s.append(consumeToken(ASTERISK).image);
 				break;
 			}
 			case BACKSLASH: {
-				t = consumeToken(BACKSLASH);
-				s.append(t.image);
+				s.append(consumeToken(BACKSLASH).image);
 				break;
 			}
 			case CHAR_SEQUENCE: {
-				t = consumeToken(CHAR_SEQUENCE);
-				s.append(t.image);
+				s.append(consumeToken(CHAR_SEQUENCE).image);
 				break;
 			}
 			case COLON: {
-				t = consumeToken(COLON);
-				s.append(t.image);
+				s.append(consumeToken(COLON).image);
 				break;
 			}
 			case DASH: {
-				t = consumeToken(DASH);
-				s.append(t.image);
+				s.append(consumeToken(DASH).image);
 				break;
 			}
 			case DIGITS: {
-				t = consumeToken(DIGITS);
-				s.append(t.image);
+				s.append(consumeToken(DIGITS).image);
 				break;
 			}
 			case DOT: {
-				t = consumeToken(DOT);
-				s.append(t.image);
+				s.append(consumeToken(DOT).image);
 				break;
 			}
 			case EQ: {
-				t = consumeToken(EQ);
-				s.append(t.image);
+				s.append(consumeToken(EQ).image);
 				break;
 			}
 			case ESCAPED_CHAR: {
-				t = consumeToken(ESCAPED_CHAR);
-				s.append(t.image);
+				s.append(consumeToken(ESCAPED_CHAR).image);
 				break;
 			}
 			case IMAGE_LABEL: {
-				t = consumeToken(IMAGE_LABEL);
-				s.append(t.image);
+				s.append(consumeToken(IMAGE_LABEL).image);
 				break;
 			}
 			case LT: {
-				t = consumeToken(LT);
-				s.append(t.image);
+				s.append(consumeToken(LT).image);
 				break;
 			}
 			case LBRACK: {
-				t = consumeToken(LBRACK);
-				s.append(t.image);
+				s.append(consumeToken(LBRACK).image);
 				break;
 			}
 			case RBRACK: {
-				t = consumeToken(RBRACK);
-				s.append(t.image);
+				s.append(consumeToken(RBRACK).image);
 				break;
 			}
 			case LPAREN: {
-				t = consumeToken(LPAREN);
-				s.append(t.image);
+				s.append(consumeToken(LPAREN).image);
 				break;
 			}
 			case GT: {
-				t = consumeToken(GT);
-				s.append(t.image);
+				s.append(consumeToken(GT).image);
 				break;
 			}
 			case RPAREN: {
-				t = consumeToken(RPAREN);
-				s.append(t.image);
+				s.append(consumeToken(RPAREN).image);
 				break;
 			}
 			case UNDERSCORE: {
-				t = consumeToken(UNDERSCORE);
-				s.append(t.image);
+				s.append(consumeToken(UNDERSCORE).image);
 				break;
 			}
 			default:
 				if (!nextAfterSpace(EOL, EOF)) {
 					switch (getNextTokenKind()) {
 					case SPACE: {
-						t = consumeToken(SPACE);
-						s.append(t.image);
+						s.append(consumeToken(SPACE).image);
 						break;
 					}
 					case TAB: {
-						t = consumeToken(TAB);
+						consumeToken(TAB);
 						s.append("    ");
 						break;
 					}
@@ -1516,90 +1403,74 @@ public class Parser {
 	private void text() {
 		Text text = new Text();
 		tree.openScope(text);
-		Token t;
 		StringBuffer s = new StringBuffer();
 		label_48: while (true) {
 			switch (getNextTokenKind()) {
 			case BACKSLASH: {
-				t = consumeToken(BACKSLASH);
-				s.append(t.image);
+				s.append(consumeToken(BACKSLASH).image);
 				break;
 			}
 			case CHAR_SEQUENCE: {
-				t = consumeToken(CHAR_SEQUENCE);
-				s.append(t.image);
+				s.append(consumeToken(CHAR_SEQUENCE).image);
 				break;
 			}
 			case COLON: {
-				t = consumeToken(COLON);
-				s.append(t.image);
+				s.append(consumeToken(COLON).image);
 				break;
 			}
 			case DASH: {
-				t = consumeToken(DASH);
-				s.append(t.image);
+				s.append(consumeToken(DASH).image);
 				break;
 			}
 			case DIGITS: {
-				t = consumeToken(DIGITS);
-				s.append(t.image);
+				s.append(consumeToken(DIGITS).image);
 				break;
 			}
 			case DOT: {
-				t = consumeToken(DOT);
-				s.append(t.image);
+				s.append(consumeToken(DOT).image);
 				break;
 			}
 			case EQ: {
-				t = consumeToken(EQ);
-				s.append(t.image);
+				s.append(consumeToken(EQ).image);
 				break;
 			}
 			case ESCAPED_CHAR: {
-				t = consumeToken(ESCAPED_CHAR);
-				s.append(t.image.substring(1));
+				s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
 				break;
 			}
 			case GT: {
-				t = consumeToken(GT);
-				s.append(t.image);
+				s.append(consumeToken(GT).image);
 				break;
 			}
 			case IMAGE_LABEL: {
-				t = consumeToken(IMAGE_LABEL);
-				s.append(t.image);
+				s.append(consumeToken(IMAGE_LABEL).image);
 				break;
 			}
 			case LPAREN: {
-				t = consumeToken(LPAREN);
-				s.append(t.image);
+				s.append(consumeToken(LPAREN).image);
 				break;
 			}
 			case LT: {
-				t = consumeToken(LT);
-				s.append(t.image);
+				s.append(consumeToken(LT).image);
 				break;
 			}
 			case RBRACK: {
-				t = consumeToken(RBRACK);
-				s.append(t.image);
+				s.append(consumeToken(RBRACK).image);
 				break;
 			}
 			case RPAREN: {
-				t = consumeToken(RPAREN);
-				s.append(t.image);
+				s.append(consumeToken(RPAREN).image);
 				break;
 			}
 			default:
 				if (!nextAfterSpace(EOL, EOF)) {
 					switch (getNextTokenKind()) {
 					case SPACE: {
-						t = consumeToken(SPACE);
-						s.append(t.image);
+						s.append(consumeToken(SPACE).image);
 						break;
 					}
 					case TAB: {
-						t = consumeToken(TAB);
+						consumeToken(TAB);
 						s.append("    ");
 						break;
 					}
