@@ -56,13 +56,9 @@ public class Parser {
 	private int nextTokenKind;
 	private int lookAhead;
 	private boolean lookingAhead = false;
-	private boolean semanticLookAhead;
-	
-	public class LookaheadSuccess extends Error {
-
-	}
-	
+	private boolean semanticLookAhead;	
 	private LookaheadSuccess lookAheadSuccess = new LookaheadSuccess();
+	private class LookaheadSuccess extends Error {}
 	
 	public Document parse(String text) {
 		return parse(new StringReader(text));
@@ -71,7 +67,7 @@ public class Parser {
 	public Document parse(File file) throws IOException {
 		return parse(new FileReader(file));
 	}
-
+	
 	private Document parse(Reader reader) {
 		cs = new CharStream(reader);
 		tm = new TokenManager(cs);
@@ -116,16 +112,6 @@ public class Parser {
 		return document;
 	}
 	
-	private boolean hasAnyBlockElementsAhead() {
-		lookAhead = 1;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanForBlockElement();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		} 
-	}
-
 	private void blockElement() {
 		currentBlockLevel++;
 		if (headingAhead(1)) {
@@ -134,25 +120,25 @@ public class Parser {
 			blockquote();
 		} else if(getNextTokenKind() == DASH) {
 			unorderedList();
-		} else if(orderedListAhead(2)) {
+		} else if(orderedListAhead()) {
 			orderedList();
-		} else if(fencedCodeBlockAhead(2147483647)) {
+		} else if(fencedCodeBlockAhead()) {
 			fencedCodeBlock();
 		} else {
 			paragraph();
 		}
 		currentBlockLevel--;
 	}
-
+	
 	private void heading() {
 		Heading heading = new Heading();
 		tree.openScope(heading);
 		int headingLevel = 0;
-	
+
 		equalsChars: while (true) {
 			consumeToken(EQ);
 			headingLevel++;
-			if(getNextTokenKind() != EQ) { 
+			if(getNextTokenKind() != EQ) {
 				break equalsChars;
 			}
 		}
@@ -160,42 +146,33 @@ public class Parser {
 		inline: while (true) {
 			if (!headingInlineAhead()) {
 				break inline;
-			}
-			if (inlineTextAhead()) {
+			} else if (inlineTextAhead()) {
 				text();
 			} else if (inlineImageAhead()) {
 				image();
-			} else if (jj_2_8(2147483647)) {
+			} else if (jj_2_8()) {
 				link();
-			} else if (jj_2_9(2147483647)) {
+			} else if (jj_2_9()) {
 				strong();
-			} else if (jj_2_10(2147483647)) {
+			} else if (jj_2_10()) {
 				em();
-			} else if (jj_2_11(2147483647)) {
+			} else if (jj_2_11()) {
 				code();
 			} else {
-				switch (getNextTokenKind()) {
-				case ASTERISK:
-				case BACKTICK:
-				case LBRACK:
-				case UNDERSCORE: {
-					looseChar();
-					break;
-				}
-				}
+				looseChar();
 			}
 		}
 		heading.setValue(headingLevel);
 		tree.closeScope(heading);
 	}
-
+	
 	private void blockquote() {
 		Blockquote blockquote = new Blockquote();
 		tree.openScope(blockquote);
-		currentQuoteLevel++;	
+		currentQuoteLevel++;
 		consumeToken(GT);
 		leadingLines: while (true) {
-			if (!jj_2_12(2147483647)) {
+			if (!blockquoteEmptyLineAhead()) {
 				break leadingLines;
 			}
 			blockquoteEmptyLine();
@@ -227,7 +204,9 @@ public class Parser {
 		currentQuoteLevel--;
 		tree.closeScope(blockquote);
 	}
-
+	
+	
+	
 	private void blockquotePrefix() {
 		int i = 0;
 		loop: while (true) {
@@ -252,17 +231,17 @@ public class Parser {
 	}
 
 	private void unorderedList() {
-		List list = new List();
+		List list = new List(false);
 		tree.openScope(list);
 		unorderedListItem();
-		label_13: while (true) {
+		listItems: while (true) {
 			if (!listItemAhead(false)) {
-				break label_13;
+				break listItems;
 			}
-			label_14: while (true) {
+			newLines: while (true) {
 				consumeToken(EOL);
 				if(getNextTokenKind() != EOL) {
-					break label_14;
+					break newLines;
 				}
 			}
 			whiteSpace();
@@ -277,7 +256,7 @@ public class Parser {
 
 		consumeToken(DASH);
 		whiteSpace();
-		if (jj_2_15(1)) {
+		if (jj_2_15()) {
 			blockElement();
 			label_15: while (true) {
 				if (!blockAhead()) {
@@ -295,28 +274,27 @@ public class Parser {
 				}
 				blockElement();
 			}
-		} 
+		}
 		tree.closeScope(listItem);
 	}
 
 	private void orderedList() {
-		List list = new List();
+		List list = new List(true);
 		tree.openScope(list);
 		orderedListItem();
-		label_17: while (true) {
+		listItems: while (true) {
 			if (!listItemAhead(true)) {
-				break label_17;
+				break listItems;
 			}
-			label_18: while (true) {
-				consumeToken(EOL);				
+			newLines: while (true) {
+				consumeToken(EOL);
 				if(getNextTokenKind() != EOL) {
-					break label_18;
+					break newLines;
 				}
 			}
 			whiteSpace();
 			orderedListItem();
 		}
-		list.setOrdered(true);
 		tree.closeScope(list);
 	}
 
@@ -338,7 +316,7 @@ public class Parser {
 					whiteSpace();
 					if (currentQuoteLevel > 0) {
 						blockquotePrefix();
-					}					
+					}
 					if(getNextTokenKind() != EOL) {
 						break label_20;
 					}
@@ -492,7 +470,397 @@ public class Parser {
 		codeBlock.setValue(s.toString());
 		tree.closeScope(codeBlock);
 	}
+	
+	private void paragraph() {
+		Paragraph paragraph = new Paragraph();
+		tree.openScope(paragraph);
+		inline();
+		label_26: while (true) {
+			if (!textAhead()) {
+				break label_26;
+			}
+			lineBreak();
+			whiteSpace();
+			label_27: while (true) {
+				if(getNextTokenKind() != GT) {
+					break label_27;
+				}
+				consumeToken(GT);
+				whiteSpace();
+			}
+			inline();
+		}
+		tree.closeScope(paragraph);
+	}
+	
+	private void text() {
+		Text text = new Text();
+		tree.openScope(text);
+		StringBuffer s = new StringBuffer();
+		loop: while (true) {
+			switch (getNextTokenKind()) {
+			case BACKSLASH: {
+				s.append(consumeToken(BACKSLASH).image);
+				break;
+			}
+			case CHAR_SEQUENCE: {
+				s.append(consumeToken(CHAR_SEQUENCE).image);
+				break;
+			}
+			case COLON: {
+				s.append(consumeToken(COLON).image);
+				break;
+			}
+			case DASH: {
+				s.append(consumeToken(DASH).image);
+				break;
+			}
+			case DIGITS: {
+				s.append(consumeToken(DIGITS).image);
+				break;
+			}
+			case DOT: {
+				s.append(consumeToken(DOT).image);
+				break;
+			}
+			case EQ: {
+				s.append(consumeToken(EQ).image);
+				break;
+			}
+			case ESCAPED_CHAR: {
+				s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
+				break;
+			}
+			case GT: {
+				s.append(consumeToken(GT).image);
+				break;
+			}
+			case IMAGE_LABEL: {
+				s.append(consumeToken(IMAGE_LABEL).image);
+				break;
+			}
+			case LPAREN: {
+				s.append(consumeToken(LPAREN).image);
+				break;
+			}
+			case LT: {
+				s.append(consumeToken(LT).image);
+				break;
+			}
+			case RBRACK: {
+				s.append(consumeToken(RBRACK).image);
+				break;
+			}
+			case RPAREN: {
+				s.append(consumeToken(RPAREN).image);
+				break;
+			}
+			default:
+				if (!nextAfterSpace(EOL, EOF)) {
+					switch (getNextTokenKind()) {
+					case SPACE: {
+						s.append(consumeToken(SPACE).image);
+						break;
+					}
+					case TAB: {
+						consumeToken(TAB);
+						s.append("    ");
+						break;
+					}
+					}
+				}
+			}
+			if (!jj_2_77(1)) {
+				break loop;
+			}
+		}
+		text.setValue(s.toString());
+		tree.closeScope(text);
+	}
+	
+	private void image() {
+		Image image = new Image();
+		tree.openScope(image);
+		String ref = "";
+		consumeToken(LBRACK);
+		whiteSpace();
+		consumeToken(IMAGE_LABEL);
+		whiteSpace();
+		loop: while (true) {
+			if (jj_2_22(1)) {
+				resourceText();
+			} else {
+				looseChar();
+			}
+			if (!jj_2_23(1)) {
+				break loop;
+			}
+		}
+		whiteSpace();
+		consumeToken(RBRACK);
+		if (jj_2_24(2147483647)) {
+			ref = resourceUrl();
+		}
+		image.setValue(ref);
+		tree.closeScope(image);
+	}
+	
+	private void link() {
+		Link link = new Link();
+		tree.openScope(link);
+		String ref = "";
+		consumeToken(LBRACK);
+		whiteSpace();
+		loop: while (true) {
+			if (jj_2_25(2147483647)) {
+				image();
+			} else if (jj_2_26(2147483647)) {
+				strong();
+			} else if (jj_2_27(2147483647)) {
+				em();
+			} else if (jj_2_28(2147483647)) {
+				code();
+			} else if (jj_2_29(1)) {
+				resourceText();
+			} else {
+				looseChar();
+			}
+			if (!jj_2_30(1)) {
+				break loop;
+			}
+		}
+		whiteSpace();
+		consumeToken(RBRACK);
+		if (jj_2_31(2147483647)) {
+			ref = resourceUrl();
+		}
+		link.setValue(ref);
+		tree.closeScope(link);
+	}
+	
+	private void strong() {
+		Strong strong = new Strong();
+		tree.openScope(strong);
+		consumeToken(ASTERISK);
+		loop: while (true) {
+			if (jj_2_45(1)) {
+				text();
+			} else if (jj_2_46(2147483647)) {
+				image();
+			} else if (jj_2_47(2147483647)) {
+				link();
+			} else if (multilineAhead(BACKTICK)) {
+				codeMultiline();
+			} else if (jj_2_48(2147483647)) {
+				emWithinStrong();
+			} else {
+				switch (getNextTokenKind()) {
+				case BACKTICK: {
+					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
+					break;
+				}
+				case LBRACK: {
+					tree.addSingleValue(new Text(), consumeToken(LBRACK));
+					break;
+				}
+				case UNDERSCORE: {
+					tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
+					break;
+				}
+				}
+			}
+			if (!jj_2_49(1)) {
+				break loop;
+			}
+		}
+		consumeToken(ASTERISK);
+		tree.closeScope(strong);
+	}
+	
+	private void em() {
+		Em em = new Em();
+		tree.openScope(em);
+		consumeToken(UNDERSCORE);
+		loop: while (true) {
+			if (jj_2_65(1)) {
+				text();
+			} else if (jj_2_66(2147483647)) {
+				image();
+			} else if (jj_2_67(2147483647)) {
+				link();
+			} else if (jj_2_68(2147483647)) {
+				code();
+			} else if (jj_2_69(2147483647)) {
+				strongWithinEm();
+			} else {
+				switch (getNextTokenKind()) {
+				case ASTERISK: {
+					tree.addSingleValue(new Text(), consumeToken(ASTERISK));
+					break;
+				}
+				case BACKTICK: {
+					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
+					break;
+				}
+				case LBRACK: {
+					tree.addSingleValue(new Text(), consumeToken(LBRACK));
+					break;
+				}
+				}
+			}
+			if (!jj_2_70(1)) {
+				break loop;
+			}
+		}
+		consumeToken(UNDERSCORE);
+		tree.closeScope(em);
+	}
+	
+	private void code() {
+		Code code = new Code();
+		tree.openScope(code);
+		consumeToken(BACKTICK);
+		codeText();
+		consumeToken(BACKTICK);
+		tree.closeScope(code);
+	}
 
+	private void codeText() {
+		Text text = new Text();
+		tree.openScope(text);
+		StringBuffer s = new StringBuffer();
+		loop: while (true) {
+			switch (getNextTokenKind()) {
+			case ASTERISK: {
+				s.append(consumeToken(ASTERISK).image);
+				break;
+			}
+			case BACKSLASH: {
+				s.append(consumeToken(BACKSLASH).image);
+				break;
+			}
+			case CHAR_SEQUENCE: {
+				s.append(consumeToken(CHAR_SEQUENCE).image);
+				break;
+			}
+			case COLON: {
+				s.append(consumeToken(COLON).image);
+				break;
+			}
+			case DASH: {
+				s.append(consumeToken(DASH).image);
+				break;
+			}
+			case DIGITS: {
+				s.append(consumeToken(DIGITS).image);
+				break;
+			}
+			case DOT: {
+				s.append(consumeToken(DOT).image);
+				break;
+			}
+			case EQ: {
+				s.append(consumeToken(EQ).image);
+				break;
+			}
+			case ESCAPED_CHAR: {
+				s.append(consumeToken(ESCAPED_CHAR).image);
+				break;
+			}
+			case IMAGE_LABEL: {
+				s.append(consumeToken(IMAGE_LABEL).image);
+				break;
+			}
+			case LT: {
+				s.append(consumeToken(LT).image);
+				break;
+			}
+			case LBRACK: {
+				s.append(consumeToken(LBRACK).image);
+				break;
+			}
+			case RBRACK: {
+				s.append(consumeToken(RBRACK).image);
+				break;
+			}
+			case LPAREN: {
+				s.append(consumeToken(LPAREN).image);
+				break;
+			}
+			case GT: {
+				s.append(consumeToken(GT).image);
+				break;
+			}
+			case RPAREN: {
+				s.append(consumeToken(RPAREN).image);
+				break;
+			}
+			case UNDERSCORE: {
+				s.append(consumeToken(UNDERSCORE).image);
+				break;
+			}
+			default:
+				if (!nextAfterSpace(EOL, EOF)) {
+					switch (getNextTokenKind()) {
+					case SPACE: {
+						s.append(consumeToken(SPACE).image);
+						break;
+					}
+					case TAB: {
+						consumeToken(TAB);
+						s.append("    ");
+						break;
+					}
+					}
+				}
+			}
+			if (!jj_2_76(1)) {
+				break loop;
+			}
+		}
+		text.setValue(s.toString());
+		tree.closeScope(text);
+	}
+
+	private void looseChar() {
+		Text text = new Text();
+		tree.openScope(text);
+		Token t = null;
+		switch (getNextTokenKind()) {
+		case ASTERISK: {
+			t = consumeToken(ASTERISK);
+			break;
+		}
+		case BACKTICK: {
+			t = consumeToken(BACKTICK);
+			break;
+		}
+		case LBRACK: {
+			t = consumeToken(LBRACK);
+			break;
+		}
+		case UNDERSCORE: {
+			t = consumeToken(UNDERSCORE);
+			break;
+		}
+		}
+		text.setValue(t.image);
+		tree.closeScope(text);
+	}
+
+	private void lineBreak() {
+		LineBreak linebreak = new LineBreak();
+		tree.openScope(linebreak);
+		loop: while (true) {
+			if(getNextTokenKind() != SPACE && getNextTokenKind() != TAB) {
+				break loop;
+			}
+			consumeToken(getNextTokenKind());
+		}
+		consumeToken(EOL);
+		tree.closeScope(linebreak);
+	}
+	
 	private void levelWhiteSpace(int threshold) {
 		Token t;
 		int currentPos = 1;
@@ -535,27 +903,7 @@ public class Parser {
 		return s.toString();
 	}
 
-	private void paragraph() {
-		Paragraph paragraph = new Paragraph();
-		tree.openScope(paragraph);
-		inline();
-		label_26: while (true) {
-			if (!textAhead()) {
-				break label_26;
-			}
-			lineBreak();
-			whiteSpace();
-			label_27: while (true) {
-				if(getNextTokenKind() != GT) {
-					break label_27;
-				}
-				consumeToken(GT);
-				whiteSpace();
-			}
-			inline();
-		}
-		tree.closeScope(paragraph);
-	}
+	
 
 	private void inline() {
 		loop: while (true) {
@@ -572,15 +920,7 @@ public class Parser {
 			} else if (multilineAhead(BACKTICK)) {
 				codeMultiline();
 			} else {
-				switch (getNextTokenKind()) {
-				case ASTERISK:
-				case BACKTICK:
-				case LBRACK:
-				case UNDERSCORE: {
-					looseChar();
-					break;
-				}
-				}
+				looseChar();
 			}
 			if (!jj_2_21(1)) {
 				break loop;
@@ -588,81 +928,9 @@ public class Parser {
 		}
 	}
 
-	private void image() {
-		Image image = new Image();
-		tree.openScope(image);
-		String ref = "";
-		consumeToken(LBRACK);
-		whiteSpace();
-		consumeToken(IMAGE_LABEL);
-		whiteSpace();
-		loop: while (true) {
-			if (jj_2_22(1)) {
-				resourceText();
-			} else {
-				switch (getNextTokenKind()) {
-				case ASTERISK:
-				case BACKTICK:
-				case LBRACK:
-				case UNDERSCORE: {
-					looseChar();
-					break;
-				}
-				}
-			}
-			if (!jj_2_23(1)) {
-				break loop;
-			}
-		}
-		whiteSpace();
-		consumeToken(RBRACK);
-		if (jj_2_24(2147483647)) {
-			ref = resourceUrl();
-		}
-		image.setValue(ref);
-		tree.closeScope(image);
-	}
+	
 
-	private void link() {
-		Link link = new Link();
-		tree.openScope(link);
-		String ref = "";
-		consumeToken(LBRACK);
-		whiteSpace();
-		loop: while (true) {
-			if (jj_2_25(2147483647)) {
-				image();
-			} else if (jj_2_26(2147483647)) {
-				strong();
-			} else if (jj_2_27(2147483647)) {
-				em();
-			} else if (jj_2_28(2147483647)) {
-				code();
-			} else if (jj_2_29(1)) {
-				resourceText();
-			} else {
-				switch (getNextTokenKind()) {
-				case ASTERISK:
-				case BACKTICK:
-				case LBRACK:
-				case UNDERSCORE: {
-					looseChar();
-					break;
-				}
-				}
-			}
-			if (!jj_2_30(1)) {
-				break loop;
-			}
-		}
-		whiteSpace();
-		consumeToken(RBRACK);
-		if (jj_2_31(2147483647)) {
-			ref = resourceUrl();
-		}
-		link.setValue(ref);
-		tree.closeScope(link);
-	}
+	
 
 	private void resourceText() {
 		Text text = new Text();
@@ -735,7 +1003,7 @@ public class Parser {
 						break;
 					}
 					}
-				} 
+				}
 			}
 			if (!jj_2_32(2)) {
 				break loop;
@@ -842,7 +1110,7 @@ public class Parser {
 						break;
 					}
 					}
-				} 
+				}
 			}
 		}
 		return s.toString();
@@ -879,24 +1147,15 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case BACKTICK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(BACKTICK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
 					break;
 				}
 				case LBRACK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(LBRACK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(LBRACK));
 					break;
 				}
 				case UNDERSCORE: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(UNDERSCORE).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
 					break;
 				}
 				}
@@ -921,14 +1180,14 @@ public class Parser {
 		}
 		consumeToken(ASTERISK);
 		tree.closeScope(strong);
-		
+
 	}
 
 	private void strongWithinEmMultilineContent() {
 		loop: while (true) {
 			if (jj_2_40(1)) {
 				text();
-			} else if (jj_2_41(2147483647)) {
+			} else if (jj_2_41()) {
 				image();
 			} else if (jj_2_42(2147483647)) {
 				link();
@@ -937,24 +1196,15 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case BACKTICK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(BACKTICK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
 					break;
 				}
 				case LBRACK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(LBRACK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(LBRACK));
 					break;
 				}
 				case UNDERSCORE: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(UNDERSCORE).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
 					break;
 				}
 				}
@@ -965,54 +1215,7 @@ public class Parser {
 		}
 	}
 
-	private void strong() {
-		Strong strong = new Strong();
-		tree.openScope(strong);
-		consumeToken(ASTERISK);
-		loop: while (true) {
-			if (jj_2_45(1)) {
-				text();
-			} else if (jj_2_46(2147483647)) {
-				image();
-			} else if (jj_2_47(2147483647)) {
-				link();
-			} else if (multilineAhead(BACKTICK)) {
-				codeMultiline();
-			} else if (jj_2_48(2147483647)) {
-				emWithinStrong();
-			} else {
-				switch (getNextTokenKind()) {
-				case BACKTICK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(BACKTICK).image);
-					tree.closeScope(text);
-					break;
-				}
-				case LBRACK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(LBRACK).image);
-					tree.closeScope(text);
-					break;
-				}
-				case UNDERSCORE: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(UNDERSCORE).image);
-					tree.closeScope(text);
-					break;
-				}
-				}
-			}
-			if (!jj_2_49(1)) {
-				break loop;
-			}
-		}
-		consumeToken(ASTERISK);
-		tree.closeScope(strong);
 	
-	}
 
 	private void strongWithinEm() {
 		Strong strong = new Strong();
@@ -1030,24 +1233,15 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case BACKTICK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(BACKTICK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
 					break;
 				}
 				case LBRACK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(LBRACK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(LBRACK));
 					break;
 				}
 				case UNDERSCORE: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(UNDERSCORE).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
 					break;
 				}
 				}
@@ -1091,24 +1285,15 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case ASTERISK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(ASTERISK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(ASTERISK));
 					break;
 				}
 				case BACKTICK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(BACKTICK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
 					break;
 				}
 				case LBRACK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(LBRACK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(LBRACK));
 					break;
 				}
 				}
@@ -1148,24 +1333,15 @@ public class Parser {
 			} else {
 				switch (getNextTokenKind()) {
 				case ASTERISK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(ASTERISK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(ASTERISK));
 					break;
 				}
 				case BACKTICK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(BACKTICK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
 					break;
 				}
 				case LBRACK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(LBRACK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(LBRACK));
 					break;
 				}
 				}
@@ -1176,53 +1352,7 @@ public class Parser {
 		}
 	}
 
-	private void em() {
-		Em em = new Em();
-		tree.openScope(em);
-		consumeToken(UNDERSCORE);
-		loop: while (true) {
-			if (jj_2_65(1)) {
-				text();
-			} else if (jj_2_66(2147483647)) {
-				image();
-			} else if (jj_2_67(2147483647)) {
-				link();
-			} else if (jj_2_68(2147483647)) {
-				code();
-			} else if (jj_2_69(2147483647)) {
-				strongWithinEm();
-			} else {
-				switch (getNextTokenKind()) {
-				case ASTERISK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(ASTERISK).image);
-					tree.closeScope(text);
-					break;
-				}
-				case BACKTICK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(BACKTICK).image);
-					tree.closeScope(text);
-					break;
-				}
-				case LBRACK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(LBRACK).image);
-					tree.closeScope(text);
-					break;
-				}
-				}
-			}
-			if (!jj_2_70(1)) {
-				break loop;
-			}
-		}
-		consumeToken(UNDERSCORE);
-		tree.closeScope(em);
-	}
+	
 
 	private void emWithinStrong() {
 		Em em = new Em();
@@ -1231,33 +1361,24 @@ public class Parser {
 		loop: while (true) {
 			if (jj_2_71(1)) {
 				text();
-			} else if (jj_2_72(2147483647)) {
+			} else if (jj_2_72()) {
 				image();
-			} else if (jj_2_73(2147483647)) {
+			} else if (jj_2_73()) {
 				link();
-			} else if (jj_2_74(2147483647)) {
+			} else if (jj_2_74()) {
 				code();
 			} else {
 				switch (getNextTokenKind()) {
 				case ASTERISK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(ASTERISK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(ASTERISK));
 					break;
 				}
 				case BACKTICK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(BACKTICK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
 					break;
 				}
 				case LBRACK: {
-					Text text = new Text();
-					tree.openScope(text);
-					text.setValue(consumeToken(LBRACK).image);
-					tree.closeScope(text);
+					tree.addSingleValue(new Text(), consumeToken(LBRACK));
 					break;
 				}
 				}
@@ -1293,237 +1414,7 @@ public class Parser {
 		consumeToken(BACKTICK);
 		tree.closeScope(code);
 	}
-
-	private void code() {
-		Code code = new Code();
-		tree.openScope(code);
-		consumeToken(BACKTICK);
-		codeText();
-		consumeToken(BACKTICK);
-		tree.closeScope(code);
-	}
-
-	private void codeText() {
-		Text text = new Text();
-		tree.openScope(text);
-		StringBuffer s = new StringBuffer();
-		loop: while (true) {
-			switch (getNextTokenKind()) {
-			case ASTERISK: {
-				s.append(consumeToken(ASTERISK).image);
-				break;
-			}
-			case BACKSLASH: {
-				s.append(consumeToken(BACKSLASH).image);
-				break;
-			}
-			case CHAR_SEQUENCE: {
-				s.append(consumeToken(CHAR_SEQUENCE).image);
-				break;
-			}
-			case COLON: {
-				s.append(consumeToken(COLON).image);
-				break;
-			}
-			case DASH: {
-				s.append(consumeToken(DASH).image);
-				break;
-			}
-			case DIGITS: {
-				s.append(consumeToken(DIGITS).image);
-				break;
-			}
-			case DOT: {
-				s.append(consumeToken(DOT).image);
-				break;
-			}
-			case EQ: {
-				s.append(consumeToken(EQ).image);
-				break;
-			}
-			case ESCAPED_CHAR: {
-				s.append(consumeToken(ESCAPED_CHAR).image);
-				break;
-			}
-			case IMAGE_LABEL: {
-				s.append(consumeToken(IMAGE_LABEL).image);
-				break;
-			}
-			case LT: {
-				s.append(consumeToken(LT).image);
-				break;
-			}
-			case LBRACK: {
-				s.append(consumeToken(LBRACK).image);
-				break;
-			}
-			case RBRACK: {
-				s.append(consumeToken(RBRACK).image);
-				break;
-			}
-			case LPAREN: {
-				s.append(consumeToken(LPAREN).image);
-				break;
-			}
-			case GT: {
-				s.append(consumeToken(GT).image);
-				break;
-			}
-			case RPAREN: {
-				s.append(consumeToken(RPAREN).image);
-				break;
-			}
-			case UNDERSCORE: {
-				s.append(consumeToken(UNDERSCORE).image);
-				break;
-			}
-			default:
-				if (!nextAfterSpace(EOL, EOF)) {
-					switch (getNextTokenKind()) {
-					case SPACE: {
-						s.append(consumeToken(SPACE).image);
-						break;
-					}
-					case TAB: {
-						consumeToken(TAB);
-						s.append("    ");
-						break;
-					}
-					}
-				} 
-			}
-			if (!jj_2_76(1)) {
-				break loop;
-			}
-		}
-		text.setValue(s.toString());
-		tree.closeScope(text);
-	}
-
-	private void text() {
-		Text text = new Text();
-		tree.openScope(text);
-		StringBuffer s = new StringBuffer();
-		loop: while (true) {
-			switch (getNextTokenKind()) {
-			case BACKSLASH: {
-				s.append(consumeToken(BACKSLASH).image);
-				break;
-			}
-			case CHAR_SEQUENCE: {
-				s.append(consumeToken(CHAR_SEQUENCE).image);
-				break;
-			}
-			case COLON: {
-				s.append(consumeToken(COLON).image);
-				break;
-			}
-			case DASH: {
-				s.append(consumeToken(DASH).image);
-				break;
-			}
-			case DIGITS: {
-				s.append(consumeToken(DIGITS).image);
-				break;
-			}
-			case DOT: {
-				s.append(consumeToken(DOT).image);
-				break;
-			}
-			case EQ: {
-				s.append(consumeToken(EQ).image);
-				break;
-			}
-			case ESCAPED_CHAR: {
-				s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
-				break;
-			}
-			case GT: {
-				s.append(consumeToken(GT).image);
-				break;
-			}
-			case IMAGE_LABEL: {
-				s.append(consumeToken(IMAGE_LABEL).image);
-				break;
-			}
-			case LPAREN: {
-				s.append(consumeToken(LPAREN).image);
-				break;
-			}
-			case LT: {
-				s.append(consumeToken(LT).image);
-				break;
-			}
-			case RBRACK: {
-				s.append(consumeToken(RBRACK).image);
-				break;
-			}
-			case RPAREN: {
-				s.append(consumeToken(RPAREN).image);
-				break;
-			}
-			default:
-				if (!nextAfterSpace(EOL, EOF)) {
-					switch (getNextTokenKind()) {
-					case SPACE: {
-						s.append(consumeToken(SPACE).image);
-						break;
-					}
-					case TAB: {
-						consumeToken(TAB);
-						s.append("    ");
-						break;
-					}
-					}
-				}
-			}
-			if (!jj_2_77(1)) {
-				break loop;
-			}
-		}
-		text.setValue(s.toString());
-		tree.closeScope(text);
-	}
-
-	private void looseChar() {
-		Text text = new Text();
-		tree.openScope(text);
-		Token t = null;
-		switch (getNextTokenKind()) {
-		case ASTERISK: {
-			t = consumeToken(ASTERISK);
-			break;
-		}
-		case BACKTICK: {
-			t = consumeToken(BACKTICK);
-			break;
-		}
-		case LBRACK: {
-			t = consumeToken(LBRACK);
-			break;
-		}
-		case UNDERSCORE: {
-			t = consumeToken(UNDERSCORE);
-			break;
-		}
-		}
-		text.setValue(t.image);
-		tree.closeScope(text);
-	}
-
-	private void lineBreak() {
-		LineBreak linebreak = new LineBreak();
-		tree.openScope(linebreak);
-		loop: while (true) {
-			if(getNextTokenKind() != SPACE && getNextTokenKind() != TAB) {
-				break loop;
-			}
-			consumeToken(getNextTokenKind());
-		}
-		consumeToken(EOL);
-		tree.closeScope(linebreak);
-	}
-
+	
 	private void whiteSpace() {
 		loop: while (true) {
 			if(getNextTokenKind() != SPACE && getNextTokenKind() != TAB) {
@@ -1532,27 +1423,232 @@ public class Parser {
 			consumeToken(getNextTokenKind());
 		}
 	}
+	
+	private int getNextTokenKind() {
+		if(nextTokenKind != -1) { 
+			return nextTokenKind; 
+		}
+		if ((nextToken = token.next) == null) {
+			return (nextTokenKind = (token.next = tm.getNextToken()).kind);
+		}
+		return (nextTokenKind = nextToken.kind);
+	}
+	
+	private Token consumeToken(int kind) {
+		Token oldToken = token;
+		if (oldToken.next != null) {
+			token = token.next;
+		} else {
+			token.next = tm.getNextToken();
+			token = token.next;
+		}
+		nextTokenKind = -1;
+		if (token.kind == kind) {
+			return token;
+		}
+		token = oldToken;
+		return token;
+	}
+	
+	private Token getToken(int index) {
+		Token t = lookingAhead ? scanPosition : token;
+		for (int i = 0; i < index; i++) {
+			if (t.next != null) {
+				t = t.next;
+			} else {
+				t = t.next = tm.getNextToken();
+			}
+		}
+		return t;
+	}
+	
+	private boolean hasAnyBlockElementsAhead() {
+		try {
+			lookAhead = 1;
+			lastPosition = scanPosition = token;
+			return !noMoreBlockElements();
+		} catch (LookaheadSuccess ls) {
+			return true;
+		} 
+	}
+	
+	private boolean blockAhead() {
+		if (getToken(1).kind == EOL) {
+			Token t;
+			int i = 2;
+			int eol = 0;
+			int quoteLevel;
+			do {
+				quoteLevel = 0;
+				do {
+					t = getToken(i++);
+					if (t.kind == EOL && currentBlockLevel > 0 && ++eol > 2) {
+						return false;
+					}
+					if (t.kind == GT) {
+						if (t.beginColumn == 1 && currentBlockLevel > 0 && currentQuoteLevel == 0) {
+							return false;
+						}
+						quoteLevel++;
+					}
+				} while (t.kind == GT || t.kind == SPACE || t.kind == TAB);
 
-	private boolean orderedListAhead(int xla) {
-		lookAhead = xla;
+				if (quoteLevel > currentQuoteLevel) {
+					return true;
+				}
+				if (quoteLevel < currentQuoteLevel) {
+					return false;
+				}
+			} while (t.kind == EOL);
+
+			return (t.kind != EOF) && ((quoteLevel > 0 && quoteLevel == currentQuoteLevel)
+					|| (t.beginColumn > ((currentBlockLevel * 4) - 2)));
+		}
+		return false;
+	}
+	
+	private boolean fencesAhead() {
+		if (getToken(1).kind == EOL) {
+			int i = skip(2, SPACE, TAB);
+			if (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK) {
+				i = skip(i + 3, SPACE, TAB);
+				return getToken(i).kind == EOL || getToken(i).kind == EOF;
+			}
+		}
+		return false;
+	}
+
+	
+
+	private boolean listItemAhead(boolean ordered) {
+		if (getToken(1).kind == EOL) {
+			for (int i = 2, eol = 1;; i++) {
+				Token t = getToken(i);
+
+				if (t.kind == EOL && ++eol > 2) {
+					return false;
+				} else if (t.kind != SPACE && t.kind != TAB && t.kind != EOL) {
+					if (currentQuoteLevel > 0) {
+						return false;
+					}
+					if (ordered) {
+						return (t.kind == DIGITS && getToken(i + 1).kind == DOT);
+					}
+					return (t.kind == DASH);
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean multilineAhead(Integer token) {
+		if (getToken(1).kind == token && getToken(2).kind != token && getToken(2).kind != EOL) {
+			for (int i = 2;; i++) {
+				Token t = getToken(i);
+				if (t.kind == token) {
+					return true;
+				} else if (t.kind == EOL) {
+					i = skip(i + 1, SPACE, TAB);
+					int quoteLevel = newQuoteLevel(i);
+					if (quoteLevel == currentQuoteLevel) {
+						i = skip(i, SPACE, TAB, GT);
+						if (getToken(i).kind == token || getToken(i).kind == EOL || getToken(i).kind == DASH
+								|| (getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
+								|| (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK
+										&& getToken(i + 2).kind == BACKTICK)
+								|| headingAhead(i)) {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else if (t.kind == EOF) {
+					return false;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean textAhead() {
+		int i = skip(1, SPACE, TAB);
+		if (getToken(i).kind == EOL && getToken(i + 1).kind != EOL && getToken(i + 1).kind != EOF) {
+			i = skip(i + 1, SPACE, TAB);
+			int quoteLevel = newQuoteLevel(i);
+			if (quoteLevel == currentQuoteLevel) {
+				i = skip(i, SPACE, TAB, GT);
+				return getToken(i).kind != EOL && getToken(i).kind != DASH
+						&& !(getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
+						&& !(getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK
+								&& getToken(i + 2).kind == BACKTICK)
+						&& !headingAhead(i);
+			}
+		}
+		return false;
+	}
+
+	private boolean nextAfterSpace(Integer... tokens) {
+		int i = skip(1, SPACE, TAB);
+		return Arrays.asList(tokens).contains(getToken(i).kind);
+	}
+
+	private int newQuoteLevel(int offset) {
+		int quoteLevel = 0;
+		for (int i = offset;; i++) {
+			Token t = getToken(i);
+			if (t.kind == GT) {
+				quoteLevel++;
+			} else if (t.kind != SPACE && t.kind != TAB) {
+				return quoteLevel;
+			}
+		}
+	}
+
+	private int skip(int offset, Integer... tokens) {
+		for (int i = offset;; i++) {
+			Token t = getToken(i);
+			if (t.kind == EOF || !Arrays.asList(tokens).contains(t.kind)) {
+				return i;
+			}
+		}
+	}
+
+	
+	private boolean headingAhead(int offset) {
+		if (getToken(offset).kind == EQ) {
+			int heading = 1;
+			for (int i = (offset + 1);; i++) {
+				if (getToken(i).kind != EQ) {
+					return true;
+				}
+				if (++heading > 6) {
+					return false;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean orderedListAhead() {
+		lookAhead = 2;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_227();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
-
-	private boolean fencedCodeBlockAhead(int xla) {
-		lookAhead = xla;
+	
+	private boolean fencedCodeBlockAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_53();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
-
+	
 	private boolean headingInlineAhead() {
 		lookAhead = 1;
 		lastPosition = scanPosition = token;
@@ -1582,9 +1678,9 @@ public class Parser {
 			return true;
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
-
+	
 	private boolean inlineTextAhead() {
 		lookAhead = 1;
 		lastPosition = scanPosition = token;
@@ -1592,7 +1688,7 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean inlineImageAhead() {
@@ -1602,67 +1698,97 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
-
-	private boolean jj_2_8(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_63();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		} 
-	}
-
-	private boolean jj_2_9(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_64();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		} 
-	}
-
-	private boolean jj_2_10(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_65();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		} 
-	}
-
-	private boolean jj_2_11(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_66();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		} 
-	}
-
-	private boolean jj_2_12(int xla) {
-		lookAhead = xla;
+	
+	private boolean blockquoteEmptyLineAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_67();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
+
+
+
+
+
+
+
+
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+
+	private boolean jj_2_8() {
+		lookAhead = 2147483647;
+		lastPosition = scanPosition = token;
+		try {
+			return !jj_3R_63();
+		} catch (LookaheadSuccess ls) {
+			return true;
+		}
+	}
+
+	private boolean jj_2_9() {
+		lookAhead = 2147483647;
+		lastPosition = scanPosition = token;
+		try {
+			return !jj_3R_64();
+		} catch (LookaheadSuccess ls) {
+			return true;
+		}
+	}
+
+	private boolean jj_2_10() {
+		lookAhead = 2147483647;
+		lastPosition = scanPosition = token;
+		try {
+			return !jj_3R_65();
+		} catch (LookaheadSuccess ls) {
+			return true;
+		}
+	}
+
+	private boolean jj_2_11() {
+		lookAhead = 2147483647;
+		lastPosition = scanPosition = token;
+		try {
+			return !jj_3R_66();
+		} catch (LookaheadSuccess ls) {
+			return true;
+		}
+	}
+
+	
 
 	private boolean jj_2_13(int xla) {
 		lookAhead = xla;
 		lastPosition = scanPosition = token;
 		try {
-			return !scanForBlockElement();
+			return !noMoreBlockElements();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_14(int xla) {
@@ -1672,27 +1798,27 @@ public class Parser {
 			return !jj_3_14();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
-	private boolean jj_2_15(int xla) {
-		lookAhead = xla;
+	private boolean jj_2_15() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
-			return !scanForBlockElement();
+			return !noMoreBlockElements();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_16(int xla) {
 		lookAhead = xla;
 		lastPosition = scanPosition = token;
 		try {
-			return !scanForBlockElement();
+			return !noMoreBlockElements();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_17(int xla) {
@@ -1702,7 +1828,7 @@ public class Parser {
 			return !jj_3_17();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_18(int xla) {
@@ -1712,7 +1838,7 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_19(int xla) {
@@ -1722,7 +1848,7 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_20(int xla) {
@@ -1732,7 +1858,7 @@ public class Parser {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_21(int xla) {
@@ -1742,7 +1868,7 @@ public class Parser {
 			return !jj_3_21();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_22(int xla) {
@@ -1752,7 +1878,7 @@ public class Parser {
 			return !jj_3R_94();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_23(int xla) {
@@ -1762,7 +1888,7 @@ public class Parser {
 			return !jj_3_23();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_24(int xla) {
@@ -1772,7 +1898,7 @@ public class Parser {
 			return !jj_3R_96();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_25(int xla) {
@@ -1782,7 +1908,7 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_26(int xla) {
@@ -1792,7 +1918,7 @@ public class Parser {
 			return !jj_3R_64();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_27(int xla) {
@@ -1802,7 +1928,7 @@ public class Parser {
 			return !jj_3R_65();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_28(int xla) {
@@ -1812,7 +1938,7 @@ public class Parser {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_29(int xla) {
@@ -1822,7 +1948,7 @@ public class Parser {
 			return !jj_3R_94();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_30(int xla) {
@@ -1832,7 +1958,7 @@ public class Parser {
 			return !jj_3_30();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_31(int xla) {
@@ -1842,7 +1968,7 @@ public class Parser {
 			return !jj_3R_96();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_32(int xla) {
@@ -1852,7 +1978,7 @@ public class Parser {
 			return !jj_3_32();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_33(int xla) {
@@ -1862,7 +1988,7 @@ public class Parser {
 			return !jj_3_33();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_34(int xla) {
@@ -1872,7 +1998,7 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_35(int xla) {
@@ -1882,7 +2008,7 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_36(int xla) {
@@ -1892,7 +2018,7 @@ public class Parser {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_37(int xla) {
@@ -1902,7 +2028,7 @@ public class Parser {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_38(int xla) {
@@ -1912,7 +2038,7 @@ public class Parser {
 			return !jj_3R_134();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_39(int xla) {
@@ -1922,7 +2048,7 @@ public class Parser {
 			return !jj_3_39();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_40(int xla) {
@@ -1932,17 +2058,17 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
-	private boolean jj_2_41(int xla) {
-		lookAhead = xla;
+	private boolean jj_2_41() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_42(int xla) {
@@ -1952,7 +2078,7 @@ public class Parser {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_43(int xla) {
@@ -1962,7 +2088,7 @@ public class Parser {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_44(int xla) {
@@ -1972,7 +2098,7 @@ public class Parser {
 			return !jj_3_44();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_45(int xla) {
@@ -1982,7 +2108,7 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_46(int xla) {
@@ -1992,7 +2118,7 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_47(int xla) {
@@ -2002,7 +2128,7 @@ public class Parser {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_48(int xla) {
@@ -2012,7 +2138,7 @@ public class Parser {
 			return !jj_3R_148();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_49(int xla) {
@@ -2022,7 +2148,7 @@ public class Parser {
 			return !jj_3_49();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_50(int xla) {
@@ -2032,7 +2158,7 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_51(int xla) {
@@ -2042,7 +2168,7 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_52(int xla) {
@@ -2052,7 +2178,7 @@ public class Parser {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_53(int xla) {
@@ -2062,7 +2188,7 @@ public class Parser {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_54(int xla) {
@@ -2072,7 +2198,7 @@ public class Parser {
 			return !jj_3_54();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_55(int xla) {
@@ -2082,7 +2208,7 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_56(int xla) {
@@ -2092,7 +2218,7 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_57(int xla) {
@@ -2102,7 +2228,7 @@ public class Parser {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_58(int xla) {
@@ -2112,7 +2238,7 @@ public class Parser {
 			return !jj_3R_162();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_59(int xla) {
@@ -2132,7 +2258,7 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_61(int xla) {
@@ -2142,7 +2268,7 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_62(int xla) {
@@ -2152,7 +2278,7 @@ public class Parser {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_63(int xla) {
@@ -2162,7 +2288,7 @@ public class Parser {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_64(int xla) {
@@ -2172,7 +2298,7 @@ public class Parser {
 			return !jj_3_64();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_65(int xla) {
@@ -2182,7 +2308,7 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_66(int xla) {
@@ -2192,7 +2318,7 @@ public class Parser {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_67(int xla) {
@@ -2202,7 +2328,7 @@ public class Parser {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_68(int xla) {
@@ -2212,7 +2338,7 @@ public class Parser {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_69(int xla) {
@@ -2222,7 +2348,7 @@ public class Parser {
 			return !jj_3R_176();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_70(int xla) {
@@ -2232,7 +2358,7 @@ public class Parser {
 			return !jj_3_70();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_71(int xla) {
@@ -2242,37 +2368,37 @@ public class Parser {
 			return !jj_3R_61();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
-	private boolean jj_2_72(int xla) {
-		lookAhead = xla;
+	private boolean jj_2_72() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
-	private boolean jj_2_73(int xla) {
-		lookAhead = xla;
+	private boolean jj_2_73() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
-	private boolean jj_2_74(int xla) {
-		lookAhead = xla;
+	private boolean jj_2_74() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_75(int xla) {
@@ -2282,7 +2408,7 @@ public class Parser {
 			return !jj_3_75();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_76(int xla) {
@@ -2292,7 +2418,7 @@ public class Parser {
 			return !jj_3_76();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
+		}
 	}
 
 	private boolean jj_2_77(int xla) {
@@ -2302,40 +2428,16 @@ public class Parser {
 			return !jj_3_77();
 		} catch (LookaheadSuccess ls) {
 			return true;
-		} 
-	}
-
-	private boolean jj_3R_259() {
-		Token xsp;
-		xsp = scanPosition;
-		if (scanToken(SPACE)) {
-			scanPosition = xsp;
-			if (scanToken(TAB)) {
-				return true;
-			}
 		}
-		return false;
 	}
 
 	private boolean jj_3R_228() {
 		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
-			if (jj_3R_259()) {
+			if (jj_3R_266()) {
 				scanPosition = xsp;
 				break loop;
-			}
-		}
-		return false;
-	}
-
-	private boolean jj_3R_267() {
-		Token xsp;
-		xsp = scanPosition;
-		if (scanToken(SPACE)) {
-			scanPosition = xsp;
-			if (scanToken(TAB)) {
-				return true;
 			}
 		}
 		return false;
@@ -2345,7 +2447,7 @@ public class Parser {
 		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
-			if (jj_3R_267()) {
+			if (jj_3R_266()) {
 				scanPosition = xsp;
 				break loop;
 			}
@@ -2366,18 +2468,6 @@ public class Parser {
 						return true;
 					}
 				}
-			}
-		}
-		return false;
-	}
-
-	private boolean jj_3R_222() {
-		Token xsp;
-		xsp = scanPosition;
-		if (scanToken(SPACE)) {
-			scanPosition = xsp;
-			if (scanToken(TAB)) {
-				return true;
 			}
 		}
 		return false;
@@ -2417,8 +2507,9 @@ public class Parser {
 																lookingAhead = true;
 																semanticLookAhead = !nextAfterSpace(EOL, EOF);
 																lookingAhead = false;
-																if (!semanticLookAhead || jj_3R_222())
+																if (!semanticLookAhead || jj_3R_266()) {
 																	return true;
+																}
 															}
 														}
 													}
@@ -2451,23 +2542,8 @@ public class Parser {
 		return false;
 	}
 
-	private boolean jj_3R_207() {
-		Token xsp;
-		xsp = scanPosition;
-		if (scanToken(SPACE)) {
-			scanPosition = xsp;
-			if (scanToken(TAB)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	private boolean jj_3R_272() {
-		if (jj_3R_262()) {
-			return true;
-		}
-		if (jj_3R_228()) {
+		if (jj_3R_262() || jj_3R_228()) {
 			return true;
 		}
 		Token xsp;
@@ -2521,8 +2597,9 @@ public class Parser {
 																			lookingAhead = true;
 																			semanticLookAhead = !nextAfterSpace(EOL, EOF);
 																			lookingAhead = false;
-																			if (!semanticLookAhead || jj_3R_207())
+																			if (!semanticLookAhead || jj_3R_266()) {
 																				return true;
+																			}
 																		}
 																	}
 																}
@@ -2559,20 +2636,11 @@ public class Parser {
 	}
 
 	private boolean jj_3R_66() {
-		if (scanToken(BACKTICK)) {
-			return true;
-		}
-		if (jj_3R_236()) {
-			return true;
-		}
-		return scanToken(BACKTICK);
+		return scanToken(BACKTICK) || jj_3R_236() || scanToken(BACKTICK);
 	}
 
 	private boolean jj_3R_242() {
-		if (scanToken(BACKTICK)) {
-			return true;
-		}
-		if (jj_3R_236()) {
+		if (scanToken(BACKTICK) || jj_3R_236()) {
 			return true;
 		}
 		Token xsp;
@@ -2585,12 +2653,9 @@ public class Parser {
 		}
 		return scanToken(BACKTICK);
 	}
-	
+
 	private boolean jj_3R_249() {
-		if (jj_3R_262()) {
-			return true;
-		}
-		return jj_3R_248();
+		return jj_3R_262() || jj_3R_248();
 	}
 
 	private boolean jj_3_75() {
@@ -2608,8 +2673,9 @@ public class Parser {
 							scanPosition = xsp;
 							if (scanToken(BACKTICK)) {
 								scanPosition = xsp;
-								if (scanToken(LBRACK))
+								if (scanToken(LBRACK)) {
 									return true;
+								}
 							}
 						}
 					}
@@ -2620,13 +2686,10 @@ public class Parser {
 	}
 
 	private boolean jj_3R_148() {
-		if (scanToken(UNDERSCORE)) {
+		if (scanToken(UNDERSCORE) || jj_3_75()) {
 			return true;
 		}
 		Token xsp;
-		if (jj_3_75()) {
-			return true;
-		}
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_75()) {
@@ -2636,7 +2699,7 @@ public class Parser {
 		}
 		return scanToken(UNDERSCORE);
 	}
-	
+
 	private boolean jj_3_70() {
 		Token xsp;
 		xsp = scanPosition;
@@ -2654,8 +2717,9 @@ public class Parser {
 								scanPosition = xsp;
 								if (scanToken(BACKTICK)) {
 									scanPosition = xsp;
-									if (scanToken(LBRACK))
+									if (scanToken(LBRACK)) {
 										return true;
+									}
 								}
 							}
 						}
@@ -2667,13 +2731,10 @@ public class Parser {
 	}
 
 	private boolean jj_3R_65() {
-		if (scanToken(UNDERSCORE)) {
+		if (scanToken(UNDERSCORE) || jj_3_70()) {
 			return true;
 		}
 		Token xsp;
-		if (jj_3_70()) {
-			return true;
-		}
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_70()) {
@@ -2699,8 +2760,9 @@ public class Parser {
 							scanPosition = xsp;
 							if (scanToken(BACKTICK)) {
 								scanPosition = xsp;
-								if (scanToken(LBRACK))
+								if (scanToken(LBRACK)) {
 									return true;
+								}
 							}
 						}
 					}
@@ -2712,8 +2774,9 @@ public class Parser {
 
 	private boolean jj_3R_248() {
 		Token xsp;
-		if (jj_3_64())
+		if (jj_3_64()) {
 			return true;
+		}
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_64()) {
@@ -2725,10 +2788,7 @@ public class Parser {
 	}
 
 	private boolean jj_3R_134() {
-		if (scanToken(UNDERSCORE)) {
-			return true;
-		}
-		if (jj_3R_248()) {
+		if (scanToken(UNDERSCORE) || jj_3R_248()) {
 			return true;
 		}
 		Token xsp;
@@ -2762,8 +2822,9 @@ public class Parser {
 								scanPosition = xsp;
 								if (scanToken(BACKTICK)) {
 									scanPosition = xsp;
-									if (scanToken(LBRACK))
+									if (scanToken(LBRACK)) {
 										return true;
+									}
 								}
 							}
 						}
@@ -2773,7 +2834,7 @@ public class Parser {
 		}
 		return false;
 	}
-	
+
 	private boolean jj_3R_251() {
 		return (jj_3R_262() || jj_3R_250());
 	}
@@ -2793,8 +2854,9 @@ public class Parser {
 							scanPosition = xsp;
 							if (scanToken(LBRACK)) {
 								scanPosition = xsp;
-								if (scanToken(UNDERSCORE))
+								if (scanToken(UNDERSCORE)) {
 									return true;
+								}
 							}
 						}
 					}
@@ -2805,13 +2867,10 @@ public class Parser {
 	}
 
 	private boolean jj_3R_176() {
-		if (scanToken(ASTERISK)) {
+		if (scanToken(ASTERISK) || jj_3_54()) {
 			return true;
 		}
 		Token xsp;
-		if (jj_3_54()) {
-			return true;
-		}
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_54()) {
@@ -2842,8 +2901,9 @@ public class Parser {
 								scanPosition = xsp;
 								if (scanToken(LBRACK)) {
 									scanPosition = xsp;
-									if (scanToken(UNDERSCORE))
+									if (scanToken(UNDERSCORE)) {
 										return true;
+									}
 								}
 							}
 						}
@@ -2853,15 +2913,12 @@ public class Parser {
 		}
 		return false;
 	}
-	
+
 	private boolean jj_3R_64() {
-		if (scanToken(ASTERISK)) {
+		if (scanToken(ASTERISK) || jj_3_49()) {
 			return true;
 		}
 		Token xsp;
-		if (jj_3_49()) {
-			return true;
-		}
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_49()) {
@@ -2914,10 +2971,7 @@ public class Parser {
 	}
 
 	private boolean jj_3R_162() {
-		if (scanToken(ASTERISK)) {
-			return true;
-		}
-		if (jj_3R_250()) {
+		if (scanToken(ASTERISK) || jj_3R_250()) {
 			return true;
 		}
 		Token xsp;
@@ -2956,18 +3010,6 @@ public class Parser {
 						}
 					}
 				}
-			}
-		}
-		return false;
-	}
-
-	private boolean jj_3R_133() {
-		Token xsp;
-		xsp = scanPosition;
-		if (scanToken(SPACE)) {
-			scanPosition = xsp;
-			if (scanToken(TAB)) {
-				return true;
 			}
 		}
 		return false;
@@ -3013,7 +3055,7 @@ public class Parser {
 																			lookingAhead = true;
 																			semanticLookAhead = !nextAfterSpace(RPAREN);
 																			lookingAhead = false;
-																			if (!semanticLookAhead || jj_3R_133()) {
+																			if (!semanticLookAhead || jj_3R_266()) {
 																				return true;
 																			}
 																		}
@@ -3047,7 +3089,7 @@ public class Parser {
 		}
 		return false;
 	}
-	
+
 	private boolean jj_3R_243() {
 		Token xsp;
 		loop: while (true) {
@@ -3061,31 +3103,10 @@ public class Parser {
 	}
 
 	private boolean jj_3R_96() {
-		if (scanToken(LPAREN)) {
-			return true;
-		}
-		if (jj_3R_228()) {
-			return true;
-		}
-		if (jj_3R_243()) {
-			return true;
-		}
-		if (jj_3R_228()) {
+		if (scanToken(LPAREN) || jj_3R_228() || jj_3R_243() || jj_3R_228()) {
 			return true;
 		}
 		return scanToken(RPAREN);
-	}
-
-	private boolean jj_3R_115() {
-		Token xsp;
-		xsp = scanPosition;
-		if (scanToken(SPACE)) {
-			scanPosition = xsp;
-			if (scanToken(TAB)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private boolean jj_3_30() {
@@ -3101,8 +3122,9 @@ public class Parser {
 						scanPosition = xsp;
 						if (jj_3R_94()) {
 							scanPosition = xsp;
-							if (jj_3R_233())
+							if (jj_3R_233()) {
 								return true;
+							}
 						}
 					}
 				}
@@ -3143,8 +3165,9 @@ public class Parser {
 															lookingAhead = true;
 															semanticLookAhead = !nextAfterSpace(RBRACK);
 															lookingAhead = false;
-															if (!semanticLookAhead || jj_3R_115())
+															if (!semanticLookAhead || jj_3R_266()) {
 																return true;
+															}
 														}
 													}
 												}
@@ -3177,16 +3200,10 @@ public class Parser {
 	}
 
 	private boolean jj_3R_63() {
-		if (scanToken(LBRACK)) {
-			return true;
-		}
-		if (jj_3R_228()) {
+		if (scanToken(LBRACK) || jj_3R_228() || jj_3_30()) {
 			return true;
 		}
 		Token xsp;
-		if (jj_3_30()) {
-			return true;
-		}
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_30()) {
@@ -3194,10 +3211,7 @@ public class Parser {
 				break loop;
 			}
 		}
-		if (jj_3R_228()) {
-			return true;
-		}
-		if (scanToken(RBRACK)) {
+		if (jj_3R_228() || scanToken(RBRACK)) {
 			return true;
 		}
 		xsp = scanPosition;
@@ -3208,22 +3222,10 @@ public class Parser {
 	}
 
 	private boolean jj_3R_62() {
-		if (scanToken(LBRACK)) {
-			return true;
-		}
-		if (jj_3R_228()) {
-			return true;
-		}
-		if (scanToken(IMAGE_LABEL)) {
-			return true;
-		}
-		if (jj_3R_228()) {
+		if (scanToken(LBRACK) || jj_3R_228() || scanToken(IMAGE_LABEL) || jj_3_23()) {
 			return true;
 		}
 		Token xsp;
-		if (jj_3_23()) {
-			return true;
-		}
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3_23()) {
@@ -3231,10 +3233,7 @@ public class Parser {
 				break loop;
 			}
 		}
-		if (jj_3R_228()) {
-			return true;
-		}
-		if (scanToken(RBRACK)) {
+		if (jj_3R_228() || scanToken(RBRACK)) {
 			return true;
 		}
 		xsp = scanPosition;
@@ -3268,8 +3267,9 @@ public class Parser {
 							lookingAhead = false;
 							if (!semanticLookAhead || jj_3R_242()) {
 								scanPosition = xsp;
-								if (jj_3R_233())
+								if (jj_3R_233()) {
 									return true;
+								}
 							}
 						}
 					}
@@ -3278,7 +3278,7 @@ public class Parser {
 		}
 		return false;
 	}
-	
+
 	private boolean jj_3R_232() {
 		Token xsp;
 		if (jj_3_21()) {
@@ -3293,7 +3293,7 @@ public class Parser {
 		}
 		return false;
 	}
-	
+
 	private boolean jj_3R_265() {
 		Token xsp;
 		xsp = scanPosition;
@@ -3307,10 +3307,10 @@ public class Parser {
 	}
 
 	private boolean jj_3R_260() {
-		Token xsp;
 		if (jj_3R_265()) {
 			return true;
 		}
+		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3R_265()) {
@@ -3322,10 +3322,7 @@ public class Parser {
 	}
 
 	private boolean jj_3R_87() {
-		if (scanToken(EOL)) {
-			return true;
-		}
-		return jj_3R_261();
+		return scanToken(EOL) || jj_3R_261();
 	}
 
 	private boolean jj_3R_266() {
@@ -3352,24 +3349,10 @@ public class Parser {
 		return false;
 	}
 
-	private boolean jj_3R_86() {
-		Token xsp;
-		xsp = scanPosition;
-		if (scanToken(SPACE)) {
-			scanPosition = xsp;
-			if (scanToken(TAB)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private boolean jj_3R_231() {
 		if (scanToken(EOL) || jj_3R_228() || scanToken(BACKTICK)) {
 			return true;
 		}
-		
-
 		Token xsp;
 		while (true) {
 			xsp = scanPosition;
@@ -3423,7 +3406,7 @@ public class Parser {
 																				lookingAhead = true;
 																				semanticLookAhead = !nextAfterSpace(EOL, EOF);
 																				lookingAhead = false;
-																				if (!semanticLookAhead || jj_3R_86()) {
+																				if (!semanticLookAhead || jj_3R_266()) {
 																					scanPosition = xsp;
 																					lookingAhead = true;
 																					semanticLookAhead = !fencesAhead();
@@ -3544,7 +3527,7 @@ public class Parser {
 	}
 
 
-	private boolean scanForBlockElement() {
+	private boolean noMoreBlockElements() {
 		Token xsp = scanPosition;
 		lookingAhead = true;
 		semanticLookAhead = headingAhead(1);
@@ -3569,21 +3552,7 @@ public class Parser {
 		return false;
 	}
 
-	private Token consumeToken(int kind) {
-		Token oldToken = token;
-		if (oldToken.next != null) {
-			token = token.next;
-		} else {
-			token.next = tm.getNextToken();
-			token = token.next;
-		}
-		nextTokenKind = -1;
-		if (token.kind == kind) {
-			return token;
-		}
-		token = oldToken;
-		return token;
-	}
+
 
 	private boolean scanToken(int kind) {
 		if (scanPosition == lastPosition) {
@@ -3605,180 +3574,12 @@ public class Parser {
 		return false;
 	}
 
-	private Token getToken(int index) {
-		Token t = lookingAhead ? scanPosition : token;
-		for (int i = 0; i < index; i++) {
-			if (t.next != null) {
-				t = t.next;
-			} else {
-				t = t.next = tm.getNextToken();
-			}
-		}
-		return t;
-	}
 
-	private int getNextTokenKind() {
-		if(nextTokenKind != -1) { 
-			return nextTokenKind; 
-		}
-		if ((nextToken = token.next) == null) {
-			return (nextTokenKind = (token.next = tm.getNextToken()).kind);
-		}
-		return (nextTokenKind = nextToken.kind);
-	}
 
-	private boolean blockAhead() {
-		if (getToken(1).kind == EOL) {
-			Token t;
-			int i = 2;
-			int eol = 0;
-			int quoteLevel;
-			do {
-				quoteLevel = 0;
-				do {
-					t = getToken(i++);
-					if (t.kind == EOL && currentBlockLevel > 0 && ++eol > 2) {
-						return false;
-					}
-					if (t.kind == GT) {
-						if (t.beginColumn == 1 && currentBlockLevel > 0 && currentQuoteLevel == 0) {
-							return false;
-						}
-						quoteLevel++;
-					}
-				} while (t.kind == GT || t.kind == SPACE || t.kind == TAB);
 
-				if (quoteLevel > currentQuoteLevel) {
-					return true;
-				}
-				if (quoteLevel < currentQuoteLevel) {
-					return false;
-				}
-			} while (t.kind == EOL);
 
-			return (t.kind != EOF) && ((quoteLevel > 0 && quoteLevel == currentQuoteLevel)
-					|| (t.beginColumn > ((currentBlockLevel * 4) - 2)));
-		}
-		return false;
-	}
 
-	private boolean fencesAhead() {
-		if (getToken(1).kind == EOL) {
-			int i = skip(2, SPACE, TAB);
-			if (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK) {
-				i = skip(i + 3, SPACE, TAB);
-				return getToken(i).kind == EOL || getToken(i).kind == EOF;
-			}
-		}
-		return false;
-	}
 
-	private boolean headingAhead(int offset) {
-		if (getToken(offset).kind == EQ) {
-			int heading = 1;
-			for (int i = (offset + 1);; i++) {
-				if (getToken(i).kind != EQ) {
-					return true;
-				}
-				if (++heading > 6) {
-					return false;
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean listItemAhead(boolean ordered) {
-		if (getToken(1).kind == EOL) {
-			for (int i = 2, eol = 1;; i++) {
-				Token t = getToken(i);
-
-				if (t.kind == EOL && ++eol > 2) {
-					return false;
-				} else if (t.kind != SPACE && t.kind != TAB && t.kind != EOL) {
-					if (currentQuoteLevel > 0) {
-						return false;
-					}
-					if (ordered) {
-						return (t.kind == DIGITS && getToken(i + 1).kind == DOT);
-					}
-					return (t.kind == DASH);
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean multilineAhead(Integer token) {
-		if (getToken(1).kind == token && getToken(2).kind != token && getToken(2).kind != EOL) {
-			for (int i = 2;; i++) {
-				Token t = getToken(i);
-				if (t.kind == token) {
-					return true;
-				} else if (t.kind == EOL) {
-					i = skip(i + 1, SPACE, TAB);
-					int quoteLevel = newQuoteLevel(i);
-					if (quoteLevel == currentQuoteLevel) {
-						i = skip(i, SPACE, TAB, GT);
-						if (getToken(i).kind == token || getToken(i).kind == EOL || getToken(i).kind == DASH
-								|| (getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
-								|| (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK
-										&& getToken(i + 2).kind == BACKTICK)
-								|| headingAhead(i)) {
-							return false;
-						}
-					} else {
-						return false;
-					}
-				} else if (t.kind == EOF) {
-					return false;
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean textAhead() {
-		int i = skip(1, SPACE, TAB);
-		if (getToken(i).kind == EOL && getToken(i + 1).kind != EOL && getToken(i + 1).kind != EOF) {
-			i = skip(i + 1, SPACE, TAB);
-			int quoteLevel = newQuoteLevel(i);
-			if (quoteLevel == currentQuoteLevel) {
-				i = skip(i, SPACE, TAB, GT);
-				return getToken(i).kind != EOL && getToken(i).kind != DASH
-						&& !(getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
-						&& !(getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK
-								&& getToken(i + 2).kind == BACKTICK)
-						&& !headingAhead(i);
-			}
-		}
-		return false;
-	}
-
-	private boolean nextAfterSpace(Integer... tokens) {
-		int i = skip(1, SPACE, TAB);
-		return Arrays.asList(tokens).contains(getToken(i).kind);
-	}
-
-	private int newQuoteLevel(int offset) {
-		int quoteLevel = 0;
-		for (int i = offset;; i++) {
-			Token t = getToken(i);
-			if (t.kind == GT) {
-				quoteLevel++;
-			} else if (t.kind != SPACE && t.kind != TAB) {
-				return quoteLevel;
-			}
-		}
-	}
-
-	private int skip(int offset, Integer... tokens) {
-		for (int i = offset;; i++) {
-			Token t = getToken(i);
-			if (t.kind == EOF || !Arrays.asList(tokens).contains(t.kind)) {
-				return i;
-			}
-		}
-	}
-
+	
+	
 }

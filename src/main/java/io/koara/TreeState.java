@@ -1,9 +1,12 @@
 package io.koara;
 
+import static io.koara.TokenManager.BACKTICK;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import io.koara.ast.Node;
+import io.koara.ast.Text;
 
 public class TreeState {
 
@@ -33,6 +36,12 @@ public class TreeState {
 			n.addChild(c, a);
 		}
 		pushNode(n);
+	}
+	
+	public void addSingleValue(Node n, Token t) {
+		openScope(n);
+		n.setValue(t.image);
+		closeScope(n);
 	}
 
 	private int nodeArity() {
