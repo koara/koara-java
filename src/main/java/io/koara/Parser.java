@@ -57,6 +57,11 @@ public class Parser {
 	private int lookAhead;
 	private boolean lookingAhead = false;
 	private boolean semanticLookAhead;
+	
+	public class LookaheadSuccess extends Error {
+
+	}
+	
 	private LookaheadSuccess lookAheadSuccess = new LookaheadSuccess();
 	
 	public Document parse(String text) {
@@ -125,19 +130,16 @@ public class Parser {
 		currentBlockLevel++;
 		if (headingAhead(1)) {
 			heading();
+		} else if(getNextTokenKind() == GT) {
+			blockquote();
+		} else if(getNextTokenKind() == DASH) {
+			unorderedList();
+		} else if(orderedListAhead(2)) {
+			orderedList();
+		} else if(fencedCodeBlockAhead(2147483647)) {
+			fencedCodeBlock();
 		} else {
-			switch (getNextTokenKind()) {
-			case GT: blockquote(); break;
-			case DASH: unorderedList(); break;
-			default:
-				if (orderedListAhead(2)) {
-					orderedList();
-				} else if (fencedCodeBlockAhead(2147483647)) {
-					fencedCodeBlock();
-				} else {
-					paragraph();
-				} 
-			}
+			paragraph();
 		}
 		currentBlockLevel--;
 	}
@@ -156,12 +158,12 @@ public class Parser {
 		}
 		whiteSpace();
 		inline: while (true) {
-			if (!jj_2_5(1)) {
+			if (!headingInlineAhead()) {
 				break inline;
 			}
-			if (jj_2_6(1)) {
+			if (inlineTextAhead()) {
 				text();
-			} else if (jj_2_7(2147483647)) {
+			} else if (inlineImageAhead()) {
 				image();
 			} else if (jj_2_8(2147483647)) {
 				link();
@@ -1551,18 +1553,40 @@ public class Parser {
 		} 
 	}
 
-	private boolean jj_2_5(int xla) {
-		lookAhead = xla;
+	private boolean headingInlineAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
-			return !jj_3_5();
+			Token xsp;
+			xsp = scanPosition;
+			if (jj_3R_61()) {
+				scanPosition = xsp;
+				if (jj_3R_62()) {
+					scanPosition = xsp;
+					if (jj_3R_63()) {
+						scanPosition = xsp;
+						if (jj_3R_64()) {
+							scanPosition = xsp;
+							if (jj_3R_65()) {
+								scanPosition = xsp;
+								if (jj_3R_66()) {
+									scanPosition = xsp;
+									if (jj_3R_233())
+										return false;
+								}
+							}
+						}
+					}
+				}
+			}
+			return true;
 		} catch (LookaheadSuccess ls) {
 			return true;
 		} 
 	}
 
-	private boolean jj_2_6(int xla) {
-		lookAhead = xla;
+	private boolean inlineTextAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
@@ -1571,8 +1595,8 @@ public class Parser {
 		} 
 	}
 
-	private boolean jj_2_7(int xla) {
-		lookAhead = xla;
+	private boolean inlineImageAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
@@ -3341,22 +3365,12 @@ public class Parser {
 	}
 
 	private boolean jj_3R_231() {
-		if (scanToken(EOL)) {
+		if (scanToken(EOL) || jj_3R_228() || scanToken(BACKTICK)) {
 			return true;
 		}
-		if (jj_3R_228()) {
-			return true;
-		}
-		if (scanToken(BACKTICK)) {
-			return true;
-		}
-		if (scanToken(BACKTICK)) {
-			return true;
-		}
+		
+
 		Token xsp;
-		if (scanToken(BACKTICK)) {
-			return true;
-		}
 		while (true) {
 			xsp = scanPosition;
 			if (scanToken(BACKTICK)) {
@@ -3414,8 +3428,9 @@ public class Parser {
 																					lookingAhead = true;
 																					semanticLookAhead = !fencesAhead();
 																					lookingAhead = false;
-																					if (!semanticLookAhead || jj_3R_87())
+																					if (!semanticLookAhead || jj_3R_87()) {
 																						return true;
+																					}
 																				}
 																			}
 																		}
@@ -3439,10 +3454,7 @@ public class Parser {
 	}
 
 	private boolean jj_3R_230() {
-		if (scanToken(EOL)) {
-			return true;
-		}
-		return jj_3R_261();
+		return scanToken(EOL) || jj_3R_261();
 	}
 
 	private boolean jj_3R_53() {
@@ -3482,43 +3494,29 @@ public class Parser {
 			}
 		}
 		xsp = scanPosition;
-		if (jj_3R_231())
+		if (jj_3R_231()) {
 			scanPosition = xsp;
+		}
 		return false;
 	}
 
 	private boolean jj_3R_237() {
-		if (scanToken(GT)) {
-			return true;
-		}
-		return jj_3R_228();
+		return scanToken(GT) || jj_3R_228();
 	}
 
 	private boolean jj_3R_227() {
-		if (scanToken(DIGITS)) {
-			return true;
-		}
-		return scanToken(DOT);
+		return scanToken(DIGITS) || scanToken(DOT);
 	}
 
 	private boolean jj_3_14() {
-		if (jj_3R_67()) {
-			return true;
-		}
-		return scanToken(EOL);
+		return jj_3R_67() || scanToken(EOL);
 	}
 
 	private boolean jj_3R_67() {
-		if (scanToken(EOL)) {
-			return true;
-		}
-		if (jj_3R_228()) {
+		if (scanToken(EOL) || jj_3R_228() || jj_3R_237()) {
 			return true;
 		}
 		Token xsp;
-		if (jj_3R_237()) {
-			return true;
-		}
 		loop: while (true) {
 			xsp = scanPosition;
 			if (jj_3R_237()) {
@@ -3529,32 +3527,6 @@ public class Parser {
 		return false;
 	}
 
-
-	private boolean jj_3_5() {
-		Token xsp;
-		xsp = scanPosition;
-		if (jj_3R_61()) {
-			scanPosition = xsp;
-			if (jj_3R_62()) {
-				scanPosition = xsp;
-				if (jj_3R_63()) {
-					scanPosition = xsp;
-					if (jj_3R_64()) {
-						scanPosition = xsp;
-						if (jj_3R_65()) {
-							scanPosition = xsp;
-							if (jj_3R_66()) {
-								scanPosition = xsp;
-								if (jj_3R_233())
-									return true;
-							}
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
 
 	private boolean jj_3R_256() {
 		Token xsp;
@@ -3573,8 +3545,7 @@ public class Parser {
 
 
 	private boolean scanForBlockElement() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		lookingAhead = true;
 		semanticLookAhead = headingAhead(1);
 		lookingAhead = false;
@@ -3599,11 +3570,12 @@ public class Parser {
 	}
 
 	private Token consumeToken(int kind) {
-		Token oldToken;
-		if ((oldToken = token).next != null) {
+		Token oldToken = token;
+		if (oldToken.next != null) {
 			token = token.next;
 		} else {
-			token = token.next = tm.getNextToken();
+			token.next = tm.getNextToken();
+			token = token.next;
 		}
 		nextTokenKind = -1;
 		if (token.kind == kind) {
@@ -3646,7 +3618,9 @@ public class Parser {
 	}
 
 	private int getNextTokenKind() {
-		if(nextTokenKind != -1) { return nextTokenKind; }
+		if(nextTokenKind != -1) { 
+			return nextTokenKind; 
+		}
 		if ((nextToken = token.next) == null) {
 			return (nextTokenKind = (token.next = tm.getNextToken()).kind);
 		}
