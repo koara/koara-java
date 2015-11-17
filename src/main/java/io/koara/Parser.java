@@ -1,27 +1,21 @@
+/*
+ * Copyright 2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.koara;
 
-import static io.koara.TokenManager.ASTERISK;
-import static io.koara.TokenManager.BACKSLASH;
-import static io.koara.TokenManager.BACKTICK;
-import static io.koara.TokenManager.CHAR_SEQUENCE;
-import static io.koara.TokenManager.COLON;
-import static io.koara.TokenManager.DASH;
-import static io.koara.TokenManager.DIGITS;
-import static io.koara.TokenManager.DOT;
-import static io.koara.TokenManager.EOF;
-import static io.koara.TokenManager.EOL;
-import static io.koara.TokenManager.EQ;
-import static io.koara.TokenManager.ESCAPED_CHAR;
-import static io.koara.TokenManager.GT;
-import static io.koara.TokenManager.IMAGE_LABEL;
-import static io.koara.TokenManager.LBRACK;
-import static io.koara.TokenManager.LPAREN;
-import static io.koara.TokenManager.LT;
-import static io.koara.TokenManager.RBRACK;
-import static io.koara.TokenManager.RPAREN;
-import static io.koara.TokenManager.SPACE;
-import static io.koara.TokenManager.TAB;
-import static io.koara.TokenManager.UNDERSCORE;
+import static io.koara.TokenManager.*;
 
 import java.io.File;
 import java.io.FileReader;
@@ -53,8 +47,8 @@ public class Parser {
 	private TreeState tree;
 	private int currentBlockLevel;
 	private int currentQuoteLevel;
-	private int nextTokenKind;
 	private int lookAhead;
+	private int nextTokenKind;
 	private boolean lookingAhead = false;
 	private boolean semanticLookAhead;	
 	private LookaheadSuccess lookAheadSuccess = new LookaheadSuccess();
@@ -77,34 +71,22 @@ public class Parser {
 		
 		Document document = new Document();
 		tree.openScope(document);
-		leadingLines: while (true) {
-			switch (getNextTokenKind()) {
-				case EOL: consumeToken(EOL); break;
-				default: break leadingLines;
-			}		
-		}
+		do {
+			consumeToken(EOL);
+		} while (getNextTokenKind() == EOL);
 		whiteSpace();
 		if (hasAnyBlockElementsAhead()) {
 			blockElement();
-			blockElements: while (true) {
-				if (!blockAhead()) {
-					break blockElements;
-				}
-				moreBlockElements: while (true) {
+			while (blockAhead()) {
+				while (getNextTokenKind() == EOL) {
 					consumeToken(EOL);
 					whiteSpace();			
-					if(getNextTokenKind() != EOL) {
-						break moreBlockElements;
-					}
 				}
 				blockElement();
 			}
-			trailingLines: while (true) {
-				if(getNextTokenKind() != EOL) {
-					break trailingLines;
-				}
+			do {
 				consumeToken(EOL);
-			}
+			} while(getNextTokenKind() == EOL);
 			whiteSpace();
 		} 
 		consumeToken(EOF);
@@ -135,28 +117,23 @@ public class Parser {
 		tree.openScope(heading);
 		int headingLevel = 0;
 
-		equalsChars: while (true) {
+		while(getNextTokenKind() == EQ) {
 			consumeToken(EQ);
 			headingLevel++;
-			if(getNextTokenKind() != EQ) {
-				break equalsChars;
-			}
 		}
 		whiteSpace();
-		inline: while (true) {
-			if (!headingInlineAhead()) {
-				break inline;
-			} else if (inlineTextAhead()) {
+	    while (headingHasInlineElementsAhead()) {
+			if (hasInlineTextAhead()) {
 				text();
-			} else if (inlineImageAhead()) {
+			} else if (hasInlineImageAhead()) {
 				image();
-			} else if (jj_2_8()) {
+			} else if (hasInlineLinkAhead()) {
 				link();
-			} else if (jj_2_9()) {
+			} else if (hasInlineStrongAhead()) {
 				strong();
-			} else if (jj_2_10()) {
+			} else if (hasInlineEmAhead()) {
 				em();
-			} else if (jj_2_11()) {
+			} else if (hasInlineCodeAhead()) {
 				code();
 			} else {
 				looseChar();
@@ -171,78 +148,52 @@ public class Parser {
 		tree.openScope(blockquote);
 		currentQuoteLevel++;
 		consumeToken(GT);
-		leadingLines: while (true) {
-			if (!blockquoteEmptyLineAhead()) {
-				break leadingLines;
-			}
+		while (blockquoteHasEmptyLineAhead()) {
 			blockquoteEmptyLine();
 		}
-		whiteSpace();
-		if (jj_2_13(1)) {
+		whiteSpace(); 
+		if (blockquoteHasAnyBlockElementseAhead()) {
 			blockElement();
-			label_8: while (true) {
-				if (!blockAhead()) {
-					break label_8;
-				}
-				label_9: while (true) {
+			while (blockAhead()) {
+				while (getNextTokenKind() == EOL) {
 					consumeToken(EOL);
 					whiteSpace();
 					blockquotePrefix();
-					if(getNextTokenKind() != EOL) {
-						break label_9;
-					}
 				}
 				blockElement();
 			}
 		}
-		trailingLines: while (true) {
-			if (!jj_2_14(2147483647)) {
-				break trailingLines;
-			}
+		while (hasBlockquoteEmptyLines()) {
 			blockquoteEmptyLine();
 		}
 		currentQuoteLevel--;
 		tree.closeScope(blockquote);
 	}
-	
-	
-	
+		
 	private void blockquotePrefix() {
 		int i = 0;
-		loop: while (true) {
+		do {
 			consumeToken(GT);
-			whiteSpace();
-			if (++i >= currentQuoteLevel) {
-				break loop;
-			}
-		}
+			whiteSpace();	
+		} while(++i < currentQuoteLevel);
 	}
 
 	private void blockquoteEmptyLine() {
 		consumeToken(EOL);
 		whiteSpace();
-		loop: while (true) {
+		do {
 			consumeToken(GT);
 			whiteSpace();
-			if(getNextTokenKind() != GT) {
-				break loop;
-			}
-		}
+		} while(getNextTokenKind() == GT);
 	}
-
+	
 	private void unorderedList() {
 		List list = new List(false);
 		tree.openScope(list);
 		unorderedListItem();
-		listItems: while (true) {
-			if (!listItemAhead(false)) {
-				break listItems;
-			}
-			newLines: while (true) {
+		while (listItemAhead(false)) {
+			while (getNextTokenKind() == EOL) {
 				consumeToken(EOL);
-				if(getNextTokenKind() != EOL) {
-					break newLines;
-				}
 			}
 			whiteSpace();
 			unorderedListItem();
@@ -256,20 +207,14 @@ public class Parser {
 
 		consumeToken(DASH);
 		whiteSpace();
-		if (jj_2_15()) {
+		if (listItemHasInlineElements()) { 
 			blockElement();
-			label_15: while (true) {
-				if (!blockAhead()) {
-					break label_15;
-				}
-				label_16: while (true) {
+			while (blockAhead()) {
+				while (getNextTokenKind() == EOL) {
 					consumeToken(EOL);
 					whiteSpace();
 					if (currentQuoteLevel > 0) {
 						blockquotePrefix();
-					}
-					if(getNextTokenKind() != EOL) {
-						break label_16;
 					}
 				}
 				blockElement();
@@ -282,15 +227,9 @@ public class Parser {
 		List list = new List(true);
 		tree.openScope(list);
 		orderedListItem();
-		listItems: while (true) {
-			if (!listItemAhead(true)) {
-				break listItems;
-			}
-			newLines: while (true) {
+		while (listItemAhead(true)) {
+			while (getNextTokenKind() == EOL) {
 				consumeToken(EOL);
-				if(getNextTokenKind() != EOL) {
-					break newLines;
-				}
 			}
 			whiteSpace();
 			orderedListItem();
@@ -305,20 +244,14 @@ public class Parser {
 		t = consumeToken(DIGITS);
 		consumeToken(DOT);
 		whiteSpace();
-		if (jj_2_16(1)) {
+		if (listItemHasInlineElements()) { 
 			blockElement();
-			label_19: while (true) {
-				if (!blockAhead()) {
-					break label_19;
-				}
-				label_20: while (true) {
+			while (blockAhead()) {
+				while (getNextTokenKind() == EOL) {
 					consumeToken(EOL);
 					whiteSpace();
 					if (currentQuoteLevel > 0) {
 						blockquotePrefix();
-					}
-					if(getNextTokenKind() != EOL) {
-						break label_20;
 					}
 				}
 				blockElement();
@@ -331,117 +264,43 @@ public class Parser {
 	private void fencedCodeBlock() {
 		CodeBlock codeBlock = new CodeBlock();
 		tree.openScope(codeBlock);
-		Token t;
-		String language;
 		StringBuilder s = new StringBuilder();
-		int beginColumn;
-		t = consumeToken(BACKTICK);
-		beginColumn = t.beginColumn;
-		consumeToken(BACKTICK);
-		label_21: while (true) {
+		int beginColumn = consumeToken(BACKTICK).beginColumn;
+		do {
 			consumeToken(BACKTICK);
-			if(getNextTokenKind() != BACKTICK) {
-				break label_21;
-			}
-		}
+		} while(getNextTokenKind() == BACKTICK);
 		whiteSpace();
-		switch (getNextTokenKind()) {
-		case BACKTICK:
-		case CHAR_SEQUENCE: {
-			language = codeLanguage();
-			codeBlock.setLanguage(language);
-			break;
+		if (getNextTokenKind() == CHAR_SEQUENCE) {
+			codeBlock.setLanguage(codeLanguage()); 
 		}
-		default:
-		}
-		if (getToken(1).kind != EOF && !fencesAhead()) {
+		if (getNextTokenKind() != EOF && !fencesAhead()) {
 			consumeToken(EOL);
 			levelWhiteSpace(beginColumn);
 		}
-		label_22: while (true) {
-			if (!jj_2_17(1)) {
-				break label_22;
-			}
+		while (fencedCodeBlockHasInlineTokens()) {
 			switch (getNextTokenKind()) {
-			case ASTERISK: {
-				s.append(consumeToken(ASTERISK).image);
-				break;
-			}
-			case BACKSLASH: {
-				s.append(consumeToken(BACKSLASH).image);
-				break;
-			}
-			case CHAR_SEQUENCE: {
-				s.append(consumeToken(CHAR_SEQUENCE).image);
-				break;
-			}
-			case COLON: {
-				s.append(consumeToken(COLON).image);
-				break;
-			}
-			case DASH: {
-				s.append(consumeToken(DASH).image);
-				break;
-			}
-			case DIGITS: {
-				s.append(consumeToken(DIGITS).image);
-				break;
-			}
-			case DOT: {
-				s.append(consumeToken(DOT).image);
-				break;
-			}
-			case EQ: {
-				s.append(consumeToken(EQ).image);
-				break;
-			}
-			case ESCAPED_CHAR: {
-				s.append(consumeToken(ESCAPED_CHAR).image);
-				break;
-			}
-			case IMAGE_LABEL: {
-				s.append(consumeToken(IMAGE_LABEL).image);
-				break;
-			}
-			case LT: {
-				s.append(consumeToken(LT).image);
-				break;
-			}
-			case GT: {
-				s.append(consumeToken(GT).image);
-				break;
-			}
-			case LBRACK: {
-				s.append(consumeToken(LBRACK).image);
-				break;
-			}
-			case RBRACK: {
-				s.append(consumeToken(RBRACK).image);
-				break;
-			}
-			case LPAREN: {
-				s.append(consumeToken(LPAREN).image);
-				break;
-			}
-			case RPAREN: {
-				s.append(consumeToken(RPAREN).image);
-				break;
-			}
-			case UNDERSCORE: {
-				s.append(consumeToken(UNDERSCORE).image);
-				break;
-			}
-			case BACKTICK: {
-				s.append(consumeToken(BACKTICK).image);
-				break;
-			}
+			case ASTERISK: 		s.append(consumeToken(ASTERISK).image); break;
+			case BACKSLASH: 	s.append(consumeToken(BACKSLASH).image); break;
+			case CHAR_SEQUENCE: s.append(consumeToken(CHAR_SEQUENCE).image); break;
+			case COLON: 		s.append(consumeToken(COLON).image); break;
+			case DASH: 			s.append(consumeToken(DASH).image); break;
+			case DIGITS: 		s.append(consumeToken(DIGITS).image); break;
+			case DOT: 			s.append(consumeToken(DOT).image); break;
+			case EQ: 			s.append(consumeToken(EQ).image); break;
+			case ESCAPED_CHAR: 	s.append(consumeToken(ESCAPED_CHAR).image); break;
+			case IMAGE_LABEL: 	s.append(consumeToken(IMAGE_LABEL).image); break;
+			case LT: 			s.append(consumeToken(LT).image); break;
+			case GT: 			s.append(consumeToken(GT).image); break;
+			case LBRACK:		s.append(consumeToken(LBRACK).image); break;
+			case RBRACK:		s.append(consumeToken(RBRACK).image); break;
+			case LPAREN:		s.append(consumeToken(LPAREN).image); break;
+			case RPAREN:		s.append(consumeToken(RPAREN).image); break;
+			case UNDERSCORE:	s.append(consumeToken(UNDERSCORE).image); break;
+			case BACKTICK:		s.append(consumeToken(BACKTICK).image); break;
 			default:
 				if (!nextAfterSpace(EOL, EOF)) {
 					switch (getNextTokenKind()) {
-					case SPACE: {
-						s.append(consumeToken(SPACE).image);
-						break;
-					}
+					case SPACE: s.append(consumeToken(SPACE).image); break;
 					case TAB: {
 						consumeToken(TAB);
 						s.append("    ");
@@ -460,11 +319,8 @@ public class Parser {
 			whiteSpace();
 			consumeToken(BACKTICK);
 			consumeToken(BACKTICK);
-			label_23: while (true) {
+			while (getNextTokenKind() == BACKTICK) {
 				consumeToken(BACKTICK);
-				if(getNextTokenKind() != BACKTICK) {
-					break label_23;
-				}
 			}
 		}
 		codeBlock.setValue(s.toString());
@@ -475,16 +331,10 @@ public class Parser {
 		Paragraph paragraph = new Paragraph();
 		tree.openScope(paragraph);
 		inline();
-		label_26: while (true) {
-			if (!textAhead()) {
-				break label_26;
-			}
+		while (textAhead()) {
 			lineBreak();
 			whiteSpace();
-			label_27: while (true) {
-				if(getNextTokenKind() != GT) {
-					break label_27;
-				}
+			while (getNextTokenKind() == GT) {
 				consumeToken(GT);
 				whiteSpace();
 			}
@@ -497,7 +347,7 @@ public class Parser {
 		Text text = new Text();
 		tree.openScope(text);
 		StringBuffer s = new StringBuffer();
-		loop: while (true) {
+		while (jj_2_77(1)) {
 			switch (getNextTokenKind()) {
 			case BACKSLASH: {
 				s.append(consumeToken(BACKSLASH).image);
@@ -570,9 +420,6 @@ public class Parser {
 					}
 				}
 			}
-			if (!jj_2_77(1)) {
-				break loop;
-			}
 		}
 		text.setValue(s.toString());
 		tree.closeScope(text);
@@ -586,14 +433,11 @@ public class Parser {
 		whiteSpace();
 		consumeToken(IMAGE_LABEL);
 		whiteSpace();
-		loop: while (true) {
+		while (jj_2_23(1)) {
 			if (jj_2_22(1)) {
 				resourceText();
 			} else {
 				looseChar();
-			}
-			if (!jj_2_23(1)) {
-				break loop;
 			}
 		}
 		whiteSpace();
@@ -611,7 +455,7 @@ public class Parser {
 		String ref = "";
 		consumeToken(LBRACK);
 		whiteSpace();
-		loop: while (true) {
+		while (jj_2_30(1)) {
 			if (jj_2_25(2147483647)) {
 				image();
 			} else if (jj_2_26(2147483647)) {
@@ -624,9 +468,6 @@ public class Parser {
 				resourceText();
 			} else {
 				looseChar();
-			}
-			if (!jj_2_30(1)) {
-				break loop;
 			}
 		}
 		whiteSpace();
@@ -642,7 +483,7 @@ public class Parser {
 		Strong strong = new Strong();
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
-		loop: while (true) {
+		while (jj_2_49(1)) {
 			if (jj_2_45(1)) {
 				text();
 			} else if (jj_2_46(2147483647)) {
@@ -669,9 +510,6 @@ public class Parser {
 				}
 				}
 			}
-			if (!jj_2_49(1)) {
-				break loop;
-			}
 		}
 		consumeToken(ASTERISK);
 		tree.closeScope(strong);
@@ -681,7 +519,7 @@ public class Parser {
 		Em em = new Em();
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
-		loop: while (true) {
+		while (jj_2_70(1)) {
 			if (jj_2_65(1)) {
 				text();
 			} else if (jj_2_66(2147483647)) {
@@ -708,14 +546,11 @@ public class Parser {
 				}
 				}
 			}
-			if (!jj_2_70(1)) {
-				break loop;
-			}
 		}
 		consumeToken(UNDERSCORE);
 		tree.closeScope(em);
 	}
-	
+
 	private void code() {
 		Code code = new Code();
 		tree.openScope(code);
@@ -729,7 +564,7 @@ public class Parser {
 		Text text = new Text();
 		tree.openScope(text);
 		StringBuffer s = new StringBuffer();
-		loop: while (true) {
+		do {
 			switch (getNextTokenKind()) {
 			case ASTERISK: {
 				s.append(consumeToken(ASTERISK).image);
@@ -814,14 +649,14 @@ public class Parser {
 					}
 				}
 			}
-			if (!jj_2_76(1)) {
-				break loop;
-			}
-		}
+		} while(jj_2_76(1));
 		text.setValue(s.toString());
 		tree.closeScope(text);
 	}
 
+	//TODO:///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+	
+	
 	private void looseChar() {
 		Text text = new Text();
 		tree.openScope(text);
@@ -851,10 +686,7 @@ public class Parser {
 	private void lineBreak() {
 		LineBreak linebreak = new LineBreak();
 		tree.openScope(linebreak);
-		loop: while (true) {
-			if(getNextTokenKind() != SPACE && getNextTokenKind() != TAB) {
-				break loop;
-			}
+		while (getNextTokenKind() == SPACE || getNextTokenKind() == TAB) {
 			consumeToken(getNextTokenKind());
 		}
 		consumeToken(EOL);
@@ -864,10 +696,7 @@ public class Parser {
 	private void levelWhiteSpace(int threshold) {
 		Token t;
 		int currentPos = 1;
-		loop: while (true) {
-			if (!((getNextTokenKind() == SPACE || getNextTokenKind() == TAB) && currentPos < (threshold - 1))) {
-				break loop;
-			}
+		while ((getNextTokenKind() == SPACE || getNextTokenKind() == TAB) && currentPos < (threshold - 1)) {
 			switch (getNextTokenKind()) {
 			case SPACE: {
 				t = consumeToken(SPACE);
@@ -885,7 +714,7 @@ public class Parser {
 
 	private String codeLanguage() {
 		StringBuilder s = new StringBuilder();
-		loop: while (true) {
+		do {
 			switch (getNextTokenKind()) {
 			case CHAR_SEQUENCE: {
 				s.append(consumeToken(CHAR_SEQUENCE).image);
@@ -896,17 +725,12 @@ public class Parser {
 				break;
 			}
 			}
-			if(getNextTokenKind() != BACKTICK && getNextTokenKind() != CHAR_SEQUENCE) {
-				break loop;
-			}
-		}
+		} while (getNextTokenKind() == BACKTICK || getNextTokenKind() == CHAR_SEQUENCE);
 		return s.toString();
 	}
 
-	
-
 	private void inline() {
-		loop: while (true) {
+		do {
 			if (jj_2_18(1)) {
 				text();
 			} else if (jj_2_19(2147483647)) {
@@ -922,21 +746,14 @@ public class Parser {
 			} else {
 				looseChar();
 			}
-			if (!jj_2_21(1)) {
-				break loop;
-			}
-		}
+		} while (jj_2_21(1));
 	}
-
-	
-
-	
 
 	private void resourceText() {
 		Text text = new Text();
 		tree.openScope(text);
 		StringBuilder s = new StringBuilder();
-		loop: while (true) {
+		do {
 			switch (getNextTokenKind()) {
 			case BACKSLASH: {
 				s.append(consumeToken(BACKSLASH).image);
@@ -1005,10 +822,7 @@ public class Parser {
 					}
 				}
 			}
-			if (!jj_2_32(2)) {
-				break loop;
-			}
-		}
+		} while(jj_2_32(2));
 		text.setValue(s.toString());
 		tree.closeScope(text);
 	}
@@ -1024,10 +838,7 @@ public class Parser {
 
 	private String resourceUrlText() {
 		StringBuilder s = new StringBuilder();
-		loop: while (true) {
-			if (!jj_2_33(1)) {
-				break loop;
-			}
+		while (jj_2_33(1)) {
 			switch (getNextTokenKind()) {
 			case ASTERISK: {
 				s.append(consumeToken(ASTERISK).image);
@@ -1121,10 +932,7 @@ public class Parser {
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
 		strongMultilineContent();
-		loop: while (true) {
-			if (!textAhead()) {
-				break loop;
-			}
+		while (textAhead()) {
 			lineBreak();
 			strongMultilineContent();
 		}
@@ -1133,7 +941,7 @@ public class Parser {
 	}
 
 	private void strongMultilineContent() {
-		loop: while (true) {
+		do {
 			if (jj_2_34(1)) {
 				text();
 			} else if (jj_2_35(2147483647)) {
@@ -1160,10 +968,7 @@ public class Parser {
 				}
 				}
 			}
-			if (!jj_2_39(1)) {
-				break loop;
-			}
-		}
+		} while(jj_2_39(1));
 	}
 
 	private void strongWithinEmMultiline() {
@@ -1171,10 +976,7 @@ public class Parser {
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
 		strongWithinEmMultilineContent();
-		loop: while (true) {
-			if (!textAhead()) {
-				break loop;
-			}
+		while (textAhead()) {
 			lineBreak();
 			strongWithinEmMultilineContent();
 		}
@@ -1184,7 +986,7 @@ public class Parser {
 	}
 
 	private void strongWithinEmMultilineContent() {
-		loop: while (true) {
+		do {
 			if (jj_2_40(1)) {
 				text();
 			} else if (jj_2_41()) {
@@ -1209,19 +1011,14 @@ public class Parser {
 				}
 				}
 			}
-			if (!jj_2_44(1)) {
-				break loop;
-			}
-		}
+		} while(jj_2_44(1));
 	}
-
-	
 
 	private void strongWithinEm() {
 		Strong strong = new Strong();
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
-		loop: while (true) {
+		do {
 			if (jj_2_50(1)) {
 				text();
 			} else if (jj_2_51(2147483647)) {
@@ -1246,10 +1043,7 @@ public class Parser {
 				}
 				}
 			}
-			if (!jj_2_54(1)) {
-				break loop;
-			}
-		}
+		} while(jj_2_54(1));
 		consumeToken(ASTERISK);
 		tree.closeScope(strong);
 	}
@@ -1259,10 +1053,7 @@ public class Parser {
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
 		emMultilineContent();
-		loop: while (true) {
-			if (!textAhead()) {
-				break loop;
-			}
+		while (textAhead()) {
 			lineBreak();
 			emMultilineContent();
 		}
@@ -1271,7 +1062,7 @@ public class Parser {
 	}
 
 	private void emMultilineContent() {
-		loop: while (true) {
+		do {
 			if (jj_2_55(1)) {
 				text();
 			} else if (jj_2_56(2147483647)) {
@@ -1298,10 +1089,7 @@ public class Parser {
 				}
 				}
 			}
-			if (!jj_2_59(1)) {
-				break loop;
-			}
-		}
+		} while(jj_2_59(1));
 	}
 
 	private void emWithinStrongMultiline() {
@@ -1309,10 +1097,7 @@ public class Parser {
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
 		emWithinStrongMultilineContent();
-		loop: while (true) {
-			if (!textAhead()) {
-				break loop;
-			}
+		while (textAhead()) {
 			lineBreak();
 			emWithinStrongMultilineContent();
 		}
@@ -1321,7 +1106,7 @@ public class Parser {
 	}
 
 	private void emWithinStrongMultilineContent() {
-		loop: while (true) {
+		do {
 			if (jj_2_60(1)) {
 				text();
 			} else if (jj_2_61(2147483647)) {
@@ -1346,19 +1131,14 @@ public class Parser {
 				}
 				}
 			}
-			if (!jj_2_64(1)) {
-				break loop;
-			}
-		}
+		} while (jj_2_64(1));
 	}
-
-	
 
 	private void emWithinStrong() {
 		Em em = new Em();
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
-		loop: while (true) {
+		do {
 			if (jj_2_71(1)) {
 				text();
 			} else if (jj_2_72()) {
@@ -1383,10 +1163,7 @@ public class Parser {
 				}
 				}
 			}
-			if (!jj_2_75(1)) {
-				break loop;
-			}
-		}
+		} while(jj_2_75(1));
 		consumeToken(UNDERSCORE);
 		tree.closeScope(em);
 	}
@@ -1396,16 +1173,10 @@ public class Parser {
 		tree.openScope(code);
 		consumeToken(BACKTICK);
 		codeText();
-		label_45: while (true) {
-			if (!textAhead()) {
-				break label_45;
-			}
+		while (textAhead()) {
 			lineBreak();
 			whiteSpace();
-			label_46: while (true) {
-				if(getNextTokenKind() != GT) {
-					break label_46;
-				}
+			while (getNextTokenKind() == GT) {
 				consumeToken(GT);
 				whiteSpace();
 			}
@@ -1416,10 +1187,7 @@ public class Parser {
 	}
 	
 	private void whiteSpace() {
-		loop: while (true) {
-			if(getNextTokenKind() != SPACE && getNextTokenKind() != TAB) {
-				break loop;
-			}
+		while (getNextTokenKind() == SPACE || getNextTokenKind() == TAB) {
 			consumeToken(getNextTokenKind());
 		}
 	}
@@ -1649,7 +1417,7 @@ public class Parser {
 		}
 	}
 	
-	private boolean headingInlineAhead() {
+	private boolean headingHasInlineElementsAhead() {
 		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
@@ -1681,7 +1449,7 @@ public class Parser {
 		}
 	}
 	
-	private boolean inlineTextAhead() {
+	private boolean hasInlineTextAhead() {
 		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
@@ -1691,7 +1459,7 @@ public class Parser {
 		}
 	}
 
-	private boolean inlineImageAhead() {
+	private boolean hasInlineImageAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1701,7 +1469,7 @@ public class Parser {
 		}
 	}
 	
-	private boolean blockquoteEmptyLineAhead() {
+	private boolean blockquoteHasEmptyLineAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1711,35 +1479,7 @@ public class Parser {
 		}
 	}
 
-
-
-
-
-
-
-
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-
-	private boolean jj_2_8() {
+	private boolean hasInlineLinkAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1749,7 +1489,7 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_9() {
+	private boolean hasInlineStrongAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1759,7 +1499,7 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_10() {
+	private boolean hasInlineEmAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1769,7 +1509,7 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_11() {
+	private boolean hasInlineCodeAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1779,29 +1519,7 @@ public class Parser {
 		}
 	}
 
-	
-
-	private boolean jj_2_13(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !noMoreBlockElements();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_14(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3_14();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_15() {
+	private boolean blockquoteHasAnyBlockElementseAhead() {
 		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
@@ -1811,8 +1529,18 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_16(int xla) {
-		lookAhead = xla;
+	private boolean hasBlockquoteEmptyLines() {
+		lookAhead = 2147483647;
+		lastPosition = scanPosition = token;
+		try {
+			return !jj_3_14();
+		} catch (LookaheadSuccess ls) {
+			return true;
+		}
+	}
+
+	private boolean listItemHasInlineElements() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !noMoreBlockElements();
@@ -1821,8 +1549,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_17(int xla) {
-		lookAhead = xla;
+	private boolean fencedCodeBlockHasInlineTokens() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_17();
@@ -3526,7 +3254,6 @@ public class Parser {
 		return false;
 	}
 
-
 	private boolean noMoreBlockElements() {
 		Token xsp = scanPosition;
 		lookingAhead = true;
@@ -3552,8 +3279,6 @@ public class Parser {
 		return false;
 	}
 
-
-
 	private boolean scanToken(int kind) {
 		if (scanPosition == lastPosition) {
 			lookAhead--;
@@ -3573,13 +3298,5 @@ public class Parser {
 		}
 		return false;
 	}
-
-
-
-
-
-
-
-	
 	
 }
