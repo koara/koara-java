@@ -123,17 +123,17 @@ public class Parser {
 		}
 		whiteSpace();
 	    while (headingHasInlineElementsAhead()) {
-			if (hasInlineTextAhead()) {
+			if (hasTextAhead()) {
 				text();
-			} else if (hasInlineImageAhead()) {
+			} else if (hasImageAhead()) {
 				image();
-			} else if (hasInlineLinkAhead()) {
+			} else if (hasLinkAhead()) {
 				link();
 			} else if (hasInlineStrongAhead()) {
 				strong();
 			} else if (hasInlineEmAhead()) {
 				em();
-			} else if (hasInlineCodeAhead()) {
+			} else if (hasCodeAhead()) {
 				code();
 			} else {
 				looseChar();
@@ -301,15 +301,11 @@ public class Parser {
 				if (!nextAfterSpace(EOL, EOF)) {
 					switch (getNextTokenKind()) {
 					case SPACE: s.append(consumeToken(SPACE).image); break;
-					case TAB: {
-						consumeToken(TAB);
-						s.append("    ");
-						break;
-					}
+					case TAB: consumeToken(TAB); s.append("    "); break;
 					}
 				} else if (!fencesAhead()) {
 					consumeToken(EOL);
-					s.append("\u005cn");
+					s.append("\n");
 					levelWhiteSpace(beginColumn);
 				}
 			}
@@ -317,8 +313,6 @@ public class Parser {
 		if (fencesAhead()) {
 			consumeToken(EOL);
 			whiteSpace();
-			consumeToken(BACKTICK);
-			consumeToken(BACKTICK);
 			while (getNextTokenKind() == BACKTICK) {
 				consumeToken(BACKTICK);
 			}
@@ -347,76 +341,27 @@ public class Parser {
 		Text text = new Text();
 		tree.openScope(text);
 		StringBuffer s = new StringBuffer();
-		while (jj_2_77(1)) {
+		while (textHasTokensAhead()) {
 			switch (getNextTokenKind()) {
-			case BACKSLASH: {
-				s.append(consumeToken(BACKSLASH).image);
-				break;
-			}
-			case CHAR_SEQUENCE: {
-				s.append(consumeToken(CHAR_SEQUENCE).image);
-				break;
-			}
-			case COLON: {
-				s.append(consumeToken(COLON).image);
-				break;
-			}
-			case DASH: {
-				s.append(consumeToken(DASH).image);
-				break;
-			}
-			case DIGITS: {
-				s.append(consumeToken(DIGITS).image);
-				break;
-			}
-			case DOT: {
-				s.append(consumeToken(DOT).image);
-				break;
-			}
-			case EQ: {
-				s.append(consumeToken(EQ).image);
-				break;
-			}
-			case ESCAPED_CHAR: {
-				s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
-				break;
-			}
-			case GT: {
-				s.append(consumeToken(GT).image);
-				break;
-			}
-			case IMAGE_LABEL: {
-				s.append(consumeToken(IMAGE_LABEL).image);
-				break;
-			}
-			case LPAREN: {
-				s.append(consumeToken(LPAREN).image);
-				break;
-			}
-			case LT: {
-				s.append(consumeToken(LT).image);
-				break;
-			}
-			case RBRACK: {
-				s.append(consumeToken(RBRACK).image);
-				break;
-			}
-			case RPAREN: {
-				s.append(consumeToken(RPAREN).image);
-				break;
-			}
+			case BACKSLASH: 	s.append(consumeToken(BACKSLASH).image); break;
+			case CHAR_SEQUENCE:	s.append(consumeToken(CHAR_SEQUENCE).image); break;
+			case COLON: 		s.append(consumeToken(COLON).image); break;
+			case DASH: 			s.append(consumeToken(DASH).image); break;
+			case DIGITS: 		s.append(consumeToken(DIGITS).image); break;
+			case DOT: 			s.append(consumeToken(DOT).image); break;
+			case EQ: 			s.append(consumeToken(EQ).image); break;
+			case ESCAPED_CHAR:	s.append(consumeToken(ESCAPED_CHAR).image.substring(1)); break;
+			case GT: 			s.append(consumeToken(GT).image); break;
+			case IMAGE_LABEL: 	s.append(consumeToken(IMAGE_LABEL).image); break;
+			case LPAREN: 		s.append(consumeToken(LPAREN).image); break;
+			case LT: 			s.append(consumeToken(LT).image); break;
+			case RBRACK: 		s.append(consumeToken(RBRACK).image); break;
+			case RPAREN: 		s.append(consumeToken(RPAREN).image); break;
 			default:
 				if (!nextAfterSpace(EOL, EOF)) {
 					switch (getNextTokenKind()) {
-					case SPACE: {
-						s.append(consumeToken(SPACE).image);
-						break;
-					}
-					case TAB: {
-						consumeToken(TAB);
-						s.append("    ");
-						break;
-					}
+					case SPACE:	s.append(consumeToken(SPACE).image); break;
+					case TAB:	consumeToken(TAB); s.append("    "); break;
 					}
 				}
 			}
@@ -433,8 +378,8 @@ public class Parser {
 		whiteSpace();
 		consumeToken(IMAGE_LABEL);
 		whiteSpace();
-		while (jj_2_23(1)) {
-			if (jj_2_22(1)) {
+		while (imageHasAnyElements()) {
+			if (hasTextAhead()) {
 				resourceText();
 			} else {
 				looseChar();
@@ -442,7 +387,7 @@ public class Parser {
 		}
 		whiteSpace();
 		consumeToken(RBRACK);
-		if (jj_2_24(2147483647)) {
+		if (imageHasResourceUrlAhead()) {
 			ref = resourceUrl();
 		}
 		image.setValue(ref);
@@ -455,16 +400,16 @@ public class Parser {
 		String ref = "";
 		consumeToken(LBRACK);
 		whiteSpace();
-		while (jj_2_30(1)) {
-			if (jj_2_25(2147483647)) {
+		while (linkHasAnyElements()) {
+			if (hasImageAhead()) {
 				image();
-			} else if (jj_2_26(2147483647)) {
+			} else if (linkStrongAhead()) {
 				strong();
-			} else if (jj_2_27(2147483647)) {
+			} else if (linkEmAhead()) {
 				em();
-			} else if (jj_2_28(2147483647)) {
+			} else if (linkCodeAhead()) {
 				code();
-			} else if (jj_2_29(1)) {
+			} else if (linkResourceTextAhead()) {
 				resourceText();
 			} else {
 				looseChar();
@@ -472,7 +417,7 @@ public class Parser {
 		}
 		whiteSpace();
 		consumeToken(RBRACK);
-		if (jj_2_31(2147483647)) {
+		if (linkHasUrl()) {
 			ref = resourceUrl();
 		}
 		link.setValue(ref);
@@ -483,31 +428,22 @@ public class Parser {
 		Strong strong = new Strong();
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
-		while (jj_2_49(1)) {
-			if (jj_2_45(1)) {
+		while (strongHasElements()) {
+			if (hasTextAhead()) {
 				text();
-			} else if (jj_2_46(2147483647)) {
+			} else if (strongHasImage()) {
 				image();
-			} else if (jj_2_47(2147483647)) {
+			} else if (strongHasLink()) {
 				link();
 			} else if (multilineAhead(BACKTICK)) {
 				codeMultiline();
-			} else if (jj_2_48(2147483647)) {
+			} else if (strongEmWithinStrongAhead()) {
 				emWithinStrong();
 			} else {
 				switch (getNextTokenKind()) {
-				case BACKTICK: {
-					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-					break;
-				}
-				case LBRACK: {
-					tree.addSingleValue(new Text(), consumeToken(LBRACK));
-					break;
-				}
-				case UNDERSCORE: {
-					tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
-					break;
-				}
+				case BACKTICK: 		tree.addSingleValue(new Text(), consumeToken(BACKTICK)); break;
+				case LBRACK:		tree.addSingleValue(new Text(), consumeToken(LBRACK)); break;
+				case UNDERSCORE:	tree.addSingleValue(new Text(), consumeToken(UNDERSCORE)); break;
 				}
 			}
 		}
@@ -519,31 +455,22 @@ public class Parser {
 		Em em = new Em();
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
-		while (jj_2_70(1)) {
-			if (jj_2_65(1)) {
+		while (emHasElements()) {
+			if (emHasText()) {
 				text();
-			} else if (jj_2_66(2147483647)) {
+			} else if (emHasImage()) {
 				image();
-			} else if (jj_2_67(2147483647)) {
+			} else if (emHasLink()) {
 				link();
-			} else if (jj_2_68(2147483647)) {
+			} else if (emHasCode()) {
 				code();
-			} else if (jj_2_69(2147483647)) {
+			} else if (emHasStrongWithinEm()) {
 				strongWithinEm();
 			} else {
 				switch (getNextTokenKind()) {
-				case ASTERISK: {
-					tree.addSingleValue(new Text(), consumeToken(ASTERISK));
-					break;
-				}
-				case BACKTICK: {
-					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-					break;
-				}
-				case LBRACK: {
-					tree.addSingleValue(new Text(), consumeToken(LBRACK));
-					break;
-				}
+				case ASTERISK:	tree.addSingleValue(new Text(), consumeToken(ASTERISK)); break;
+				case BACKTICK:	tree.addSingleValue(new Text(), consumeToken(BACKTICK)); break;
+				case LBRACK: 	tree.addSingleValue(new Text(), consumeToken(LBRACK));	break;
 				}
 			}
 		}
@@ -566,120 +493,47 @@ public class Parser {
 		StringBuffer s = new StringBuffer();
 		do {
 			switch (getNextTokenKind()) {
-			case ASTERISK: {
-				s.append(consumeToken(ASTERISK).image);
-				break;
-			}
-			case BACKSLASH: {
-				s.append(consumeToken(BACKSLASH).image);
-				break;
-			}
-			case CHAR_SEQUENCE: {
-				s.append(consumeToken(CHAR_SEQUENCE).image);
-				break;
-			}
-			case COLON: {
-				s.append(consumeToken(COLON).image);
-				break;
-			}
-			case DASH: {
-				s.append(consumeToken(DASH).image);
-				break;
-			}
-			case DIGITS: {
-				s.append(consumeToken(DIGITS).image);
-				break;
-			}
-			case DOT: {
-				s.append(consumeToken(DOT).image);
-				break;
-			}
-			case EQ: {
-				s.append(consumeToken(EQ).image);
-				break;
-			}
-			case ESCAPED_CHAR: {
-				s.append(consumeToken(ESCAPED_CHAR).image);
-				break;
-			}
-			case IMAGE_LABEL: {
-				s.append(consumeToken(IMAGE_LABEL).image);
-				break;
-			}
-			case LT: {
-				s.append(consumeToken(LT).image);
-				break;
-			}
-			case LBRACK: {
-				s.append(consumeToken(LBRACK).image);
-				break;
-			}
-			case RBRACK: {
-				s.append(consumeToken(RBRACK).image);
-				break;
-			}
-			case LPAREN: {
-				s.append(consumeToken(LPAREN).image);
-				break;
-			}
-			case GT: {
-				s.append(consumeToken(GT).image);
-				break;
-			}
-			case RPAREN: {
-				s.append(consumeToken(RPAREN).image);
-				break;
-			}
-			case UNDERSCORE: {
-				s.append(consumeToken(UNDERSCORE).image);
-				break;
-			}
+			case ASTERISK: 		s.append(consumeToken(ASTERISK).image); break;
+			case BACKSLASH: 	s.append(consumeToken(BACKSLASH).image); break;
+			case CHAR_SEQUENCE: s.append(consumeToken(CHAR_SEQUENCE).image); break;
+			case COLON: 		s.append(consumeToken(COLON).image); break;
+			case DASH: 			s.append(consumeToken(DASH).image); break;
+			case DIGITS:		s.append(consumeToken(DIGITS).image); break;
+			case DOT:			s.append(consumeToken(DOT).image); break;
+			case EQ:			s.append(consumeToken(EQ).image); break;
+			case ESCAPED_CHAR:	s.append(consumeToken(ESCAPED_CHAR).image); break;
+			case IMAGE_LABEL:	s.append(consumeToken(IMAGE_LABEL).image); break;
+			case LT:			s.append(consumeToken(LT).image); break;
+			case LBRACK:		s.append(consumeToken(LBRACK).image); break;
+			case RBRACK:		s.append(consumeToken(RBRACK).image); break;
+			case LPAREN:		s.append(consumeToken(LPAREN).image); break;
+			case GT:			s.append(consumeToken(GT).image); break;
+			case RPAREN:		s.append(consumeToken(RPAREN).image); break;
+			case UNDERSCORE:	s.append(consumeToken(UNDERSCORE).image); break;
 			default:
 				if (!nextAfterSpace(EOL, EOF)) {
 					switch (getNextTokenKind()) {
-					case SPACE: {
-						s.append(consumeToken(SPACE).image);
-						break;
-					}
-					case TAB: {
-						consumeToken(TAB);
-						s.append("    ");
-						break;
-					}
+					case SPACE:	s.append(consumeToken(SPACE).image); break;
+					case TAB: consumeToken(TAB); s.append("    "); break;
 					}
 				}
 			}
-		} while(jj_2_76(1));
+		} while(codeTextHasAnyTokenAhead());
 		text.setValue(s.toString());
 		tree.closeScope(text);
 	}
 
-	//TODO:///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
-	
-	
+	//TODO: 2 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+
 	private void looseChar() {
 		Text text = new Text();
 		tree.openScope(text);
-		Token t = null;
 		switch (getNextTokenKind()) {
-		case ASTERISK: {
-			t = consumeToken(ASTERISK);
-			break;
+		case ASTERISK:		text.setValue(consumeToken(ASTERISK).image); break;
+		case BACKTICK:		text.setValue(consumeToken(BACKTICK).image); break;
+		case LBRACK:		text.setValue(consumeToken(LBRACK).image); break;
+		case UNDERSCORE:	text.setValue(consumeToken(UNDERSCORE).image); break;		
 		}
-		case BACKTICK: {
-			t = consumeToken(BACKTICK);
-			break;
-		}
-		case LBRACK: {
-			t = consumeToken(LBRACK);
-			break;
-		}
-		case UNDERSCORE: {
-			t = consumeToken(UNDERSCORE);
-			break;
-		}
-		}
-		text.setValue(t.image);
 		tree.closeScope(text);
 	}
 
@@ -694,21 +548,9 @@ public class Parser {
 	}
 	
 	private void levelWhiteSpace(int threshold) {
-		Token t;
 		int currentPos = 1;
 		while ((getNextTokenKind() == SPACE || getNextTokenKind() == TAB) && currentPos < (threshold - 1)) {
-			switch (getNextTokenKind()) {
-			case SPACE: {
-				t = consumeToken(SPACE);
-				currentPos = t.beginColumn;
-				break;
-			}
-			case TAB: {
-				t = consumeToken(TAB);
-				currentPos = t.beginColumn;
-				break;
-			}
-			}
+			currentPos = consumeToken(getNextTokenKind()).beginColumn;
 		}
 	}
 
@@ -716,14 +558,8 @@ public class Parser {
 		StringBuilder s = new StringBuilder();
 		do {
 			switch (getNextTokenKind()) {
-			case CHAR_SEQUENCE: {
-				s.append(consumeToken(CHAR_SEQUENCE).image);
-				break;
-			}
-			case BACKTICK: {
-				s.append(consumeToken(BACKTICK).image);
-				break;
-			}
+			case CHAR_SEQUENCE:	s.append(consumeToken(CHAR_SEQUENCE).image); break;
+			case BACKTICK: s.append(consumeToken(BACKTICK).image); break;
 			}
 		} while (getNextTokenKind() == BACKTICK || getNextTokenKind() == CHAR_SEQUENCE);
 		return s.toString();
@@ -731,11 +567,11 @@ public class Parser {
 
 	private void inline() {
 		do {
-			if (jj_2_18(1)) {
+			if (hasInlineTextAhead()) {
 				text();
-			} else if (jj_2_19(2147483647)) {
+			} else if (hasImageAhead()) {
 				image();
-			} else if (jj_2_20(2147483647)) {
+			} else if (hasLinkAhead()) {
 				link();
 			} else if (multilineAhead(ASTERISK)) {
 				strongMultiline();
@@ -746,7 +582,7 @@ public class Parser {
 			} else {
 				looseChar();
 			}
-		} while (jj_2_21(1));
+		} while (hasInlineElementAhead());
 	}
 
 	private void resourceText() {
@@ -755,74 +591,28 @@ public class Parser {
 		StringBuilder s = new StringBuilder();
 		do {
 			switch (getNextTokenKind()) {
-			case BACKSLASH: {
-				s.append(consumeToken(BACKSLASH).image);
-				break;
-			}
-			case COLON: {
-				s.append(consumeToken(COLON).image);
-				break;
-			}
-			case CHAR_SEQUENCE: {
-				s.append(consumeToken(CHAR_SEQUENCE).image);
-				break;
-			}
-			case DASH: {
-				s.append(consumeToken(DASH).image);
-				break;
-			}
-			case DIGITS: {
-				s.append(consumeToken(DIGITS).image);
-				break;
-			}
-			case DOT: {
-				s.append(consumeToken(DOT).image);
-				break;
-			}
-			case EQ: {
-				s.append(consumeToken(EQ).image);
-				break;
-			}
-			case ESCAPED_CHAR: {
-				s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
-				break;
-			}
-			case IMAGE_LABEL: {
-				s.append(consumeToken(IMAGE_LABEL).image);
-				break;
-			}
-			case GT: {
-				s.append(consumeToken(GT).image);
-				break;
-			}
-			case LPAREN: {
-				s.append(consumeToken(LPAREN).image);
-				break;
-			}
-			case LT: {
-				s.append(consumeToken(LT).image);
-				break;
-			}
-			case RPAREN: {
-				s.append(consumeToken(RPAREN).image);
-				break;
-			}
+			case BACKSLASH:		s.append(consumeToken(BACKSLASH).image); break;
+			case COLON:			s.append(consumeToken(COLON).image); break;
+			case CHAR_SEQUENCE:	s.append(consumeToken(CHAR_SEQUENCE).image); break;
+			case DASH:			s.append(consumeToken(DASH).image); break;
+			case DIGITS:		s.append(consumeToken(DIGITS).image); break;
+			case DOT:			s.append(consumeToken(DOT).image); break;
+			case EQ:			s.append(consumeToken(EQ).image); break;
+			case ESCAPED_CHAR:	s.append(consumeToken(ESCAPED_CHAR).image.substring(1)); break;
+			case IMAGE_LABEL:	s.append(consumeToken(IMAGE_LABEL).image); break;
+			case GT:			s.append(consumeToken(GT).image); break;
+			case LPAREN:		s.append(consumeToken(LPAREN).image); break;
+			case LT:			s.append(consumeToken(LT).image); break;
+			case RPAREN:		s.append(consumeToken(RPAREN).image); break;
 			default:
 				if (!nextAfterSpace(RBRACK)) {
 					switch (getNextTokenKind()) {
-					case SPACE: {
-						s.append(consumeToken(SPACE).image);
-						break;
-					}
-					case TAB: {
-						consumeToken(TAB);
-						s.append("    ");
-						break;
-					}
+					case SPACE:	s.append(consumeToken(SPACE).image); break;
+					case TAB:	consumeToken(TAB); s.append("    "); break;
 					}
 				}
 			}
-		} while(jj_2_32(2));
+		} while(resourceHasElementAhead());
 		text.setValue(s.toString());
 		tree.closeScope(text);
 	}
@@ -838,88 +628,30 @@ public class Parser {
 
 	private String resourceUrlText() {
 		StringBuilder s = new StringBuilder();
-		while (jj_2_33(1)) {
+		while (resourceTextHasElementsAhead()) {
 			switch (getNextTokenKind()) {
-			case ASTERISK: {
-				s.append(consumeToken(ASTERISK).image);
-				break;
-			}
-			case BACKSLASH: {
-				s.append(consumeToken(BACKSLASH).image);
-				break;
-			}
-			case BACKTICK: {
-				s.append(consumeToken(BACKTICK).image);
-				break;
-			}
-			case CHAR_SEQUENCE: {
-				s.append(consumeToken(CHAR_SEQUENCE).image);
-				break;
-			}
-			case COLON: {
-				s.append(consumeToken(COLON).image);
-				break;
-			}
-			case DASH: {
-				s.append(consumeToken(DASH).image);
-				break;
-			}
-			case DIGITS: {
-				s.append(consumeToken(DIGITS).image);
-				break;
-			}
-			case DOT: {
-				s.append(consumeToken(DOT).image);
-				break;
-			}
-			case EQ: {
-				s.append(consumeToken(EQ).image);
-				break;
-			}
-			case ESCAPED_CHAR: {
-				s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
-				break;
-			}
-			case IMAGE_LABEL: {
-				s.append(consumeToken(IMAGE_LABEL).image);
-				break;
-			}
-			case GT: {
-				s.append(consumeToken(GT).image);
-				break;
-			}
-			case LBRACK: {
-				s.append(consumeToken(LBRACK).image);
-				break;
-			}
-			case LPAREN: {
-				s.append(consumeToken(LPAREN).image);
-				break;
-			}
-			case LT: {
-				s.append(consumeToken(LT).image);
-				break;
-			}
-			case RBRACK: {
-				s.append(consumeToken(RBRACK).image);
-				break;
-			}
-			case UNDERSCORE: {
-				s.append(consumeToken(UNDERSCORE).image);
-				break;
-			}
+			case ASTERISK: 		s.append(consumeToken(ASTERISK).image); break;
+			case BACKSLASH:		s.append(consumeToken(BACKSLASH).image); break;
+			case BACKTICK:		s.append(consumeToken(BACKTICK).image); break;
+			case CHAR_SEQUENCE:	s.append(consumeToken(CHAR_SEQUENCE).image); break;
+			case COLON:			s.append(consumeToken(COLON).image); break;
+			case DASH:			s.append(consumeToken(DASH).image); break;
+			case DIGITS:		s.append(consumeToken(DIGITS).image); break;
+			case DOT:			s.append(consumeToken(DOT).image); break;
+			case EQ:			s.append(consumeToken(EQ).image); break;
+			case ESCAPED_CHAR:	s.append(consumeToken(ESCAPED_CHAR).image.substring(1)); break;
+			case IMAGE_LABEL:	s.append(consumeToken(IMAGE_LABEL).image); break;
+			case GT:			s.append(consumeToken(GT).image); break;
+			case LBRACK:		s.append(consumeToken(LBRACK).image); break;
+			case LPAREN:		s.append(consumeToken(LPAREN).image); break;
+			case LT:			s.append(consumeToken(LT).image); break;
+			case RBRACK:		s.append(consumeToken(RBRACK).image); break;
+			case UNDERSCORE:	s.append(consumeToken(UNDERSCORE).image); break;
 			default:
 				if (!nextAfterSpace(RPAREN)) {
 					switch (getNextTokenKind()) {
-					case SPACE: {
-						s.append(consumeToken(SPACE).image);
-						break;
-					}
-					case TAB: {
-						consumeToken(TAB);
-						s.append("    ");
-						break;
-					}
+					case SPACE:	s.append(consumeToken(SPACE).image); break;
+					case TAB:	consumeToken(TAB); s.append("    "); break;
 					}
 				}
 			}
@@ -942,33 +674,24 @@ public class Parser {
 
 	private void strongMultilineContent() {
 		do {
-			if (jj_2_34(1)) {
+			if (hasTextAhead()) {
 				text();
-			} else if (jj_2_35(2147483647)) {
+			} else if (hasImageAhead()) {
 				image();
-			} else if (jj_2_36(2147483647)) {
+			} else if (hasLinkAhead()) {
 				link();
-			} else if (jj_2_37(2147483647)) {
+			} else if (hasCodeAhead()) {
 				code();
-			} else if (jj_2_38(2147483647)) {
+			} else if (hasEmWithinStrongMultiline()) {
 				emWithinStrongMultiline();
 			} else {
 				switch (getNextTokenKind()) {
-				case BACKTICK: {
-					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-					break;
-				}
-				case LBRACK: {
-					tree.addSingleValue(new Text(), consumeToken(LBRACK));
-					break;
-				}
-				case UNDERSCORE: {
-					tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
-					break;
-				}
+				case BACKTICK:		tree.addSingleValue(new Text(), consumeToken(BACKTICK)); break;
+				case LBRACK:		tree.addSingleValue(new Text(), consumeToken(LBRACK)); break;
+				case UNDERSCORE:	tree.addSingleValue(new Text(), consumeToken(UNDERSCORE)); break;
 				}
 			}
-		} while(jj_2_39(1));
+		} while(strongMultilineHasElementsAhead());
 	}
 
 	private void strongWithinEmMultiline() {
@@ -987,31 +710,22 @@ public class Parser {
 
 	private void strongWithinEmMultilineContent() {
 		do {
-			if (jj_2_40(1)) {
+			if (hasTextAhead()) {
 				text();
-			} else if (jj_2_41()) {
+			} else if (hasImageAhead()) {
 				image();
-			} else if (jj_2_42(2147483647)) {
+			} else if (hasLinkAhead()) {
 				link();
-			} else if (jj_2_43(2147483647)) {
+			} else if (hasCodeAhead()) {
 				code();
 			} else {
 				switch (getNextTokenKind()) {
-				case BACKTICK: {
-					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-					break;
-				}
-				case LBRACK: {
-					tree.addSingleValue(new Text(), consumeToken(LBRACK));
-					break;
-				}
-				case UNDERSCORE: {
-					tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
-					break;
-				}
+				case BACKTICK:		tree.addSingleValue(new Text(), consumeToken(BACKTICK)); break;
+				case LBRACK:		tree.addSingleValue(new Text(), consumeToken(LBRACK)); break;
+				case UNDERSCORE:	tree.addSingleValue(new Text(), consumeToken(UNDERSCORE)); break;
 				}
 			}
-		} while(jj_2_44(1));
+		} while(strongWithinEmMultilineHasElementsAhead());
 	}
 
 	private void strongWithinEm() {
@@ -1019,31 +733,22 @@ public class Parser {
 		tree.openScope(strong);
 		consumeToken(ASTERISK);
 		do {
-			if (jj_2_50(1)) {
+			if (hasTextAhead()) {
 				text();
-			} else if (jj_2_51(2147483647)) {
+			} else if (hasImageAhead()) {
 				image();
-			} else if (jj_2_52(2147483647)) {
+			} else if (hasLinkAhead()) {
 				link();
-			} else if (jj_2_53(2147483647)) {
+			} else if (hasCodeAhead()) {
 				code();
 			} else {
 				switch (getNextTokenKind()) {
-				case BACKTICK: {
-					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-					break;
-				}
-				case LBRACK: {
-					tree.addSingleValue(new Text(), consumeToken(LBRACK));
-					break;
-				}
-				case UNDERSCORE: {
-					tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
-					break;
-				}
+				case BACKTICK:		tree.addSingleValue(new Text(), consumeToken(BACKTICK)); break;
+				case LBRACK:		tree.addSingleValue(new Text(), consumeToken(LBRACK)); break;
+				case UNDERSCORE:	tree.addSingleValue(new Text(), consumeToken(UNDERSCORE)); break;
 				}
 			}
-		} while(jj_2_54(1));
+		} while(strongWithinEmHasElementsAhead());
 		consumeToken(ASTERISK);
 		tree.closeScope(strong);
 	}
@@ -1063,33 +768,24 @@ public class Parser {
 
 	private void emMultilineContent() {
 		do {
-			if (jj_2_55(1)) {
+			if (hasTextAhead()) {
 				text();
-			} else if (jj_2_56(2147483647)) {
+			} else if (hasImageAhead()) {
 				image();
-			} else if (jj_2_57(2147483647)) {
+			} else if (hasLinkAhead()) {
 				link();
 			} else if (multilineAhead(BACKTICK)) {
 				codeMultiline();
-			} else if (jj_2_58(2147483647)) {
+			} else if (hasStrongWithinEmMultilineAhead()) {
 				strongWithinEmMultiline();
 			} else {
 				switch (getNextTokenKind()) {
-				case ASTERISK: {
-					tree.addSingleValue(new Text(), consumeToken(ASTERISK));
-					break;
-				}
-				case BACKTICK: {
-					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-					break;
-				}
-				case LBRACK: {
-					tree.addSingleValue(new Text(), consumeToken(LBRACK));
-					break;
-				}
+				case ASTERISK:	tree.addSingleValue(new Text(), consumeToken(ASTERISK)); break;
+				case BACKTICK:	tree.addSingleValue(new Text(), consumeToken(BACKTICK)); break;
+				case LBRACK:	tree.addSingleValue(new Text(), consumeToken(LBRACK)); break;
 				}
 			}
-		} while(jj_2_59(1));
+		} while(emMultilineContentHasElementsAhead());
 	}
 
 	private void emWithinStrongMultiline() {
@@ -1107,31 +803,22 @@ public class Parser {
 
 	private void emWithinStrongMultilineContent() {
 		do {
-			if (jj_2_60(1)) {
+			if (hasTextAhead()) {
 				text();
-			} else if (jj_2_61(2147483647)) {
+			} else if (hasImageAhead()) {
 				image();
-			} else if (jj_2_62(2147483647)) {
+			} else if (hasLinkAhead()) {
 				link();
-			} else if (jj_2_63(2147483647)) {
+			} else if (hasCodeAhead()) {
 				code();
 			} else {
 				switch (getNextTokenKind()) {
-				case ASTERISK: {
-					tree.addSingleValue(new Text(), consumeToken(ASTERISK));
-					break;
-				}
-				case BACKTICK: {
-					tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-					break;
-				}
-				case LBRACK: {
-					tree.addSingleValue(new Text(), consumeToken(LBRACK));
-					break;
-				}
+				case ASTERISK: 	tree.addSingleValue(new Text(), consumeToken(ASTERISK)); break;
+				case BACKTICK:	tree.addSingleValue(new Text(), consumeToken(BACKTICK)); break;
+				case LBRACK:	tree.addSingleValue(new Text(), consumeToken(LBRACK)); break;
 				}
 			}
-		} while (jj_2_64(1));
+		} while (emWithinStrongMultilineContentHasElementsAhaed());
 	}
 
 	private void emWithinStrong() {
@@ -1355,6 +1042,8 @@ public class Parser {
 		return false;
 	}
 
+// TODO: 3 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	
 	private boolean nextAfterSpace(Integer... tokens) {
 		int i = skip(1, SPACE, TAB);
 		return Arrays.asList(tokens).contains(getToken(i).kind);
@@ -1449,7 +1138,7 @@ public class Parser {
 		}
 	}
 	
-	private boolean hasInlineTextAhead() {
+	private boolean hasTextAhead() {
 		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
@@ -1459,7 +1148,7 @@ public class Parser {
 		}
 	}
 
-	private boolean hasInlineImageAhead() {
+	private boolean hasImageAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1479,7 +1168,7 @@ public class Parser {
 		}
 	}
 
-	private boolean hasInlineLinkAhead() {
+	private boolean hasLinkAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1509,7 +1198,7 @@ public class Parser {
 		}
 	}
 
-	private boolean hasInlineCodeAhead() {
+	private boolean hasCodeAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1559,8 +1248,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_18(int xla) {
-		lookAhead = xla;
+	private boolean hasInlineTextAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
@@ -1569,28 +1258,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_19(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_62();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_20(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_63();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_21(int xla) {
-		lookAhead = xla;
+	private boolean hasInlineElementAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_21();
@@ -1599,18 +1268,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_22(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_94();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_23(int xla) {
-		lookAhead = xla;
+	private boolean imageHasAnyElements() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_23();
@@ -1619,8 +1278,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_24(int xla) {
-		lookAhead = xla;
+	private boolean imageHasResourceUrlAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_96();
@@ -1629,18 +1288,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_25(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_62();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_26(int xla) {
-		lookAhead = xla;
+	private boolean linkStrongAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_64();
@@ -1649,8 +1298,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_27(int xla) {
-		lookAhead = xla;
+	private boolean linkEmAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_65();
@@ -1659,8 +1308,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_28(int xla) {
-		lookAhead = xla;
+	private boolean linkCodeAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
@@ -1669,8 +1318,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_29(int xla) {
-		lookAhead = xla;
+	private boolean linkResourceTextAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_94();
@@ -1679,8 +1328,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_30(int xla) {
-		lookAhead = xla;
+	private boolean linkHasAnyElements() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_30();
@@ -1689,8 +1338,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_31(int xla) {
-		lookAhead = xla;
+	private boolean linkHasUrl() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_96();
@@ -1699,8 +1348,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_32(int xla) {
-		lookAhead = xla;
+	private boolean resourceHasElementAhead() {
+		lookAhead = 2;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_32();
@@ -1709,8 +1358,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_33(int xla) {
-		lookAhead = xla;
+	private boolean resourceTextHasElementsAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_33();
@@ -1719,48 +1368,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_34(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_61();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_35(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_62();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_36(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_63();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_37(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_66();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_38(int xla) {
-		lookAhead = xla;
+	private boolean hasEmWithinStrongMultiline() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_134();
@@ -1769,8 +1378,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_39(int xla) {
-		lookAhead = xla;
+	private boolean strongMultilineHasElementsAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_39();
@@ -1778,18 +1387,18 @@ public class Parser {
 			return true;
 		}
 	}
-
-	private boolean jj_2_40(int xla) {
-		lookAhead = xla;
+	
+	private boolean strongWithinEmMultilineHasElementsAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
-			return !jj_3R_61();
+			return !jj_3_44();
 		} catch (LookaheadSuccess ls) {
 			return true;
 		}
 	}
 
-	private boolean jj_2_41() {
+	private boolean strongHasImage() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1799,8 +1408,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_42(int xla) {
-		lookAhead = xla;
+	private boolean strongHasLink() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
@@ -1809,58 +1418,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_43(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_66();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_44(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3_44();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_45(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_61();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_46(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_62();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_47(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_63();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_48(int xla) {
-		lookAhead = xla;
+	private boolean strongEmWithinStrongAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_148();
@@ -1869,8 +1428,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_49(int xla) {
-		lookAhead = xla;
+	private boolean strongHasElements() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_49();
@@ -1879,48 +1438,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_50(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_61();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_51(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_62();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_52(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_63();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_53(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_66();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_54(int xla) {
-		lookAhead = xla;
+	private boolean strongWithinEmHasElementsAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_54();
@@ -1929,38 +1448,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_55(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_61();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_56(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_62();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_57(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_63();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_58(int xla) {
-		lookAhead = xla;
+	private boolean hasStrongWithinEmMultilineAhead() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_162();
@@ -1969,8 +1458,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_59(int xla) {
-		lookAhead = xla;
+	private boolean emMultilineContentHasElementsAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_59();
@@ -1979,48 +1468,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_60(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_61();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_61(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_62();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_62(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_63();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_63(int xla) {
-		lookAhead = xla;
-		lastPosition = scanPosition = token;
-		try {
-			return !jj_3R_66();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean jj_2_64(int xla) {
-		lookAhead = xla;
+	private boolean emWithinStrongMultilineContentHasElementsAhaed() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_64();
@@ -2029,8 +1478,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_65(int xla) {
-		lookAhead = xla;
+	private boolean emHasText() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_61();
@@ -2039,8 +1488,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_66(int xla) {
-		lookAhead = xla;
+	private boolean emHasImage() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_62();
@@ -2049,8 +1498,10 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_67(int xla) {
-		lookAhead = xla;
+// TODO: 4 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	private boolean emHasLink() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_63();
@@ -2059,8 +1510,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_68(int xla) {
-		lookAhead = xla;
+	private boolean emHasCode() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_66();
@@ -2069,8 +1520,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_69(int xla) {
-		lookAhead = xla;
+	private boolean emHasStrongWithinEm() {
+		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3R_176();
@@ -2079,8 +1530,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_70(int xla) {
-		lookAhead = xla;
+	private boolean emHasElements() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_70();
@@ -2139,8 +1590,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_76(int xla) {
-		lookAhead = xla;
+	private boolean codeTextHasAnyTokenAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_76();
@@ -2149,8 +1600,8 @@ public class Parser {
 		}
 	}
 
-	private boolean jj_2_77(int xla) {
-		lookAhead = xla;
+	private boolean textHasTokensAhead() {
+		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
 			return !jj_3_77();
@@ -2743,6 +2194,8 @@ public class Parser {
 		return false;
 	}
 
+// TODO: 5 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	
 	private boolean jj_3_33() {
 		Token xsp;
 		xsp = scanPosition;
