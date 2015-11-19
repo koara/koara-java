@@ -15,13 +15,10 @@
  */
 package io.koara;
 
-import static io.koara.TokenManager.BACKTICK;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import io.koara.ast.Node;
-import io.koara.ast.Text;
 
 public class TreeState {
 
