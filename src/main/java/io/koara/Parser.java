@@ -15,7 +15,28 @@
  */
 package io.koara;
 
-import static io.koara.TokenManager.*;
+import static io.koara.TokenManager.ASTERISK;
+import static io.koara.TokenManager.BACKSLASH;
+import static io.koara.TokenManager.BACKTICK;
+import static io.koara.TokenManager.CHAR_SEQUENCE;
+import static io.koara.TokenManager.COLON;
+import static io.koara.TokenManager.DASH;
+import static io.koara.TokenManager.DIGITS;
+import static io.koara.TokenManager.DOT;
+import static io.koara.TokenManager.EOF;
+import static io.koara.TokenManager.EOL;
+import static io.koara.TokenManager.EQ;
+import static io.koara.TokenManager.ESCAPED_CHAR;
+import static io.koara.TokenManager.GT;
+import static io.koara.TokenManager.IMAGE_LABEL;
+import static io.koara.TokenManager.LBRACK;
+import static io.koara.TokenManager.LPAREN;
+import static io.koara.TokenManager.LT;
+import static io.koara.TokenManager.RBRACK;
+import static io.koara.TokenManager.RPAREN;
+import static io.koara.TokenManager.SPACE;
+import static io.koara.TokenManager.TAB;
+import static io.koara.TokenManager.UNDERSCORE;
 
 import java.io.File;
 import java.io.FileReader;
@@ -53,6 +74,7 @@ public class Parser {
 	private boolean semanticLookAhead;	
 	private LookaheadSuccess lookAheadSuccess = new LookaheadSuccess();
 	private class LookaheadSuccess extends Error {}
+	private String[] includes;
 	
 	public Document parse(String text) {
 		return parse(new StringReader(text));
@@ -129,9 +151,9 @@ public class Parser {
 				image();
 			} else if (hasLinkAhead()) {
 				link();
-			} else if (hasInlineStrongAhead()) {
+			} else if (hasStrongAhead()) {
 				strong();
-			} else if (hasInlineEmAhead()) {
+			} else if (hasEmAhead()) {
 				em();
 			} else if (hasCodeAhead()) {
 				code();
@@ -163,7 +185,7 @@ public class Parser {
 				blockElement();
 			}
 		}
-		while (hasBlockquoteEmptyLines()) {
+		while (hasBlockquoteEmptyLinesAhead()) {
 			blockquoteEmptyLine();
 		}
 		currentQuoteLevel--;
@@ -387,7 +409,7 @@ public class Parser {
 		}
 		whiteSpace();
 		consumeToken(RBRACK);
-		if (imageHasResourceUrlAhead()) {
+		if (hasResourceUrlAhead()) {
 			ref = resourceUrl();
 		}
 		image.setValue(ref);
@@ -403,13 +425,13 @@ public class Parser {
 		while (linkHasAnyElements()) {
 			if (hasImageAhead()) {
 				image();
-			} else if (linkStrongAhead()) {
+			} else if (hasStrongAhead()) {
 				strong();
-			} else if (linkEmAhead()) {
+			} else if (hasEmAhead()) {
 				em();
-			} else if (linkCodeAhead()) {
+			} else if (hasCodeAhead()) {
 				code();
-			} else if (linkResourceTextAhead()) {
+			} else if (hasResourceTextAhead()) {
 				resourceText();
 			} else {
 				looseChar();
@@ -417,7 +439,7 @@ public class Parser {
 		}
 		whiteSpace();
 		consumeToken(RBRACK);
-		if (linkHasUrl()) {
+		if (hasResourceUrlAhead()) {
 			ref = resourceUrl();
 		}
 		link.setValue(ref);
@@ -431,9 +453,9 @@ public class Parser {
 		while (strongHasElements()) {
 			if (hasTextAhead()) {
 				text();
-			} else if (strongHasImage()) {
+			} else if (hasImage()) {
 				image();
-			} else if (strongHasLink()) {
+			} else if (hasLinkAhead()) {
 				link();
 			} else if (multilineAhead(BACKTICK)) {
 				codeMultiline();
@@ -456,13 +478,13 @@ public class Parser {
 		tree.openScope(em);
 		consumeToken(UNDERSCORE);
 		while (emHasElements()) {
-			if (emHasText()) {
+			if (hasTextAhead()) {
 				text();
-			} else if (emHasImage()) {
+			} else if (hasImage()) {
 				image();
-			} else if (emHasLink()) {
+			} else if (hasLinkAhead()) {
 				link();
-			} else if (emHasCode()) {
+			} else if (hasCodeAhead()) {
 				code();
 			} else if (emHasStrongWithinEm()) {
 				strongWithinEm();
@@ -867,43 +889,7 @@ public class Parser {
 			consumeToken(getNextTokenKind());
 		}
 	}
-	
-	private int getNextTokenKind() {
-		if(nextTokenKind != -1) { 
-			return nextTokenKind; 
-		} else if ((nextToken = token.next) == null) {
-			return (nextTokenKind = (token.next = tm.getNextToken()).kind);
-		}
-		return (nextTokenKind = nextToken.kind);
-	}
-	
-	private Token consumeToken(int kind) {
-		Token old = token;
-		if (token.next != null) {
-			token = token.next;
-		} else {
-			token = token.next = tm.getNextToken();
-		}
-		nextTokenKind = -1;
-		if (token.kind == kind) {
-			return token;
-		}
-		token = old;
-		return token;
-	}
-	
-	private Token getToken(int index) {
-		Token t = lookingAhead ? scanPosition : token;
-		for (int i = 0; i < index; i++) {
-			if (t.next != null) {
-				t = t.next;
-			} else {
-				t = t.next = tm.getNextToken();
-			}
-		}
-		return t;
-	}
-	
+
 	private boolean hasAnyBlockElementsAhead() {
 		try {
 			lookAhead = 1;
@@ -1146,17 +1132,7 @@ public class Parser {
 		}
 	}
 
-	private boolean hasLinkAhead() {
-		lookAhead = 2147483647;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanLink();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean hasInlineStrongAhead() {
+	private boolean hasStrongAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1166,7 +1142,7 @@ public class Parser {
 		}
 	}
 
-	private boolean hasInlineEmAhead() {
+	private boolean hasEmAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1196,7 +1172,7 @@ public class Parser {
 		}
 	}
 
-	private boolean hasBlockquoteEmptyLines() {
+	private boolean hasBlockquoteEmptyLinesAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1256,47 +1232,7 @@ public class Parser {
 		}
 	}
 
-	private boolean imageHasResourceUrlAhead() {
-		lookAhead = 2147483647;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanResourceUrl();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean linkStrongAhead() {
-		lookAhead = 2147483647;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanStrong();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean linkEmAhead() {
-		lookAhead = 2147483647;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanEm();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean linkCodeAhead() {
-		lookAhead = 2147483647;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanCode();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean linkResourceTextAhead() {
+	private boolean hasResourceTextAhead() {
 		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
@@ -1316,7 +1252,7 @@ public class Parser {
 		}
 	}
 
-	private boolean linkHasUrl() {
+	private boolean hasResourceUrlAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1376,7 +1312,7 @@ public class Parser {
 		}
 	}
 
-	private boolean strongHasImage() {
+	private boolean hasImage() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1386,7 +1322,7 @@ public class Parser {
 		}
 	}
 
-	private boolean strongHasLink() {
+	private boolean hasLinkAhead() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
@@ -1451,46 +1387,6 @@ public class Parser {
 		lastPosition = scanPosition = token;
 		try {
 			return !scanEmWithinStrongMultilineContent();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean emHasText() {
-		lookAhead = 1;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanTextTokens();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean emHasImage() {
-		lookAhead = 2147483647;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanImage();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean emHasLink() {
-		lookAhead = 2147483647;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanLink();
-		} catch (LookaheadSuccess ls) {
-			return true;
-		}
-	}
-
-	private boolean emHasCode() {
-		lookAhead = 2147483647;
-		lastPosition = scanPosition = token;
-		try {
-			return !scanCode();
 		} catch (LookaheadSuccess ls) {
 			return true;
 		}
@@ -2583,6 +2479,46 @@ public class Parser {
 			throw lookAheadSuccess;
 		}
 		return false;
+	}
+	
+	private int getNextTokenKind() {
+		if(nextTokenKind != -1) { 
+			return nextTokenKind; 
+		} else if ((nextToken = token.next) == null) {
+			return (nextTokenKind = (token.next = tm.getNextToken()).kind);
+		}
+		return (nextTokenKind = nextToken.kind);
+	}
+	
+	private Token consumeToken(int kind) {
+		Token old = token;
+		if (token.next != null) {
+			token = token.next;
+		} else {
+			token = token.next = tm.getNextToken();
+		}
+		nextTokenKind = -1;
+		if (token.kind == kind) {
+			return token;
+		}
+		token = old;
+		return token;
+	}
+	
+	private Token getToken(int index) {
+		Token t = lookingAhead ? scanPosition : token;
+		for (int i = 0; i < index; i++) {
+			if (t.next != null) {
+				t = t.next;
+			} else {
+				t = t.next = tm.getNextToken();
+			}
+		}
+		return t;
+	}
+	
+	public void setIncludes(String[] includes) {
+		this.includes = includes;
 	}
 	
 }

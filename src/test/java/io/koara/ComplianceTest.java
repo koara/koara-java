@@ -33,14 +33,15 @@ import org.junit.runners.Parameterized.Parameters;
 import io.koara.ast.Document;
 import io.koara.renderer.HtmlRenderer;
 
+import static io.koara.TestUtils.*;
+
 @RunWith(Parameterized.class)
 public class ComplianceTest {
 
 	private static final String TESTSUITE_FOLDER = "src/test/resources";
-	
+
 	private String module;
 	private String testcase;
-	
     private static List<String> include = Arrays.asList();
 	
 	public ComplianceTest(String module, String testcase) {
@@ -76,21 +77,6 @@ public class ComplianceTest {
 		assertEquals(html, renderer.getOutput());
 	}
 	
-	private String readFile(String path) throws IOException {
-		BufferedReader reader = null;
-		try {
-			StringBuffer fileData = new StringBuffer();
-			reader = new BufferedReader(new FileReader(path));
-			char[] buf = new char[1024];
-	        int numRead=0;
-	        while((numRead=reader.read(buf)) != -1){
-	            String readData = String.valueOf(buf, 0, numRead);
-	            fileData.append(readData);
-	        }
-	        return fileData.toString();
-		} finally {
-			reader.close();
-		}
-    }
+	
 	
 }

@@ -15,7 +15,9 @@
  */
 package io.koara.ast;
 
-public abstract class BlockElement extends Node {
+import io.koara.renderer.Renderer;
+
+public class BlockElement extends Node {
 
 	public boolean isNested() {
 		return !(getParent() instanceof Document);
@@ -23,6 +25,11 @@ public abstract class BlockElement extends Node {
 
 	public boolean isSingleChild() {
 		return ((Node) this.getParent()).getChildren().length == 1;
+	}
+
+	@Override
+	public void accept(Renderer visitor) {
+		visitor.visit(this);
 	}
 
 }

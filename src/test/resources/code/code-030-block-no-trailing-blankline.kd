@@ -1,6 +1,0 @@
-```javascript
-function greeting() {
-  console.log("Hello World");
-}
-```
-A blank line is not necassary:

@@ -15,6 +15,7 @@
  */
 package io.koara.renderer;
 
+import io.koara.ast.BlockElement;
 import io.koara.ast.Blockquote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;
@@ -45,6 +46,8 @@ public interface Renderer {
 	void visit(CodeBlock node);
 
 	void visit(Paragraph node);
+	
+	void visit(BlockElement node);
 
 	void visit(Image node);
 

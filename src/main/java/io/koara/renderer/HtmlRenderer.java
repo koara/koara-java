@@ -17,6 +17,7 @@ package io.koara.renderer;
 
 import java.util.Stack;
 
+import io.koara.ast.BlockElement;
 import io.koara.ast.Blockquote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;
@@ -112,6 +113,11 @@ public class HtmlRenderer implements Renderer {
 			if(!node.isNested()) { out.append("\n"); }
 		}
 	}
+	
+	@Override
+	public void visit(BlockElement node) {
+		// TODO Auto-generated method stub	
+	}
 		
 	public void visit(Image node) {
 		out.append("<img src=\"" + escapeUrl(node.getValue().toString()) + "\" alt=\"");
@@ -182,5 +188,7 @@ public class HtmlRenderer implements Renderer {
 	public String getOutput() {
 		return out.toString().trim();
 	}
+
+
 	
 }
