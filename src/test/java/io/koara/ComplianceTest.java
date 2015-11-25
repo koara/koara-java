@@ -38,7 +38,7 @@ import static io.koara.TestUtils.*;
 @RunWith(Parameterized.class)
 public class ComplianceTest {
 
-	private static final String TESTSUITE_FOLDER = "src/test/resources";
+	private static final String TESTSUITE_FOLDER = "src/test/resources/tests";
 
 	private String module;
 	private String testcase;
