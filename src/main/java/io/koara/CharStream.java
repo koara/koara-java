@@ -163,17 +163,11 @@ public class CharStream {
 		}
 
 		switch (c) {
-		case '\r':
-			prevCharIsCR = true;
-			break;
-		case '\n':
-			prevCharIsLF = true;
-			break;
+		case '\r': prevCharIsCR = true; break;
+		case '\n': prevCharIsLF = true; break;
 		case '\t':
 			column--;
 			column += (tabSize - (column % tabSize));
-			break;
-		default:
 			break;
 		}
 		bufline[bufpos] = line;

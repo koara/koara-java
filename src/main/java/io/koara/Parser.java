@@ -523,8 +523,6 @@ public class Parser {
 		tree.closeScope(text);
 	}
 
-	//TODO: 2 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
-
 	private void looseChar() {
 		Text text = new Text();
 		tree.openScope(text);
@@ -1024,8 +1022,6 @@ public class Parser {
 		return false;
 	}
 
-// TODO: 3 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-	
 	private boolean nextAfterSpace(Integer... tokens) {
 		int i = skip(1, SPACE, TAB);
 		return Arrays.asList(tokens).contains(getToken(i).kind);
@@ -1092,8 +1088,7 @@ public class Parser {
 		lookAhead = 1;
 		lastPosition = scanPosition = token;
 		try {
-			Token xsp;
-			xsp = scanPosition;
+			Token xsp = scanPosition;
 			if (scanTextTokens()) {
 				scanPosition = xsp;
 				if (scanImage()) {
@@ -1481,8 +1476,6 @@ public class Parser {
 		}
 	}
 
-// TODO: 4 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-
 	private boolean emHasLink() {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
@@ -1554,17 +1547,14 @@ public class Parser {
 	}
 
 	private boolean scanLooseChar() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanToken(ASTERISK)) {
 			scanPosition = xsp;
 			if (scanToken(BACKTICK)) {
 				scanPosition = xsp;
 				if (scanToken(LBRACK)) {
 					scanPosition = xsp;
-					if (scanToken(UNDERSCORE)) {
-						return true;
-					}
+					return scanToken(UNDERSCORE);
 				}
 			}
 		}
@@ -1572,8 +1562,7 @@ public class Parser {
 	}
 
 	private boolean scanText() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanToken(BACKSLASH)) {
 			scanPosition = xsp;
 			if (scanToken(CHAR_SEQUENCE)) {
@@ -1626,10 +1615,10 @@ public class Parser {
 	}
 
 	private boolean scanTextTokens() {
-		Token xsp;
 		if (scanText()) {
 			return true;
 		}
+		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
 			if (scanText()) {
@@ -1641,8 +1630,7 @@ public class Parser {
 	}
 	
 	private boolean scanCodeTextTokens() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanToken(ASTERISK)) {
 			scanPosition = xsp;
 			if (scanToken(BACKSLASH)) {
@@ -1724,10 +1712,10 @@ public class Parser {
 	}
 	
 	private boolean scanCodeTextTokensAhead() {
-		Token xsp;
 		if (scanCodeTextTokens()) {
 			return true;
 		}
+		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
 			if (scanCodeTextTokens()) {
@@ -1770,8 +1758,7 @@ public class Parser {
 	}
 
 	private boolean scanEmWithinStrongElements() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -1810,8 +1797,7 @@ public class Parser {
 	}
 
 	private boolean scanEmElements() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -1853,8 +1839,7 @@ public class Parser {
 	}
 
 	private boolean scanEmWithinStrongMultilineContent() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -1878,10 +1863,10 @@ public class Parser {
 	}
 
 	private boolean hasNoEmWithinStrongMultilineContentAhead() {
-		Token xsp;
 		if (scanEmWithinStrongMultilineContent()) {
 			return true;
 		}
+		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
 			if (scanEmWithinStrongMultilineContent()) {
@@ -1908,8 +1893,7 @@ public class Parser {
 	}
 
 	private boolean scanEmMultilineContentElements() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -1939,8 +1923,7 @@ public class Parser {
 	}
 
 	private boolean scanStrongWithinEmElements() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -1979,8 +1962,7 @@ public class Parser {
 	}
 
 	private boolean scanStrongElements() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -2025,8 +2007,7 @@ public class Parser {
 	}
 
 	private boolean scanStrongWithinEmMultilineElements() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -2050,10 +2031,10 @@ public class Parser {
 	}
 
 	private boolean scanForMoreStrongWithinEmMultilineElements() {
-		Token xsp;
 		if (scanStrongWithinEmMultilineElements()) {
 			return true;
 		}
+		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
 			if (scanStrongWithinEmMultilineElements()) {
@@ -2080,8 +2061,7 @@ public class Parser {
 	}
 
 	private boolean scanStrongMultilineElements() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -2107,11 +2087,8 @@ public class Parser {
 		return false;
 	}
 
-// TODO: 5 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-	
 	private boolean scanResourceTextElement() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanToken(ASTERISK)) {
 			scanPosition = xsp;
 			if (scanToken(BACKSLASH)) {
@@ -2171,8 +2148,7 @@ public class Parser {
 	}
 
 	private boolean scanImageElement() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanResourceElements()) {
 			scanPosition = xsp;
 			if (scanLooseChar()) {
@@ -2199,8 +2175,7 @@ public class Parser {
 	}
 
 	private boolean scanLinkElement() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanImage()) {
 			scanPosition = xsp;
 			if (scanStrong()) {
@@ -2221,8 +2196,7 @@ public class Parser {
 	}
 
 	private boolean scanResourceElement() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanToken(BACKSLASH)) {
 			scanPosition = xsp;
 			if (scanToken(COLON)) {
@@ -2270,10 +2244,10 @@ public class Parser {
 	}
 
 	private boolean scanResourceElements() {
-		Token xsp;
 		if (scanResourceElement()) {
 			return true;
 		}
+		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
 			if (scanResourceElement()) {
@@ -2329,8 +2303,7 @@ public class Parser {
 	}
 
 	private boolean scanInlineElement() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanTextTokens()) {
 			scanPosition = xsp;
 			if (scanImage()) {
@@ -2362,7 +2335,7 @@ public class Parser {
 		return false;
 	}
 
-	private boolean scanInlineElements() {
+	private boolean scanParagraph() {
 		Token xsp;
 		if (scanInlineElement()) {
 			return true;
@@ -2378,8 +2351,7 @@ public class Parser {
 	}
 
 	private boolean scanForCodeLanguageElement() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanToken(CHAR_SEQUENCE)) {
 			scanPosition = xsp;
 			if (scanToken(BACKTICK)) {
@@ -2405,8 +2377,7 @@ public class Parser {
 	}
 
 	private boolean scanWhitspaceToken() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanToken(SPACE)) {
 			scanPosition = xsp;
 			if (scanToken(TAB)) {
@@ -2431,8 +2402,7 @@ public class Parser {
 	}
 	
 	private boolean scanFencedCodeBlockTokens() {
-		Token xsp;
-		xsp = scanPosition;
+		Token xsp = scanPosition;
 		if (scanToken(ASTERISK)) {
 			scanPosition = xsp;
 			if (scanToken(BACKSLASH)) {
@@ -2556,12 +2526,11 @@ public class Parser {
 		return false;
 	}
 
-	//TODO: scan ongoings
 	private boolean scanForHeadersigns() {
-		Token xsp;
 		if (scanToken(EQ)) {
 			return true;
 		}
+		Token xsp;
 		loop: while (true) {
 			xsp = scanPosition;
 			if (scanToken(EQ)) {
@@ -2587,8 +2556,7 @@ public class Parser {
 						scanPosition = xsp;
 						if (scanFencedCodeBlock()) {
 							scanPosition = xsp;
-							if (scanInlineElements())
-								return true;
+							return scanParagraph();
 						}
 					}
 				}
