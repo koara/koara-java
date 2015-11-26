@@ -28,6 +28,11 @@ repositories {
 
 cobertura.coverageFormats = ['html', 'xml']
 
+compileJava {
+  sourceCompatibility = 1.6
+  targetCompatibility = 1.6
+}
+
 signing {
 	required = false
 	sign configurations.archives
