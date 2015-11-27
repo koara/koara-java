@@ -48,9 +48,9 @@ public abstract class Node {
 		return children;
 	}
 	
-	public void setChildren(Node[] children) {
-		this.children = children;
-	}
+//	public void setChildren(Node[] children) {
+//		this.children = children;
+//	}
 	
 	public Node getParent() {
 		return parent;

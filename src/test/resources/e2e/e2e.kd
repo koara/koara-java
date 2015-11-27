@@ -1,0 +1,29 @@
+= End-to-end
+
+[image:Koara](http://www.koara.io/logo.png)
+
+## Introduction
+This file is an [end-to-end test](#) to see if koara works in *all* possible configuration scenario's. For example:
+- allow `paragraphs`
+- allow `paragraphs + headers
+- allow lists + images
+- ...
+
+There are many scenario's where you want to have different scenario's
+1. Blog post
+2. Comment
+3. Chatmessage
+4. ...
+
+Because of the _modular_ nature of koara, we want to make sure that all fallback scencario's work 
+as expected. This becomes even more important when the language evolves in the future. 
+> The goal of koara is to make it work in any use case where a developer wants to enhance the writing experience of the 
+user. 
+
+## Configuration
+You can set modules like this:
+```
+Parser parser = new Parser();
+parser.setIncludes("paragraphs", "headers");
+Document document = parser.parse(kd);
+```

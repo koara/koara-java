@@ -116,7 +116,14 @@ public class HtmlRenderer implements Renderer {
 	
 	@Override
 	public void visit(BlockElement node) {
-		// TODO Auto-generated method stub	
+		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
+			node.childrenAccept(this);
+		} else {
+			out.append(indent());
+			node.childrenAccept(this);
+			out.append("<br>\n");
+			if(!node.isNested()) { out.append("\n"); }
+		}
 	}
 		
 	public void visit(Image node) {
@@ -189,6 +196,4 @@ public class HtmlRenderer implements Renderer {
 		return out.toString().trim();
 	}
 
-
-	
 }

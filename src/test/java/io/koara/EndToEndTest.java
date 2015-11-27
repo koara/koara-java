@@ -3,11 +3,15 @@ package io.koara;
 import static io.koara.TestUtils.readFile;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import io.koara.ast.Document;
 import io.koara.renderer.HtmlRenderer;
+
+import static io.koara.Module.*;
 
 public class EndToEndTest {
 
@@ -21,14 +25,14 @@ public class EndToEndTest {
 	
 	@Test
 	public void scenario000001() throws Exception {
-	  assertOutput("scenario000001", new String[]{"paragraphs"});
+	  assertOutput("scenario000001", PARAGRAPHS);
 	}
 
-//	@Test
-//	public void scenario000002() throws Exception {
-//	  assertOutput("scenario000002", new String[]{"headers"});
-//	}
-//
+	@Test
+	public void scenario000002() throws Exception {
+	  assertOutput("scenario000002", HEADINGS);
+	}
+
 //	@Test
 //	public void scenario000003() throws Exception {
 //	  assertOutput("scenario000003", new String[]{"paragraphs","headers"});
@@ -1294,8 +1298,8 @@ public class EndToEndTest {
 //	  assertOutput("scenario000255", new String[]{"paragraphs","headers","lists","links","images","formatting","blockquotes","code"});
 //	}
 //	
-	private void assertOutput(String file, String... includes) throws Exception {
-		String kd = readFile(TESTSUITE_FOLDER + "/e2e/kuwarra.kd");
+	private void assertOutput(String file, Module... includes) throws Exception {
+		File kd = new File(TESTSUITE_FOLDER + "/e2e/e2e.kd");
 		String html = readFile(TESTSUITE_FOLDER + "/e2e/" + file + ".htm");
 		
 		parser.setIncludes(includes);

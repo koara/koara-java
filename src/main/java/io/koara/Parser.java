@@ -45,6 +45,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 
+import io.koara.ast.BlockElement;
 import io.koara.ast.Blockquote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;
@@ -74,7 +75,7 @@ public class Parser {
 	private boolean semanticLookAhead;	
 	private LookaheadSuccess lookAheadSuccess = new LookaheadSuccess();
 	private class LookaheadSuccess extends Error {}
-	private String[] includes;
+	private java.util.List<Module> includes;
 	
 	public Document parse(String text) {
 		return parse(new StringReader(text));
@@ -118,15 +119,15 @@ public class Parser {
 	
 	private void blockElement() {
 		currentBlockLevel++;
-		if (headingAhead(1)) {
+		if (includes.contains(Module.HEADINGS) && headingAhead(1)) {
 			heading();
-		} else if(getNextTokenKind() == GT) {
+		} else if(includes.contains(Module.BLOCKQUOTES) && getNextTokenKind() == GT) {
 			blockquote();
-		} else if(getNextTokenKind() == DASH) {
+		} else if(includes.contains(Module.LISTS) && getNextTokenKind() == DASH) {
 			unorderedList();
-		} else if(hasOrderedListAhead()) {
+		} else if(includes.contains(Module.LISTS) && hasOrderedListAhead()) {
 			orderedList();
-		} else if(hasFencedCodeBlockAhead()) {
+		} else if(includes.contains(Module.CODE) && hasFencedCodeBlockAhead()) {
 			fencedCodeBlock();
 		} else {
 			paragraph();
@@ -147,15 +148,15 @@ public class Parser {
 	    while (headingHasInlineElementsAhead()) {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImageAhead()) {
+			} else if (includes.contains(Module.IMAGES) &&  hasImageAhead()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (hasStrongAhead()) {
+			} else if (includes.contains(Module.FORMATTING) && hasStrongAhead()) {
 				strong();
-			} else if (hasEmAhead()) {
+			} else if (includes.contains(Module.FORMATTING) && hasEmAhead()) {
 				em();
-			} else if (hasCodeAhead()) {
+			} else if (includes.contains(Module.CODE) && hasCodeAhead()) {
 				code();
 			} else {
 				looseChar();
@@ -344,7 +345,13 @@ public class Parser {
 	}
 	
 	private void paragraph() {
-		Paragraph paragraph = new Paragraph();
+		BlockElement paragraph;
+		if(includes.contains(Module.PARAGRAPHS)) {
+			paragraph = new Paragraph();			
+		} else {
+			paragraph = new BlockElement();
+		}
+		
 		tree.openScope(paragraph);
 		inline();
 		while (textAhead()) {
@@ -423,13 +430,13 @@ public class Parser {
 		consumeToken(LBRACK);
 		whiteSpace();
 		while (linkHasAnyElements()) {
-			if (hasImageAhead()) {
+			if (includes.contains(Module.IMAGES) && hasImageAhead()) {
 				image();
-			} else if (hasStrongAhead()) {
+			} else if (includes.contains(Module.FORMATTING) && hasStrongAhead()) {
 				strong();
-			} else if (hasEmAhead()) {
+			} else if (includes.contains(Module.FORMATTING) && hasEmAhead()) {
 				em();
-			} else if (hasCodeAhead()) {
+			} else if (includes.contains(Module.CODE) && hasCodeAhead()) {
 				code();
 			} else if (hasResourceTextAhead()) {
 				resourceText();
@@ -453,11 +460,11 @@ public class Parser {
 		while (strongHasElements()) {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImage()) {
+			} else if (includes.contains(Module.IMAGES) && hasImage()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (multilineAhead(BACKTICK)) {
+			} else if (includes.contains(Module.CODE) && multilineAhead(BACKTICK)) {
 				codeMultiline();
 			} else if (strongEmWithinStrongAhead()) {
 				emWithinStrong();
@@ -480,11 +487,11 @@ public class Parser {
 		while (emHasElements()) {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImage()) {
+			} else if (includes.contains(Module.IMAGES) && hasImage()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (hasCodeAhead()) {
+			} else if (includes.contains(Module.CODE) && hasCodeAhead()) {
 				code();
 			} else if (emHasStrongWithinEm()) {
 				strongWithinEm();
@@ -589,15 +596,15 @@ public class Parser {
 		do {
 			if (hasInlineTextAhead()) {
 				text();
-			} else if (hasImageAhead()) {
+			} else if (includes.contains(Module.IMAGES) && hasImageAhead()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (multilineAhead(ASTERISK)) {
+			} else if (includes.contains(Module.FORMATTING) && multilineAhead(ASTERISK)) {
 				strongMultiline();
-			} else if (multilineAhead(UNDERSCORE)) {
+			} else if (includes.contains(Module.FORMATTING) && multilineAhead(UNDERSCORE)) {
 				emMultiline();
-			} else if (multilineAhead(BACKTICK)) {
+			} else if (includes.contains(Module.CODE) && multilineAhead(BACKTICK)) {
 				codeMultiline();
 			} else {
 				looseChar();
@@ -696,11 +703,11 @@ public class Parser {
 		do {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImageAhead()) {
+			} else if (includes.contains(Module.IMAGES) && hasImageAhead()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (hasCodeAhead()) {
+			} else if (includes.contains(Module.CODE) && hasCodeAhead()) {
 				code();
 			} else if (hasEmWithinStrongMultiline()) {
 				emWithinStrongMultiline();
@@ -732,11 +739,11 @@ public class Parser {
 		do {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImageAhead()) {
+			} else if (includes.contains(Module.IMAGES) && hasImageAhead()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (hasCodeAhead()) {
+			} else if (includes.contains(Module.CODE) && hasCodeAhead()) {
 				code();
 			} else {
 				switch (getNextTokenKind()) {
@@ -755,11 +762,11 @@ public class Parser {
 		do {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImageAhead()) {
+			} else if (includes.contains(Module.IMAGES) && hasImageAhead()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (hasCodeAhead()) {
+			} else if (includes.contains(Module.CODE) && hasCodeAhead()) {
 				code();
 			} else {
 				switch (getNextTokenKind()) {
@@ -790,11 +797,11 @@ public class Parser {
 		do {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImageAhead()) {
+			} else if (includes.contains(Module.IMAGES) && hasImageAhead()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (multilineAhead(BACKTICK)) {
+			} else if (includes.contains(Module.CODE) && multilineAhead(BACKTICK)) {
 				codeMultiline();
 			} else if (hasStrongWithinEmMultilineAhead()) {
 				strongWithinEmMultiline();
@@ -825,11 +832,11 @@ public class Parser {
 		do {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImageAhead()) {
+			} else if (includes.contains(Module.IMAGES) && hasImageAhead()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (hasCodeAhead()) {
+			} else if (includes.contains(Module.CODE) && hasCodeAhead()) {
 				code();
 			} else {
 				switch (getNextTokenKind()) {
@@ -848,11 +855,11 @@ public class Parser {
 		do {
 			if (hasTextAhead()) {
 				text();
-			} else if (hasImageAhead()) {
+			} else if (includes.contains(Module.IMAGES) && hasImageAhead()) {
 				image();
-			} else if (hasLinkAhead()) {
+			} else if (includes.contains(Module.LINKS) && hasLinkAhead()) {
 				link();
-			} else if (hasCodeAhead()) {
+			} else if (includes.contains(Module.CODE) && hasCodeAhead()) {
 				code();
 			} else {
 				switch (getNextTokenKind()) {
@@ -999,9 +1006,10 @@ public class Parser {
 			int quoteLevel = newQuoteLevel(i);
 			if (quoteLevel == currentQuoteLevel) {
 				i = skip(i, SPACE, TAB, GT);
-				return getToken(i).kind != EOL && getToken(i).kind != DASH
-						&& !(getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
-						&& !(getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK)
+				return getToken(i).kind != EOL 
+						&& !(includes.contains(Module.LISTS) && getToken(i).kind == DASH)
+						&& !(includes.contains(Module.LISTS) && getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
+						&& !(includes.contains(Module.CODE) && getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK)
 						&& !headingAhead(i);
 			}
 		}
@@ -2517,8 +2525,8 @@ public class Parser {
 		return t;
 	}
 	
-	public void setIncludes(String[] includes) {
-		this.includes = includes;
+	public void setIncludes(Module... includes) {
+		this.includes = Arrays.asList(includes);
 	}
 	
 }
