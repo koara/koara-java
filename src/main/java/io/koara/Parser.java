@@ -75,7 +75,8 @@ public class Parser {
 	private boolean semanticLookAhead;	
 	private LookaheadSuccess lookAheadSuccess = new LookaheadSuccess();
 	private class LookaheadSuccess extends Error {}
-	private java.util.List<Module> includes;
+	private java.util.List<Module> includes = Arrays.asList(Module.PARAGRAPHS, Module.HEADINGS, Module.LISTS, Module.LINKS, 
+			Module.IMAGES, Module.FORMATTING, Module.BLOCKQUOTES, Module.CODE);
 	
 	public Document parse(String text) {
 		return parse(new StringReader(text));
