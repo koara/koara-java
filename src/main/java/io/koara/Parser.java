@@ -357,9 +357,11 @@ public class Parser {
 		while (textAhead()) {
 			lineBreak();
 			whiteSpace();
-			while (getNextTokenKind() == GT) {
-				consumeToken(GT);
-				whiteSpace();
+			if(includes.contains(Module.BLOCKQUOTES)) {
+				while (getNextTokenKind() == GT) {
+					consumeToken(GT);
+					whiteSpace();
+				}
 			}
 			inline();
 		}
@@ -1023,14 +1025,17 @@ public class Parser {
 
 	private int newQuoteLevel(int offset) {
 		int quoteLevel = 0;
-		for (int i = offset;; i++) {
-			Token t = getToken(i);
-			if (t.kind == GT) {
-				quoteLevel++;
-			} else if (t.kind != SPACE && t.kind != TAB) {
-				return quoteLevel;
+		if(includes.contains(Module.BLOCKQUOTES)) {
+			for (int i = offset;; i++) {
+				Token t = getToken(i);
+				if (t.kind == GT) {
+					quoteLevel++;
+				} else if (t.kind != SPACE && t.kind != TAB) {
+					return quoteLevel;
+				}
 			}
 		}
+		return quoteLevel;
 	}
 
 	private int skip(int offset, Integer... tokens) {
@@ -1134,7 +1139,7 @@ public class Parser {
 		lookAhead = 2147483647;
 		lastPosition = scanPosition = token;
 		try {
-			return !scranBlockquoteEmptyLine();
+			return !scanBlockquoteEmptyLine();
 		} catch (LookaheadSuccess ls) {
 			return true;
 		}
@@ -2412,10 +2417,10 @@ public class Parser {
 	}
 
 	private boolean scanBlockquoteEmptyLines() {
-		return scranBlockquoteEmptyLine() || scanToken(EOL);
+		return scanBlockquoteEmptyLine() || scanToken(EOL);
 	}
 
-	private boolean scranBlockquoteEmptyLine() {
+	private boolean scanBlockquoteEmptyLine() {
 		if (scanToken(EOL) || scanWhitspaceTokens() || scanToken(GT) || scanWhitspaceTokens()) {
 			return true;
 		}

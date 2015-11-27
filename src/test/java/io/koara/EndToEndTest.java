@@ -33,11 +33,11 @@ public class EndToEndTest {
 	  assertOutput("scenario000002", HEADINGS);
 	}
 
-//	@Test
-//	public void scenario000003() throws Exception {
-//	  assertOutput("scenario000003", new String[]{"paragraphs","headers"});
-//	}
-//
+	@Test
+	public void scenario000003() throws Exception {
+	  assertOutput("scenario000003", PARAGRAPHS, HEADINGS);
+	}
+
 //	@Test
 //	public void scenario000004() throws Exception {
 //	  assertOutput("scenario000004", new String[]{"lists"});
