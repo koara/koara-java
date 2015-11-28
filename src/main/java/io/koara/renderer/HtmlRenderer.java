@@ -32,6 +32,7 @@ import io.koara.ast.ListItem;
 import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
 import io.koara.ast.Text;
+import jdk.nashorn.internal.ir.Block;
 
 public class HtmlRenderer implements Renderer {
 
@@ -84,11 +85,13 @@ public class HtmlRenderer implements Renderer {
 		}
 		out.append(">");
 		if(node.getChildren() != null) {
-			if(node.getChildren().length > 1 || !(node.getChildren()[0] instanceof Paragraph)) { out.append("\n"); }
+			boolean block = (node.getChildren()[0].getClass() == Paragraph.class || node.getChildren()[0].getClass() == BlockElement.class);
+			
+			if(node.getChildren().length > 1 || !block) { out.append("\n"); }
 			level++;
 			node.childrenAccept(this);
 			level--;
-			if(node.getChildren().length > 1 || !(node.getChildren()[0] instanceof Paragraph)) { out.append(indent()); }
+			if(node.getChildren().length > 1 || !block) { out.append(indent()); }
 		}
 		out.append("</li>\n");
 	}
