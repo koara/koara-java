@@ -32,8 +32,6 @@ import io.koara.ast.ListItem;
 import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
 import io.koara.ast.Text;
-import jdk.nashorn.internal.ir.Block;
-
 public class HtmlRenderer implements Renderer {
 
 	private StringBuffer out;
@@ -74,7 +72,6 @@ public class HtmlRenderer implements Renderer {
 		listSequence.pop();
 	}
 	
-	@Override
 	public void visit(ListItem node) {
 		Integer seq = listSequence.peek() + 1;		
 		listSequence.set(listSequence.size() - 1, listSequence.peek() + 1);

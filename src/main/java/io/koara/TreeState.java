@@ -61,9 +61,7 @@ public class TreeState {
 	}
 	
 	private Node popNode() {
-		if (--nodesOnStack < currentMark) {
-			currentMark = marks.remove(marks.size() - 1);
-		}
+		--nodesOnStack;
 		return nodes.remove(nodes.size() - 1);
 	}
 	

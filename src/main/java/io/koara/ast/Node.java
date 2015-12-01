@@ -26,10 +26,6 @@ public abstract class Node {
 	public void addChild(Node n, int i) {
 		if (children == null) {
 			children = new Node[i + 1];
-		} else if (i >= children.length) {
-			Node c[] = new Node[i + 1];
-			System.arraycopy(children, 0, c, 0, children.length);
-			children = c;
 		}
 		children[i] = n;
 	}
@@ -47,10 +43,6 @@ public abstract class Node {
 	public Node[] getChildren() {
 		return children;
 	}
-	
-//	public void setChildren(Node[] children) {
-//		this.children = children;
-//	}
 	
 	public Node getParent() {
 		return parent;
