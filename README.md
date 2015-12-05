@@ -10,5 +10,5 @@
 ## Usage
 
 ## Community
-- Mailing Lists: [archive](http://groups.google.com/group/koara-users/topics), [subscribe](koara-users+subscribe@googlegroups.com),  [unsubscribe](koara-users+unsubscribe@googlegroups.com)
+- Mailing Lists: [archive](http://groups.google.com/group/koara-users/topics), [subscribe](mailto:koara-users+subscribe@googlegroups.com),  [unsubscribe](mailto:koara-users+unsubscribe@googlegroups.com)
 - Stack overflow: [http://stackoverflow.com/questions/tagged/koara](http://stackoverflow.com/questions/tagged/koara)
