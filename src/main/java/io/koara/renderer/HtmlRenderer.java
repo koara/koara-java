@@ -96,7 +96,7 @@ public class HtmlRenderer implements Renderer {
 	public void visit(CodeBlock node) {
 		out.append(indent() + "<pre><code");
 		if(node.getLanguage() != null) {
-			out.append(" class=\"language-" + node.getLanguage() + "\"");
+			out.append(" class=\"language-" + escape(node.getLanguage()) + "\"");
 		}
 		out.append(">");
 		out.append(escape(node.getValue().toString()) + "</code></pre>\n");

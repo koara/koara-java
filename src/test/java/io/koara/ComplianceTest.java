@@ -15,12 +15,10 @@
  */
 package io.koara;
 
+import static io.koara.TestUtils.readFile;
 import static org.junit.Assert.assertEquals;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,8 +30,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import io.koara.ast.Document;
 import io.koara.renderer.HtmlRenderer;
-
-import static io.koara.TestUtils.*;
 
 @RunWith(Parameterized.class)
 public class ComplianceTest {

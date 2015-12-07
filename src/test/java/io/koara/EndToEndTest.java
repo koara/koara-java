@@ -4,6 +4,7 @@ import static io.koara.TestUtils.readFile;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.PrintWriter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -1309,6 +1310,11 @@ public class EndToEndTest {
 		Document document = parser.parse(kd); // Generate AST
 		HtmlRenderer renderer = new HtmlRenderer();
 		document.accept(renderer);
+		
+//		PrintWriter out = new PrintWriter("/Users/andy/Desktop/" + file + ".htm");
+//		out.write(renderer.getOutput());
+//		out.close();
+		
 		assertEquals(html, renderer.getOutput());
 	}
 	

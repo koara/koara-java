@@ -579,6 +579,9 @@ public class Parser {
 	
 	private void levelWhiteSpace(int threshold) {
 		int currentPos = 1;
+	    while(getNextTokenKind() == GT) {
+	    	consumeToken(getNextTokenKind());
+	    }
 		while ((getNextTokenKind() == SPACE || getNextTokenKind() == TAB) && currentPos < (threshold - 1)) {
 			currentPos = consumeToken(getNextTokenKind()).beginColumn;
 		}
@@ -588,10 +591,29 @@ public class Parser {
 		StringBuilder s = new StringBuilder();
 		do {
 			switch (getNextTokenKind()) {
-			case CHAR_SEQUENCE:	s.append(consumeToken(CHAR_SEQUENCE).image); break;
+			case ASTERISK: s.append(consumeToken(ASTERISK).image); break;
+			case BACKSLASH: s.append(consumeToken(BACKSLASH).image); break;
 			case BACKTICK: s.append(consumeToken(BACKTICK).image); break;
+			case CHAR_SEQUENCE:	s.append(consumeToken(CHAR_SEQUENCE).image); break;
+			case COLON:	s.append(consumeToken(COLON).image); break;
+			case DASH: s.append(consumeToken(DASH).image); break;
+			case DIGITS: s.append(consumeToken(DIGITS).image); break;
+			case DOT: s.append(consumeToken(DOT).image); break;
+			case EQ: s.append(consumeToken(EQ).image); break;
+			case ESCAPED_CHAR: s.append(consumeToken(ESCAPED_CHAR).image); break;
+			case IMAGE_LABEL: s.append(consumeToken(IMAGE_LABEL).image); break;
+			case LT: s.append(consumeToken(LT).image); break;
+			case GT: s.append(consumeToken(GT).image); break;
+			case LBRACK: s.append(consumeToken(LBRACK).image); break;
+			case RBRACK: s.append(consumeToken(RBRACK).image); break;
+			case LPAREN: s.append(consumeToken(LPAREN).image); break;
+			case RPAREN: s.append(consumeToken(RPAREN).image); break;
+			case UNDERSCORE: s.append(consumeToken(UNDERSCORE).image); break;
+			case SPACE: s.append(consumeToken(SPACE).image); break;
+			case TAB: s.append("    "); break;
+			default: break;
 			}
-		} while (getNextTokenKind() == BACKTICK || getNextTokenKind() == CHAR_SEQUENCE);
+		} while (getNextTokenKind() != EOL && getNextTokenKind() != EOF);
 		return s.toString();
 	}
 
@@ -943,17 +965,17 @@ public class Parser {
 		return false;
 	}
 	
-	private boolean fencesAhead() {
-		if (getToken(1).kind == EOL) {
-			int i = skip(2, SPACE, TAB);
-			if (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK) {
-				i = skip(i + 3, SPACE, TAB);
-				return getToken(i).kind == EOL || getToken(i).kind == EOF;
-			}
-		}
-		return false;
-	}
-
+    private boolean fencesAhead() {
+        if(getToken(1).kind == EOL) {
+          int i = skip(2, SPACE, TAB, GT);
+          if(getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK) {
+             i = skip(i+3, SPACE, TAB);
+             return getToken(i).kind == EOL || getToken(i).kind == EOF;
+          }
+        }
+        return false;
+    }
+    
 	private boolean listItemAhead(boolean ordered) {
 		if (getToken(1).kind == EOL) {
 			for (int i = 2, eol = 1;; i++) {
