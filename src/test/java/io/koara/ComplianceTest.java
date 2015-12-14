@@ -34,7 +34,7 @@ import io.koara.renderer.HtmlRenderer;
 @RunWith(Parameterized.class)
 public class ComplianceTest {
 
-	private static final String TESTSUITE_FOLDER = "src/test/resources/tests";
+	private static final String TESTSUITE_FOLDER = "src/test/resources/spec";
 
 	private String module;
 	private String testcase;

@@ -101,7 +101,7 @@ public class Parser {
 		whiteSpace();
 		if (hasAnyBlockElementsAhead()) {
 			blockElement();
-			while (blockAhead()) {
+			while (blockAhead(0)) {
 				while (getNextTokenKind() == EOL) {
 					consumeToken(EOL);
 					whiteSpace();			
@@ -178,7 +178,7 @@ public class Parser {
 		whiteSpace(); 
 		if (blockquoteHasAnyBlockElementseAhead()) {
 			blockElement();
-			while (blockAhead()) {
+			while (blockAhead(0)) {
 				while (getNextTokenKind() == EOL) {
 					consumeToken(EOL);
 					whiteSpace();
@@ -214,26 +214,29 @@ public class Parser {
 	private void unorderedList() {
 		List list = new List(false);
 		tree.openScope(list);
-		unorderedListItem();
-		while (listItemAhead(false)) {
+		int listBeginColumn = unorderedListItem();
+		while (listItemAhead(listBeginColumn, false)) {
 			while (getNextTokenKind() == EOL) {
 				consumeToken(EOL);
 			}
 			whiteSpace();
+			if (currentQuoteLevel > 0) {
+				blockquotePrefix();
+			}
 			unorderedListItem();
 		}
 		tree.closeScope(list);
 	}
 
-	private void unorderedListItem() {
+	private int unorderedListItem() {
 		ListItem listItem = new ListItem();
 		tree.openScope(listItem);
 
-		consumeToken(DASH);
+		Token t = consumeToken(DASH);
 		whiteSpace();
 		if (listItemHasInlineElements()) { 
 			blockElement();
-			while (blockAhead()) {
+			while (blockAhead(t.beginColumn)) {
 				while (getNextTokenKind() == EOL) {
 					consumeToken(EOL);
 					whiteSpace();
@@ -245,23 +248,27 @@ public class Parser {
 			}
 		}
 		tree.closeScope(listItem);
+		return t.beginColumn;
 	}
 
 	private void orderedList() {
 		List list = new List(true);
 		tree.openScope(list);
-		orderedListItem();
-		while (listItemAhead(true)) {
+		int listBeginColumn = orderedListItem();
+		while (listItemAhead(listBeginColumn, true)) {
 			while (getNextTokenKind() == EOL) {
 				consumeToken(EOL);
 			}
 			whiteSpace();
+			if (currentQuoteLevel > 0) {
+				blockquotePrefix();
+			}
 			orderedListItem();
 		}
 		tree.closeScope(list);
 	}
 
-	private void orderedListItem() {
+	private int orderedListItem() {
 		ListItem listItem = new ListItem();
 		tree.openScope(listItem);
 		Token t;
@@ -270,7 +277,7 @@ public class Parser {
 		whiteSpace();
 		if (listItemHasInlineElements()) { 
 			blockElement();
-			while (blockAhead()) {
+			while (blockAhead(t.beginColumn)) {
 				while (getNextTokenKind() == EOL) {
 					consumeToken(EOL);
 					whiteSpace();
@@ -283,6 +290,7 @@ public class Parser {
 		}
 		listItem.setNumber(Integer.valueOf(Integer.valueOf(t.image)));
 		tree.closeScope(listItem);
+		return t.beginColumn;
 	}
 
 	private void fencedCodeBlock() {
@@ -932,158 +940,156 @@ public class Parser {
 		} 
 	}
 	
-	private boolean blockAhead() {
-		if (getToken(1).kind == EOL) {
-			Token t;
-			int i = 2;
-			int eol = 0;
-			int quoteLevel;
-			do {
-				quoteLevel = 0;
-				do {
-					t = getToken(i++);
-					if (t.kind == EOL && currentBlockLevel > 0 && ++eol > 2) {
-						return false;
-					}
-					if (t.kind == GT) {
-						if (t.beginColumn == 1 && currentBlockLevel > 0 && currentQuoteLevel == 0) {
-							return false;
-						}
-						quoteLevel++;
-					}
-				} while (t.kind == GT || t.kind == SPACE || t.kind == TAB);
-				if (quoteLevel > currentQuoteLevel) {
-					return true;
-				}
-				if (quoteLevel < currentQuoteLevel) {
-					return false;
-				}
-			} while (t.kind == EOL);
-			return (t.kind != EOF) && ((quoteLevel > 0 && quoteLevel == currentQuoteLevel)
-					|| (t.beginColumn > ((currentBlockLevel * 4) - 2)));
-		}
-		return false;
-	}
-	
-    private boolean fencesAhead() {
-        if(getToken(1).kind == EOL) {
-          int i = skip(2, SPACE, TAB, GT);
-          if(getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK) {
-             i = skip(i+3, SPACE, TAB);
-             return getToken(i).kind == EOL || getToken(i).kind == EOF;
-          }
-        }
-        return false;
-    }
-    
-	private boolean listItemAhead(boolean ordered) {
-		if (getToken(1).kind == EOL) {
-			for (int i = 2, eol = 1;; i++) {
-				Token t = getToken(i);
-				if (t.kind == EOL && ++eol > 2) {
-					return false;
-				} else if (t.kind != SPACE && t.kind != TAB && t.kind != EOL) {
-					if (currentQuoteLevel > 0) {
-						return false;
-					}
-					if (ordered) {
-						return (t.kind == DIGITS && getToken(i + 1).kind == DOT);
-					}
-					return (t.kind == DASH);
-				}
-			}
-		}
-		return false;
-	}
+	 private boolean blockAhead(int blockBeginColumn) {
+         int quoteLevel;
 
-	private boolean multilineAhead(Integer token) {
-		if (getToken(1).kind == token && getToken(2).kind != token && getToken(2).kind != EOL) {
-			for (int i = 2;; i++) {
-				Token t = getToken(i);
-				if (t.kind == token) {
-					return true;
-				} else if (t.kind == EOL) {
-					i = skip(i + 1, SPACE, TAB);
-					int quoteLevel = newQuoteLevel(i);
-					if (quoteLevel == currentQuoteLevel) {
-						i = skip(i, SPACE, TAB, GT);
-						if (getToken(i).kind == token || getToken(i).kind == EOL || getToken(i).kind == DASH
-								|| (getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
-								|| (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK)
-								|| headingAhead(i)) {
-							return false;
-						}
-					} else {
-						return false;
-					}
-				} else if (t.kind == EOF) {
-					return false;
-				}
-			}
-		}
-		return false;
-	}
+ if(getToken(1).kind == EOL) {
+   Token t;
+   int i = 2;
+   quoteLevel=0;
+   do {
+       quoteLevel=0;
+       do {
+         t = getToken(i++);
+         if(t.kind == GT) {
+           if(t.beginColumn == 1 && currentBlockLevel > 0 && currentQuoteLevel == 0)  {
+        	   return false;
+           }
+           quoteLevel++;
+         }
+       } while(t.kind == GT || t.kind == SPACE || t.kind == TAB);
+       if(quoteLevel > currentQuoteLevel) {
+         return true;
+       }
+       if(quoteLevel < currentQuoteLevel) {
+         return false;
+       }
+   } while(t.kind == EOL);
+   boolean result = t.kind != EOF && (currentBlockLevel == 0 || t.beginColumn >= blockBeginColumn + 2) ;
+   return result;
+ }
+ return false;
+}
 
-	private boolean textAhead() {
-		int i = skip(1, SPACE, TAB);
-		if (getToken(i).kind == EOL && getToken(i + 1).kind != EOL && getToken(i + 1).kind != EOF) {
-			i = skip(i + 1, SPACE, TAB);
-			int quoteLevel = newQuoteLevel(i);
-			if (quoteLevel == currentQuoteLevel) {
-				i = skip(i, SPACE, TAB, GT);
-				return getToken(i).kind != EOL 
-						&& !(includes.contains(Module.LISTS) && getToken(i).kind == DASH)
-						&& !(includes.contains(Module.LISTS) && getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
-						&& !(includes.contains(Module.CODE) && getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK)
-						&& !headingAhead(i);
-			}
-		}
-		return false;
-	}
 
-	private boolean nextAfterSpace(Integer... tokens) {
-		int i = skip(1, SPACE, TAB);
-		return Arrays.asList(tokens).contains(getToken(i).kind);
-	}
+ private boolean multilineAhead(Integer token) {
+if(getToken(1).kind == token && getToken(2).kind != token && getToken(2).kind != EOL) {
 
-	private int newQuoteLevel(int offset) {
-		int quoteLevel = 0;
-		if(includes.contains(Module.BLOCKQUOTES)) {
-			for (int i = offset;; i++) {
-				Token t = getToken(i);
-				if (t.kind == GT) {
-					quoteLevel++;
-				} else if (t.kind != SPACE && t.kind != TAB) {
-					return quoteLevel;
-				}
-			}
-		}
-		return quoteLevel;
-	}
+ for(int i=2;;i++) {
+   Token t = getToken(i);
+   if(t.kind == token) {
+                 return true;
+   } else if(t.kind == EOL) {
+                   i = skip(i+1, SPACE, TAB);
+                   int quoteLevel = newQuoteLevel(i);
+               if(quoteLevel == currentQuoteLevel) {
+                   i = skip(i, SPACE, TAB, GT);
+                   if(getToken(i).kind == token
+                                   || getToken(i).kind == EOL
+                           || getToken(i).kind == DASH
+                           || (getToken(i).kind == DIGITS && getToken(i+1).kind == DOT)
+                           || (getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK)
+                           || headingAhead(i)) {
+                           return false;
+                   }
+               } else {
+                   return false;
+               }
+   } else if(t.kind == EOF) {
+     return false;
+   }
+ }
+}
+return false;
+}
 
-	private int skip(int offset, Integer... tokens) {
-		for (int i = offset;; i++) {
-			Token t = getToken(i);
-			if (t.kind == EOF || !Arrays.asList(tokens).contains(t.kind)) {
-				return i;
-			}
-		}
-	}
-	
-	private boolean headingAhead(int offset) {
-		if (getToken(offset).kind == EQ) {
-			int heading = 1;
-			for (int i = (offset + 1);; i++) {
-				if (getToken(i).kind != EQ) {
-					return true;
-				}
-				if (++heading > 6) {
-					return false;
-				}
-			}
-		}
-		return false;
-	}
+private boolean fencesAhead() {
+     if(getToken(1).kind == EOL) {
+       int i = skip(2, SPACE, TAB, GT);
+       if(getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK) {
+          i = skip(i+3, SPACE, TAB);
+          boolean result = getToken(i).kind == EOL || getToken(i).kind == EOF;
+          return result;
+       }
+     }
+     return false;
+}
+
+
+ private boolean headingAhead(int offset) {
+if (getToken(offset).kind == EQ) {
+ int heading = 1;
+ for(int i=(offset + 1);;i++) {
+   if(getToken(i).kind != EQ) { return true; }
+   if(++heading > 6) { return false;}
+ }
+}
+return false;
+}
+
+private boolean listItemAhead(int listBeginColumn, boolean ordered) {
+ if(getToken(1).kind == EOL) {
+         for(int i=2, eol=1;;i++) {
+                 Token t = getToken(i);
+
+                 if(t.kind == EOL && ++eol > 2) {
+                   return false;
+                 } else if(t.kind != SPACE && t.kind != TAB && t.kind != GT && t.kind != EOL) {
+                     if(ordered) {
+                         boolean result = (t.kind == DIGITS && getToken(i+1).kind == DOT && t.beginColumn >= listBeginColumn);
+                         return result;
+                     }
+                     boolean result = t.kind == DASH && t.beginColumn >= listBeginColumn;
+                     return result;
+                 }
+         }
+ }
+ return false;
+}
+
+private boolean textAhead() {
+if(getToken(1).kind == EOL && getToken(2).kind != EOL) {
+   int i = skip(2, SPACE, TAB);
+           int quoteLevel = newQuoteLevel(i);
+                 if(quoteLevel == currentQuoteLevel) {
+                   i = skip(i, SPACE, TAB, GT);
+
+           Token t = getToken(i);
+           boolean result = getToken(i).kind != EOL
+                           && t.kind != DASH
+                           && !(t.kind == DIGITS && getToken(i+1).kind == DOT)
+                                   && !(getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK)
+                           && !headingAhead(i);
+           return result;
+   }
+}
+return false;
+}
+
+private boolean nextAfterSpace(Integer... tokens) {
+int i = skip(1, SPACE, TAB);
+return Arrays.asList(tokens).contains(getToken(i).kind);
+}
+
+ private int newQuoteLevel(int offset) {
+   int quoteLevel = 0;
+   for(int i=offset;;i++) {
+           Token t = getToken(i);
+           if(t.kind == GT) {
+                   quoteLevel++;
+       } else if(t.kind != SPACE && t.kind != TAB) {
+           return quoteLevel;
+       }
+
+   }
+}
+
+private int skip(int offset, Integer... tokens) {
+for(int i=offset;;i++) {
+ Token t = getToken(i);
+ if(t.kind == EOF || !Arrays.asList(tokens).contains(t.kind)) { return i; }
+}
+}
 	
 	private boolean hasOrderedListAhead() {
 		lookAhead = 2;
