@@ -1302,18 +1302,19 @@ public class EndToEndTest {
 
 
 	
-	private void assertOutput(String file, Module... includes) throws Exception {
+	private void assertOutput(String file, Module... modules) throws Exception {
 		File kd = new File(TESTSUITE_FOLDER + "/e2e/e2e.kd");
 		String html = readFile(TESTSUITE_FOLDER + "/e2e/" + file + ".htm");
 		
-		parser.setIncludes(includes);
+		parser.setModules(modules);
 		Document document = parser.parse(kd); // Generate AST
 		HtmlRenderer renderer = new HtmlRenderer();
 		document.accept(renderer);
 		
-//		PrintWriter out = new PrintWriter("/Users/andy/Desktop/" + file + ".htm");
-//		out.write(renderer.getOutput());
-//		out.close();
+		PrintWriter out = new PrintWriter("/Users/andy/Desktop/" + file + ".htm");
+		out.write(renderer.getOutput());
+		out.close();
+
 		
 		assertEquals(html, renderer.getOutput());
 	}
