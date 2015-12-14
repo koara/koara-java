@@ -8,12 +8,12 @@
 > Koara to HTML parser written in Java
 
 ## Getting Started
-- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara/0.6.0/koara-0.6.0.jar)
+- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara/0.7.0/koara-0.7.0.jar)
 - Gradle
 
   ```groovy
   dependencies {
-	compile "io.koara:koara:0.6.0"
+	compile "io.koara:koara:0.7.0"
   }
   ```
   
@@ -23,7 +23,7 @@
   <dependency>
     <groupId>io.koara</groupId>
     <artifactId>koara</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
   </dependency>
   ```
 

@@ -60,28 +60,32 @@ public class TokenManager {
 	}
 
 	public Token getNextToken() {
-		Token matchedToken;
-		int curPos = 0;
-
-		while (true) {
-			try {
-				curChar = cs.beginToken();
-			} catch (java.io.IOException e) {
-				matchedKind = 0;
-				matchedPos = -1;
-				matchedToken = fillToken();
-				return matchedToken;
-			}
-			matchedKind = 0x7fffffff;
-			matchedPos = 0;
-			curPos = moveStringLiteralDfa0_0();
-			if (matchedKind != 0x7fffffff) {
-				if (matchedPos + 1 < curPos) {
-					cs.backup(curPos - matchedPos - 1);
+		try {
+			Token matchedToken;
+			int curPos = 0;
+	
+			while (true) {
+				try {
+					curChar = cs.beginToken();
+				} catch (java.io.IOException e) {
+					matchedKind = 0;
+					matchedPos = -1;
+					matchedToken = fillToken();
+					return matchedToken;
 				}
-				matchedToken = fillToken();
-				return matchedToken;
+				matchedKind = 0x7fffffff;
+				matchedPos = 0;
+				curPos = moveStringLiteralDfa0_0();
+				if (matchedKind != 0x7fffffff) {
+					if (matchedPos + 1 < curPos) {
+						cs.backup(curPos - matchedPos - 1);
+					}
+					matchedToken = fillToken();
+					return matchedToken;
+				}
 			}
+		} catch(IOException e) {
+			return null;
 		}
 	}
 	
@@ -89,7 +93,7 @@ public class TokenManager {
 		return new Token(matchedKind, cs.getBeginLine(), cs.getBeginColumn(), cs.getEndLine(), cs.getEndColumn(), cs.getImage());
 	}
 
-	private int moveStringLiteralDfa0_0() {
+	private int moveStringLiteralDfa0_0() throws IOException {
 		switch (curChar) {
 		case 9:  return startNfaWithStates(0, TAB, 8);
 		case 32: return startNfaWithStates(0, SPACE, 8);
@@ -129,63 +133,44 @@ public class TokenManager {
 		return pos + 1;
 	}
 
-	private int moveStringLiteralDfa1_0(long active) {
-		try {
-			curChar = cs.readChar();
-			if(curChar == 77 || curChar == 109) {
-				return moveStringLiteralDfa2_0(active, 0x2000L);
-			}
-			return startNfa(0, active);
-		} catch (IOException e) {
-			return 1;
-		}		
+	private int moveStringLiteralDfa1_0(long active) throws IOException {
+		curChar = cs.readChar();
+		if(curChar == 77 || curChar == 109) {
+			return moveStringLiteralDfa2_0(active, 0x2000L);
+		}
+		return startNfa(0, active);	
 	}
 	
-	private int moveStringLiteralDfa2_0(long old, long active) {
-		try {
-			curChar = cs.readChar();
-			if(curChar == 65 || curChar == 97) {
-				return moveStringLiteralDfa3_0(active, 0x2000L);
-			}
-			return startNfa(1, active);
-		} catch (IOException e) {
-			return 2;
+	private int moveStringLiteralDfa2_0(long old, long active) throws IOException {
+		curChar = cs.readChar();
+		if(curChar == 65 || curChar == 97) {
+			return moveStringLiteralDfa3_0(active, 0x2000L);
 		}
+		return startNfa(1, active);
+		
 	}
-	private int moveStringLiteralDfa3_0(long old, long active) {
-		try {
-			curChar = cs.readChar();
-			if(curChar == 71 || curChar == 103) {
-				return moveStringLiteralDfa4_0(active, 0x2000L);
-			}
-		} catch (IOException e) {
-			return 3;
+	private int moveStringLiteralDfa3_0(long old, long active) throws IOException {
+		curChar = cs.readChar();
+		if(curChar == 71 || curChar == 103) {
+			return moveStringLiteralDfa4_0(active, 0x2000L);
 		}
 		return startNfa(2, active);
 	}
 	
-	private int moveStringLiteralDfa4_0(long old, long active) {
-		try {
-			curChar = cs.readChar();
-			if(curChar == 69 || curChar == 101) {
-				return moveStringLiteralDfa5_0(active, 0x2000L);
-			}
-			return startNfa(3, active);
-		} catch (IOException e) {
-			return 4;
+	private int moveStringLiteralDfa4_0(long old, long active) throws IOException {
+		curChar = cs.readChar();
+		if(curChar == 69 || curChar == 101) {
+			return moveStringLiteralDfa5_0(active, 0x2000L);
 		}
+		return startNfa(3, active);
 	}
 	
-	private int moveStringLiteralDfa5_0(long old, long active) {
-		try {
-			curChar = cs.readChar();
-			if(curChar == 58 && ((active & 0x2000L) != 0L)) {
-				return stopAtPos(5, 13);
-			}
-			return startNfa(4, active);
-		} catch (IOException e) {
-			return 5;
+	private int moveStringLiteralDfa5_0(long old, long active) throws IOException {
+		curChar = cs.readChar();
+		if(curChar == 58 && ((active & 0x2000L) != 0L)) {
+			return stopAtPos(5, 13);
 		}
+		return startNfa(4, active);
 	}
 	
 	private int startNfa(int pos, long active) {
