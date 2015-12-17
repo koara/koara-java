@@ -1048,22 +1048,21 @@ private boolean listItemAhead(int listBeginColumn, boolean ordered) {
 }
 
 private boolean textAhead() {
-if(getToken(1).kind == EOL && getToken(2).kind != EOL) {
-   int i = skip(2, SPACE, TAB);
-           int quoteLevel = newQuoteLevel(i);
-                 if(quoteLevel == currentQuoteLevel) {
-                   i = skip(i, SPACE, TAB, GT);
-
-           Token t = getToken(i);
-           boolean result = getToken(i).kind != EOL
-                           && t.kind != DASH
-                           && !(t.kind == DIGITS && getToken(i+1).kind == DOT)
-                                   && !(getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK)
-                           && !headingAhead(i);
-           return result;
-   }
-}
-return false;
+	if(getToken(1).kind == EOL && getToken(2).kind != EOL) {
+	   int i = skip(2, SPACE, TAB);
+	           int quoteLevel = newQuoteLevel(i);
+	           if(quoteLevel == currentQuoteLevel || !modules.contains(Module.BLOCKQUOTES) ) {
+	                   i = skip(i, SPACE, TAB, GT);
+	
+	           Token t = getToken(i);
+	           boolean result = getToken(i).kind != EOL
+                   && !(modules.contains(Module.LISTS) && t.kind == DASH)
+                   && !(modules.contains(Module.LISTS) && t.kind == DIGITS && getToken(i+1).kind == DOT) && !(getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK)
+                   && !(modules.contains(Module.HEADINGS) && headingAhead(i));
+	           return result;
+	           } 
+	}
+	return false;
 }
 
 private boolean nextAfterSpace(Integer... tokens) {

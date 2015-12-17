@@ -121,7 +121,6 @@ public class HtmlRenderer implements Renderer {
 		} else {
 			out.append(indent());
 			node.childrenAccept(this);
-			out.append("<br>\n");
 			if(!node.isNested()) { out.append("\n"); }
 		}
 	}
