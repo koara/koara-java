@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.koara.ast.Document;
-import io.koara.renderer.HtmlRenderer;
+import io.koara.renderer.Html5Renderer;
 
 import static io.koara.Module.*;
 
@@ -1308,7 +1308,7 @@ public class EndToEndTest {
 		
 		parser.setModules(modules);
 		Document document = parser.parse(kd); // Generate AST
-		HtmlRenderer renderer = new HtmlRenderer();
+		Html5Renderer renderer = new Html5Renderer();
 		document.accept(renderer);
 		
 		PrintWriter out = new PrintWriter("/Users/andy/Desktop/" + file + ".htm");

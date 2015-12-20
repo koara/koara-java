@@ -29,7 +29,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.koara.ast.Document;
-import io.koara.renderer.HtmlRenderer;
+import io.koara.renderer.Html5Renderer;
 
 @RunWith(Parameterized.class)
 public class ComplianceTest {
@@ -68,7 +68,7 @@ public class ComplianceTest {
 		Parser parser = new Parser();
 		Document document = parser.parse(kd); // Generate AST
 		
-		HtmlRenderer renderer = new HtmlRenderer();
+		Html5Renderer renderer = new Html5Renderer();
 		document.accept(renderer);
 		assertEquals(html, renderer.getOutput());
 	}
