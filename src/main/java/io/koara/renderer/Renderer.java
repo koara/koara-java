@@ -25,7 +25,7 @@ import io.koara.ast.Heading;
 import io.koara.ast.Image;
 import io.koara.ast.LineBreak;
 import io.koara.ast.Link;
-import io.koara.ast.List;
+import io.koara.ast.ListBlock;
 import io.koara.ast.ListItem;
 import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
@@ -39,7 +39,7 @@ public interface Renderer {
 
 	void visit(Blockquote node);
 
-	void visit(List node);
+	void visit(ListBlock node);
 
 	void visit(ListItem node);
 

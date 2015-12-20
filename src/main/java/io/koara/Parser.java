@@ -55,7 +55,7 @@ import io.koara.ast.Heading;
 import io.koara.ast.Image;
 import io.koara.ast.LineBreak;
 import io.koara.ast.Link;
-import io.koara.ast.List;
+import io.koara.ast.ListBlock;
 import io.koara.ast.ListItem;
 import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
@@ -212,7 +212,7 @@ public class Parser {
 	}
 	
 	private void unorderedList() {
-		List list = new List(false);
+		ListBlock list = new ListBlock(false);
 		tree.openScope(list);
 		int listBeginColumn = unorderedListItem();
 		while (listItemAhead(listBeginColumn, false)) {
@@ -252,7 +252,7 @@ public class Parser {
 	}
 
 	private void orderedList() {
-		List list = new List(true);
+		ListBlock list = new ListBlock(true);
 		tree.openScope(list);
 		int listBeginColumn = orderedListItem();
 		while (listItemAhead(listBeginColumn, true)) {

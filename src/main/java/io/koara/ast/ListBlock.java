@@ -17,11 +17,11 @@ package io.koara.ast;
 
 import io.koara.renderer.Renderer;
 
-public class List extends BlockElement {
+public class ListBlock extends BlockElement {
 
 	private boolean ordered;
 	
-	public List(boolean ordered) {
+	public ListBlock(boolean ordered) {
 		this.ordered = ordered;
 	}
 

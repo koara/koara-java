@@ -27,7 +27,7 @@ import io.koara.ast.Heading;
 import io.koara.ast.Image;
 import io.koara.ast.LineBreak;
 import io.koara.ast.Link;
-import io.koara.ast.List;
+import io.koara.ast.ListBlock;
 import io.koara.ast.ListItem;
 import io.koara.ast.Paragraph;
 import io.koara.ast.Strong;
@@ -60,7 +60,7 @@ public class HtmlRenderer implements Renderer {
 		if(!node.isNested()) { out.append("\n"); }
 	}
 	
-	public void visit(List node) {
+	public void visit(ListBlock node) {
 		listSequence.push(0);
 		String tag = node.isOrdered() ? "ol" : "ul";
 		out.append(indent() + "<" + tag + ">\n");
