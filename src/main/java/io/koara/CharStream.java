@@ -28,7 +28,6 @@ public class CharStream {
 	private int bufline[] = new int[4096];
 	private int column = 0;
 	private int line = 1;
-	private boolean prevCharIsCR = false;
 	private boolean prevCharIsLF = false;
 	private Reader reader;
 	private char[] buffer = new char[4096];

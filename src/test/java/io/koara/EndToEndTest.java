@@ -4,7 +4,6 @@ import static io.koara.TestUtils.readFile;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.PrintWriter;
 
 import org.junit.Before;
 import org.junit.Test;

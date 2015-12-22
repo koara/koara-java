@@ -60,17 +60,14 @@ public class TokenManager {
 
 	public Token getNextToken() {
 		try {
-			Token matchedToken;
 			int curPos = 0;
-	
 			while (true) {
 				try {
 					curChar = cs.beginToken();
 				} catch (java.io.IOException e) {
 					matchedKind = 0;
 					matchedPos = -1;
-					matchedToken = fillToken();
-					return matchedToken;
+					return fillToken();
 				}
 				matchedKind = 0x7fffffff;
 				matchedPos = 0;
@@ -79,8 +76,7 @@ public class TokenManager {
 					if (matchedPos + 1 < curPos) {
 						cs.backup(curPos - matchedPos - 1);
 					}
-					matchedToken = fillToken();
-					return matchedToken;
+					return fillToken();
 				}
 			}
 		} catch(IOException e) {
