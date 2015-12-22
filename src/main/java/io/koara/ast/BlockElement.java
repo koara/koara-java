@@ -28,8 +28,8 @@ public class BlockElement extends Node {
 	}
 
 	@Override
-	public void accept(Renderer visitor) {
-		visitor.visit(this);
+	public void accept(Renderer renderer) {
+		renderer.visit(this);
 	}
 
 }

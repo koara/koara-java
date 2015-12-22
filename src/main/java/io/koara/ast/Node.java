@@ -23,7 +23,7 @@ public abstract class Node {
 	private Node[] children;
 	private Object value;
 
-	public void addChild(Node n, int i) {
+	public void add(Node n, int i) {
 		if (children == null) {
 			children = new Node[i + 1];
 		}

@@ -45,7 +45,7 @@ public class TreeState {
 		while (a-- > 0) {
 			Node c = popNode();
 			c.setParent(n);
-			n.addChild(c, a);
+			n.add(c, a);
 		}
 		pushNode(n);
 	}

@@ -19,8 +19,8 @@ import io.koara.renderer.Renderer;
 
 public class Strong extends Node {
 
-	public void accept(Renderer visitor) {
-		visitor.visit(this);
+	public void accept(Renderer renderer) {
+		renderer.visit(this);
 	}
 	
 }
