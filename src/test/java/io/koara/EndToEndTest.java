@@ -1311,10 +1311,6 @@ public class EndToEndTest {
 		Html5Renderer renderer = new Html5Renderer();
 		document.accept(renderer);
 		
-		PrintWriter out = new PrintWriter("/Users/andy/Desktop/" + file + ".htm");
-		out.write(renderer.getOutput());
-		out.close();
-		
 		assertEquals(html, renderer.getOutput());
 	}
 	
