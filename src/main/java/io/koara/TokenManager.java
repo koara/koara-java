@@ -41,11 +41,10 @@ public class TokenManager {
 	public static final int SPACE = 19;
 	public static final int TAB = 20;
 	public static final int UNDERSCORE = 21;
-	public static final int DEFAULT = 0;
 
 	private CharStream cs;
 	private int[] jjrounds = new int[8];
-	private int[] jjstateSet = new int[2 * 8];
+	private int[] jjstateSet = new int[16];
 	private char curChar;
 	private long[] jjbitVec0 = { 0xfffffffffffffffeL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL };
 	private long[] jjbitVec2 = { 0x0L, 0x0L, 0xffffffffffffffffL, 0xffffffffffffffffL };
@@ -116,6 +115,7 @@ public class TokenManager {
 		default: return moveNfa(6, 0);
 		}
 	}
+	
 	private int startNfaWithStates(int pos, int kind, int state) {
 		matchedKind = kind;
 		matchedPos = pos;
