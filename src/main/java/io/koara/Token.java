@@ -17,14 +17,14 @@ package io.koara;
 
 public class Token {
 
-	public int kind;
-	public int beginLine;
-	public int beginColumn;
-	public int endLine;
-	public int endColumn;
-	public String image;
-	public Token next;
-	public Token specialToken;
+	protected int kind;
+	protected int beginLine;
+	protected int beginColumn;
+	protected int endLine;
+	protected int endColumn;
+	protected String image;
+	protected Token next;
+	protected Token specialToken;
 
 	public Token() {
 	}
