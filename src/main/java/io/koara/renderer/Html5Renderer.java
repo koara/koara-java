@@ -74,11 +74,11 @@ public class Html5Renderer implements Renderer {
 	
 	public void visit(ListItem node) {
 		Integer seq = listSequence.peek() + 1;		
-		listSequence.set(listSequence.size() - 1, listSequence.peek() + 1);
+		listSequence.set(listSequence.size() - 1, seq);
 		out.append(indent() + "<li");
 		if(node.getNumber() != null && (seq != node.getNumber())) {
 			out.append(" value=\"" + node.getNumber() + "\"");
-			listSequence.set(listSequence.size() - 1, node.getNumber());
+			listSequence.push(node.getNumber());
 		}
 		out.append(">");
 		if(node.getChildren() != null) {

@@ -65,11 +65,10 @@ public class CharStream {
 	private void fillBuff() throws IOException {
 		if (maxNextCharInd == available) {
 			if (available == bufsize) {
+				bufpos = 0;
+				maxNextCharInd = 0;
 				if (tokenBegin > 2048) {
-					bufpos = maxNextCharInd = 0;
 					available = tokenBegin;
-				} else if (tokenBegin < 0) {
-					bufpos = maxNextCharInd = 0;
 				} 
 			} else {
 				available = bufsize;
@@ -104,7 +103,8 @@ public class CharStream {
 		column++;
 		if (prevCharIsLF) {
 			prevCharIsLF = false;
-			line += (column = 1);
+			column = 1;
+			line += column;
 		} 
 
 		switch (c) {

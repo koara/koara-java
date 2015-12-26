@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.List;
 
 import io.koara.ast.BlockElement;
 import io.koara.ast.Blockquote;
@@ -71,12 +72,16 @@ public class Parser {
 	private int currentQuoteLevel;
 	private int lookAhead;
 	private int nextTokenKind;
-	private boolean lookingAhead = false;
+	private boolean lookingAhead;
 	private boolean semanticLookAhead;	
-	private LookaheadSuccess lookAheadSuccess = new LookaheadSuccess();
-	private class LookaheadSuccess extends Error {}
-	private java.util.List<Module> modules = Arrays.asList(Module.PARAGRAPHS, Module.HEADINGS, Module.LISTS, Module.LINKS, 
-			Module.IMAGES, Module.FORMATTING, Module.BLOCKQUOTES, Module.CODE);
+	private LookaheadSuccess lookAheadSuccess;
+	private List<Module> modules;
+	
+	public Parser() {
+		this.lookAheadSuccess = new LookaheadSuccess();
+		this.modules = Arrays.asList(Module.PARAGRAPHS, Module.HEADINGS, Module.LISTS, Module.LINKS, 
+				Module.IMAGES, Module.FORMATTING, Module.BLOCKQUOTES, Module.CODE);
+	}
 	
 	public Document parse(String text) {
 		return parse(new StringReader(text));
@@ -94,7 +99,7 @@ public class Parser {
 		nextTokenKind = -1;
 		
 		Document document = new Document();
-		tree.openScope(document);
+		tree.openScope();
 		do {
 			consumeToken(EOL);
 		} while (getNextTokenKind() == EOL);
@@ -138,7 +143,7 @@ public class Parser {
 	
 	private void heading() {
 		Heading heading = new Heading();
-		tree.openScope(heading);
+		tree.openScope();
 		int headingLevel = 0;
 
 		while(getNextTokenKind() == EQ) {
@@ -169,7 +174,7 @@ public class Parser {
 	
 	private void blockquote() {
 		Blockquote blockquote = new Blockquote();
-		tree.openScope(blockquote);
+		tree.openScope();
 		currentQuoteLevel++;
 		consumeToken(GT);
 		while (blockquoteHasEmptyLineAhead()) {
@@ -213,7 +218,7 @@ public class Parser {
 	
 	private void unorderedList() {
 		ListBlock list = new ListBlock(false);
-		tree.openScope(list);
+		tree.openScope();
 		int listBeginColumn = unorderedListItem();
 		while (listItemAhead(listBeginColumn, false)) {
 			while (getNextTokenKind() == EOL) {
@@ -230,7 +235,7 @@ public class Parser {
 
 	private int unorderedListItem() {
 		ListItem listItem = new ListItem();
-		tree.openScope(listItem);
+		tree.openScope();
 
 		Token t = consumeToken(DASH);
 		whiteSpace();
@@ -253,7 +258,7 @@ public class Parser {
 
 	private void orderedList() {
 		ListBlock list = new ListBlock(true);
-		tree.openScope(list);
+		tree.openScope();
 		int listBeginColumn = orderedListItem();
 		while (listItemAhead(listBeginColumn, true)) {
 			while (getNextTokenKind() == EOL) {
@@ -270,9 +275,8 @@ public class Parser {
 
 	private int orderedListItem() {
 		ListItem listItem = new ListItem();
-		tree.openScope(listItem);
-		Token t;
-		t = consumeToken(DIGITS);
+		tree.openScope();
+		Token t = consumeToken(DIGITS);
 		consumeToken(DOT);
 		whiteSpace();
 		if (listItemHasInlineElements()) { 
@@ -288,14 +292,14 @@ public class Parser {
 				blockElement();
 			}
 		}
-		listItem.setNumber(Integer.valueOf(Integer.valueOf(t.image)));
+		listItem.setNumber(Integer.valueOf(t.image));
 		tree.closeScope(listItem);
 		return t.beginColumn;
 	}
 
 	private void fencedCodeBlock() {
 		CodeBlock codeBlock = new CodeBlock();
-		tree.openScope(codeBlock);
+		tree.openScope();
 		StringBuilder s = new StringBuilder();
 		int beginColumn = consumeToken(BACKTICK).beginColumn;
 		do {
@@ -361,7 +365,7 @@ public class Parser {
 			paragraph = new BlockElement();
 		}
 		
-		tree.openScope(paragraph);
+		tree.openScope();
 		inline();
 		while (textAhead()) {
 			lineBreak();
@@ -379,7 +383,7 @@ public class Parser {
 	
 	private void text() {
 		Text text = new Text();
-		tree.openScope(text);
+		tree.openScope();
 		StringBuffer s = new StringBuffer();
 		while (textHasTokensAhead()) {
 			switch (getNextTokenKind()) {
@@ -412,7 +416,7 @@ public class Parser {
 	
 	private void image() {
 		Image image = new Image();
-		tree.openScope(image);
+		tree.openScope();
 		String ref = "";
 		consumeToken(LBRACK);
 		whiteSpace();
@@ -436,7 +440,7 @@ public class Parser {
 	
 	private void link() {
 		Link link = new Link();
-		tree.openScope(link);
+		tree.openScope();
 		String ref = "";
 		consumeToken(LBRACK);
 		whiteSpace();
@@ -466,7 +470,7 @@ public class Parser {
 	
 	private void strong() {
 		Strong strong = new Strong();
-		tree.openScope(strong);
+		tree.openScope();
 		consumeToken(ASTERISK);
 		while (strongHasElements()) {
 			if (hasTextAhead()) {
@@ -493,7 +497,7 @@ public class Parser {
 	
 	private void em() {
 		Em em = new Em();
-		tree.openScope(em);
+		tree.openScope();
 		consumeToken(UNDERSCORE);
 		while (emHasElements()) {
 			if (hasTextAhead()) {
@@ -520,7 +524,7 @@ public class Parser {
 
 	private void code() {
 		Code code = new Code();
-		tree.openScope(code);
+		tree.openScope();
 		consumeToken(BACKTICK);
 		codeText();
 		consumeToken(BACKTICK);
@@ -529,7 +533,7 @@ public class Parser {
 
 	private void codeText() {
 		Text text = new Text();
-		tree.openScope(text);
+		tree.openScope();
 		StringBuffer s = new StringBuffer();
 		do {
 			switch (getNextTokenKind()) {
@@ -565,7 +569,7 @@ public class Parser {
 
 	private void looseChar() {
 		Text text = new Text();
-		tree.openScope(text);
+		tree.openScope();
 		switch (getNextTokenKind()) {
 		case ASTERISK:		text.setValue(consumeToken(ASTERISK).image); break;
 		case BACKTICK:		text.setValue(consumeToken(BACKTICK).image); break;
@@ -577,7 +581,7 @@ public class Parser {
 
 	private void lineBreak() {
 		LineBreak linebreak = new LineBreak();
-		tree.openScope(linebreak);
+		tree.openScope();
 		while (getNextTokenKind() == SPACE || getNextTokenKind() == TAB) {
 			consumeToken(getNextTokenKind());
 		}
@@ -647,7 +651,7 @@ public class Parser {
 
 	private void resourceText() {
 		Text text = new Text();
-		tree.openScope(text);
+		tree.openScope();
 		StringBuilder s = new StringBuilder();
 		do {
 			switch (getNextTokenKind()) {
@@ -721,7 +725,7 @@ public class Parser {
 
 	private void strongMultiline() {
 		Strong strong = new Strong();
-		tree.openScope(strong);
+		tree.openScope();
 		consumeToken(ASTERISK);
 		strongMultilineContent();
 		while (textAhead()) {
@@ -756,7 +760,7 @@ public class Parser {
 
 	private void strongWithinEmMultiline() {
 		Strong strong = new Strong();
-		tree.openScope(strong);
+		tree.openScope();
 		consumeToken(ASTERISK);
 		strongWithinEmMultilineContent();
 		while (textAhead()) {
@@ -790,7 +794,7 @@ public class Parser {
 
 	private void strongWithinEm() {
 		Strong strong = new Strong();
-		tree.openScope(strong);
+		tree.openScope();
 		consumeToken(ASTERISK);
 		do {
 			if (hasTextAhead()) {
@@ -815,7 +819,7 @@ public class Parser {
 
 	private void emMultiline() {
 		Em em = new Em();
-		tree.openScope(em);
+		tree.openScope();
 		consumeToken(UNDERSCORE);
 		emMultilineContent();
 		while (textAhead()) {
@@ -850,7 +854,7 @@ public class Parser {
 
 	private void emWithinStrongMultiline() {
 		Em em = new Em();
-		tree.openScope(em);
+		tree.openScope();
 		consumeToken(UNDERSCORE);
 		emWithinStrongMultilineContent();
 		while (textAhead()) {
@@ -883,7 +887,7 @@ public class Parser {
 
 	private void emWithinStrong() {
 		Em em = new Em();
-		tree.openScope(em);
+		tree.openScope();
 		consumeToken(UNDERSCORE);
 		do {
 			if (hasTextAhead()) {
@@ -908,7 +912,7 @@ public class Parser {
 
 	private void codeMultiline() {
 		Code code = new Code();
-		tree.openScope(code);
+		tree.openScope();
 		consumeToken(BACKTICK);
 		codeText();
 		while (textAhead()) {
@@ -2526,7 +2530,8 @@ for(int i=offset;;i++) {
 		if(nextTokenKind != -1) { 
 			return nextTokenKind; 
 		} else if ((nextToken = token.next) == null) {
-			return (nextTokenKind = (token.next = tm.getNextToken()).kind);
+			token.next = tm.getNextToken();
+			return (nextTokenKind = token.next.kind);
 		}
 		return (nextTokenKind = nextToken.kind);
 	}

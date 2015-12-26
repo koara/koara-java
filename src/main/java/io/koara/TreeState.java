@@ -34,7 +34,7 @@ public class TreeState {
 		currentMark = 0;
 	}
 
-	public void openScope(Node n) {
+	public void openScope() {
 		marks.add(currentMark);
 		currentMark = nodesOnStack;
 	}
@@ -51,7 +51,7 @@ public class TreeState {
 	}
 	
 	public void addSingleValue(Node n, Token t) {
-		openScope(n);
+		openScope();
 		n.setValue(t.image);
 		closeScope(n);
 	}
