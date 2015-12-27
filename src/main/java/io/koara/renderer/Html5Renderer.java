@@ -18,7 +18,7 @@ package io.koara.renderer;
 import java.util.Stack;
 
 import io.koara.ast.BlockElement;
-import io.koara.ast.Blockquote;
+import io.koara.ast.BlockQuote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;
 import io.koara.ast.Document;
@@ -50,7 +50,7 @@ public class Html5Renderer implements Renderer {
 		if(!node.isNested()) { out.append("\n"); }
 	}
 	
-	public void visit(Blockquote node) {
+	public void visit(BlockQuote node) {
 		out.append(indent() + "<blockquote>");
 		if(node.getChildren() != null && node.getChildren().length > 0) { out.append("\n"); }
 		level++;

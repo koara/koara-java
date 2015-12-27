@@ -47,7 +47,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.koara.ast.BlockElement;
-import io.koara.ast.Blockquote;
+import io.koara.ast.BlockQuote;
 import io.koara.ast.Code;
 import io.koara.ast.CodeBlock;
 import io.koara.ast.Document;
@@ -173,7 +173,7 @@ public class Parser {
 	}
 	
 	private void blockquote() {
-		Blockquote blockquote = new Blockquote();
+		BlockQuote blockquote = new BlockQuote();
 		tree.openScope();
 		currentQuoteLevel++;
 		consumeToken(GT);
@@ -769,7 +769,6 @@ public class Parser {
 		}
 		consumeToken(ASTERISK);
 		tree.closeScope(strong);
-
 	}
 
 	private void strongWithinEmMultilineContent() {
@@ -969,8 +968,7 @@ public class Parser {
          return false;
        }
    } while(t.kind == EOL);
-   boolean result = t.kind != EOF && (currentBlockLevel == 0 || t.beginColumn >= blockBeginColumn + 2) ;
-   return result;
+   return t.kind != EOF && (currentBlockLevel == 0 || t.beginColumn >= blockBeginColumn + 2) ;
  }
  return false;
 }
@@ -1012,8 +1010,7 @@ private boolean fencesAhead() {
        int i = skip(2, SPACE, TAB, GT);
        if(getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK) {
           i = skip(i+3, SPACE, TAB);
-          boolean result = getToken(i).kind == EOL || getToken(i).kind == EOF;
-          return result;
+          return getToken(i).kind == EOL || getToken(i).kind == EOF;
        }
      }
      return false;
@@ -1040,11 +1037,9 @@ private boolean listItemAhead(int listBeginColumn, boolean ordered) {
                    return false;
                  } else if(t.kind != SPACE && t.kind != TAB && t.kind != GT && t.kind != EOL) {
                      if(ordered) {
-                         boolean result = (t.kind == DIGITS && getToken(i+1).kind == DOT && t.beginColumn >= listBeginColumn);
-                         return result;
+                         return (t.kind == DIGITS && getToken(i+1).kind == DOT && t.beginColumn >= listBeginColumn);
                      }
-                     boolean result = t.kind == DASH && t.beginColumn >= listBeginColumn;
-                     return result;
+                     return t.kind == DASH && t.beginColumn >= listBeginColumn;
                  }
          }
  }
@@ -1059,11 +1054,10 @@ private boolean textAhead() {
 	                   i = skip(i, SPACE, TAB, GT);
 	
 	           Token t = getToken(i);
-	           boolean result = getToken(i).kind != EOL
+	           return getToken(i).kind != EOL
                    && !(modules.contains(Module.LISTS) && t.kind == DASH)
                    && !(modules.contains(Module.LISTS) && t.kind == DIGITS && getToken(i+1).kind == DOT) && !(getToken(i).kind == BACKTICK && getToken(i+1).kind == BACKTICK && getToken(i+2).kind == BACKTICK)
                    && !(modules.contains(Module.HEADINGS) && headingAhead(i));
-	           return result;
 	           } 
 	}
 	return false;

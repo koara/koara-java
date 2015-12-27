@@ -72,7 +72,7 @@ uploadArchives {
 			pom.project {
 				name 'koara'
 				packaging 'jar'
-				description 'Koara to HTML parser written in Java'
+				description 'Koara to HTML5 parser written in Java'
 				url 'http://www.koara.io'
 
 				scm {
