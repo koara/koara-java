@@ -1529,9 +1529,7 @@ for(int i=offset;;i++) {
 																lookingAhead = true;
 																semanticLookAhead = !nextAfterSpace(EOL, EOF);
 																lookingAhead = false;
-																if (!semanticLookAhead || scanWhitspaceToken()) {
-																	return true;
-																}
+																return (!semanticLookAhead || scanWhitspaceToken());
 															}
 														}
 													}
@@ -1554,11 +1552,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanText()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -1603,9 +1601,7 @@ for(int i=offset;;i++) {
 																			lookingAhead = true;
 																			semanticLookAhead = !nextAfterSpace(EOL, EOF);
 																			lookingAhead = false;
-																			if (!semanticLookAhead || scanWhitspaceToken()) {
-																				return true;
-																			}
+																			return (!semanticLookAhead || scanWhitspaceToken());
 																		}
 																	}
 																}
@@ -1636,11 +1632,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (hasCodeTextOnNextLineAhead()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return scanToken(BACKTICK);
@@ -1651,11 +1647,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanCodeTextTokens()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -1666,11 +1662,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanToken(GT)) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return scanCodeTextTokensAhead();
@@ -1678,11 +1674,11 @@ for(int i=offset;;i++) {
 	
 	private boolean scanWhitspaceTokens() {
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanWhitspaceToken()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -1721,11 +1717,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanEmWithinStrongElements()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return scanToken(UNDERSCORE);
@@ -1763,11 +1759,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanEmElements()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return scanToken(UNDERSCORE);
@@ -1802,11 +1798,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanEmWithinStrongMultilineContent()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -1817,11 +1813,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanWhitespaceTokenBeforeEol() || hasNoEmWithinStrongMultilineContentAhead()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return scanToken(UNDERSCORE);
@@ -1886,11 +1882,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanStrongWithinEmElements()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return scanToken(ASTERISK);
@@ -1931,11 +1927,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanStrongElements()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return scanToken(ASTERISK);
@@ -1970,11 +1966,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanStrongWithinEmMultilineElements()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -1985,11 +1981,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanWhitespaceTokenBeforeEol() || scanForMoreStrongWithinEmMultilineElements()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return scanToken(ASTERISK);
@@ -2095,11 +2091,11 @@ for(int i=offset;;i++) {
 
 	private boolean scanResourceTextElements() {
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanResourceTextElement()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -2183,11 +2179,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanResourceElement()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -2198,11 +2194,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanLinkElement()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		if (scanWhitspaceTokens() || scanToken(RBRACK)) {
@@ -2220,11 +2216,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanImageElement()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		if (scanWhitspaceTokens() || scanToken(RBRACK)) {
@@ -2275,11 +2271,11 @@ for(int i=offset;;i++) {
 		if (scanInlineElement()) {
 			return true;
 		}
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanInlineElement()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -2301,11 +2297,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanForCodeLanguageElement()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -2451,11 +2447,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanToken(GT) || scanWhitspaceTokens()) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
@@ -2466,11 +2462,11 @@ for(int i=offset;;i++) {
 			return true;
 		}
 		Token xsp;
-		loop: while (true) {
+		while (true) {
 			xsp = scanPosition;
 			if (scanToken(EQ)) {
 				scanPosition = xsp;
-				break loop;
+				break;
 			}
 		}
 		return false;
