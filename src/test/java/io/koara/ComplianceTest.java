@@ -67,7 +67,7 @@ public class ComplianceTest {
         String kd = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".kd");
 
         Parser parser = new Parser();
-        Document document = parser.parse(kd); // Generate AST
+        Document document = parser.parse(kd);
 
         Html5Renderer renderer = new Html5Renderer();
         document.accept(renderer);

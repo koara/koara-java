@@ -1303,7 +1303,7 @@ public class EndToEndTest {
         String html = readFile(TESTSUITE_FOLDER + "/e2e/" + file + ".htm");
 
         parser.setModules(modules);
-        Document document = parser.parse(kd); // Generate AST
+        Document document = parser.parse(kd);
         Html5Renderer renderer = new Html5Renderer();
         document.accept(renderer);
 
