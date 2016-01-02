@@ -34,45 +34,44 @@ import io.koara.renderer.Html5Renderer;
 @RunWith(Parameterized.class)
 public class ComplianceTest {
 
-	private static final String TESTSUITE_FOLDER = "src/test/resources/spec";
+    private static final String TESTSUITE_FOLDER = "src/test/resources/spec";
 
-	private String module;
-	private String testcase;
+    private String module;
+    private String testcase;
     private static List<String> include = Arrays.asList();
-	
-	public ComplianceTest(String module, String testcase) {
-  		this.module = module;
-  		this.testcase = testcase;
-    }
-	
-	@Parameters(name= "{0}: {1}")
-	public static Iterable<Object[]> data() {
-		List<Object[]> modules = new ArrayList<Object[]>();
-		for(File module : new File(TESTSUITE_FOLDER).listFiles()) {
-			if(include.size() == 0 || include.contains(module.getName())) {
-				for(File testcase : module.listFiles()) {
-					if(testcase.getName().endsWith(".kd")) {
-						modules.add(new Object[]{module.getName(), testcase.getName().substring(0, testcase.getName().length() - 3)});
-					}
-				}
-			}
-		}
-		return modules;
-	}
 
-	@Test
-	public void output() throws Exception {
-		String html = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".htm");
-		String kd = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".kd");
-		
-		Parser parser = new Parser();
-		Document document = parser.parse(kd); // Generate AST
-		
-		Html5Renderer renderer = new Html5Renderer();
-		document.accept(renderer);
-		assertEquals(html, renderer.getOutput());
-	}
-	
-	
-	
+    public ComplianceTest(String module, String testcase) {
+        this.module = module;
+        this.testcase = testcase;
+    }
+
+    @Parameters(name = "{0}: {1}")
+    public static Iterable<Object[]> data() {
+        List<Object[]> modules = new ArrayList<Object[]>();
+        for (File module : new File(TESTSUITE_FOLDER).listFiles()) {
+            if (include.size() == 0 || include.contains(module.getName())) {
+                for (File testcase : module.listFiles()) {
+                    if (testcase.getName().endsWith(".kd")) {
+                        modules.add(new Object[] { module.getName(),
+                                testcase.getName().substring(0, testcase.getName().length() - 3) });
+                    }
+                }
+            }
+        }
+        return modules;
+    }
+
+    @Test
+    public void output() throws Exception {
+        String html = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".htm");
+        String kd = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".kd");
+
+        Parser parser = new Parser();
+        Document document = parser.parse(kd); // Generate AST
+
+        Html5Renderer renderer = new Html5Renderer();
+        document.accept(renderer);
+        assertEquals(html, renderer.getOutput());
+    }
+
 }

@@ -19,19 +19,18 @@ import io.koara.renderer.Renderer;
 
 public class ListBlock extends BlockElement {
 
-	private boolean ordered;
-	
-	public ListBlock(boolean ordered) {
-		this.ordered = ordered;
-	}
+    private boolean ordered;
 
-	public boolean isOrdered() {
-		return ordered;
-	}
+    public ListBlock(boolean ordered) {
+        this.ordered = ordered;
+    }
 
+    public boolean isOrdered() {
+        return ordered;
+    }
 
-	public void accept(Renderer renderer) {
-		renderer.visit(this);
-	}
-	
+    public void accept(Renderer renderer) {
+        renderer.visit(this);
+    }
+
 }

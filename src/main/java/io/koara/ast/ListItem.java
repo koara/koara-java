@@ -19,18 +19,18 @@ import io.koara.renderer.Renderer;
 
 public class ListItem extends Node {
 
-	private Integer number;
+    private Integer number;
 
-	public Integer getNumber() {
-		return number;
-	}
+    public Integer getNumber() {
+        return number;
+    }
 
-	public void setNumber(Integer number) {
-		this.number = number;
-	}
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
 
-	public void accept(Renderer renderer) {
-		renderer.visit(this);
-	}
-	
+    public void accept(Renderer renderer) {
+        renderer.visit(this);
+    }
+
 }

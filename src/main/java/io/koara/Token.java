@@ -33,7 +33,7 @@ public class Token {
 		this.kind = kind;
 		this.beginLine = beginLine;
 		this.beginColumn = beginColumn;
-		this.endLine = endLine;
+        this.endLine = endLine;
 		this.endColumn = endColumn;
 		this.image = image;
 	}

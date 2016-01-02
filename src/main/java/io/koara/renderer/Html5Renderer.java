@@ -192,7 +192,7 @@ public class Html5Renderer implements Renderer {
 	}
 	
 	public String getOutput() {
-		return out.toString().trim();
-	}
+        return out.toString().trim();
+    }
 
 }

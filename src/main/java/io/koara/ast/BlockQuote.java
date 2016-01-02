@@ -19,8 +19,8 @@ import io.koara.renderer.Renderer;
 
 public class BlockQuote extends BlockElement {
 
-	public void accept(Renderer renderer) {
-		renderer.visit(this);
-	}
-	
+    public void accept(Renderer renderer) {
+        renderer.visit(this);
+    }
+
 }

@@ -33,34 +33,34 @@ import io.koara.ast.Text;
 
 public interface Renderer {
 
-	void visit(Document node);
+    void visit(Document node);
 
-	void visit(Heading node);
+    void visit(Heading node);
 
-	void visit(BlockQuote node);
+    void visit(BlockQuote node);
 
-	void visit(ListBlock node);
+    void visit(ListBlock node);
 
-	void visit(ListItem node);
+    void visit(ListItem node);
 
-	void visit(CodeBlock node);
+    void visit(CodeBlock node);
 
-	void visit(Paragraph node);
-	
-	void visit(BlockElement node);
+    void visit(Paragraph node);
 
-	void visit(Image node);
+    void visit(BlockElement node);
 
-	void visit(Link node);
+    void visit(Image node);
 
-	void visit(Text node);
+    void visit(Link node);
 
-	void visit(Strong node);
+    void visit(Text node);
 
-	void visit(Em node);
+    void visit(Strong node);
 
-	void visit(Code node);
+    void visit(Em node);
 
-	void visit(LineBreak node);
-	
+    void visit(Code node);
+
+    void visit(LineBreak node);
+
 }

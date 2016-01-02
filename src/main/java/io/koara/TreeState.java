@@ -22,53 +22,52 @@ import io.koara.ast.Node;
 
 public class TreeState {
 
-	private List<Node> nodes;
-	private List<Integer> marks;
-	private int nodesOnStack;
-	private int currentMark;
+    private List<Node> nodes;
+    private List<Integer> marks;
+    private int nodesOnStack;
+    private int currentMark;
 
-	public TreeState() {
-		nodes = new ArrayList<Node>();
-		marks = new ArrayList<Integer>();
-		nodesOnStack = 0;
-		currentMark = 0;
-	}
+    public TreeState() {
+        nodes = new ArrayList<Node>();
+        marks = new ArrayList<Integer>();
+        nodesOnStack = 0;
+        currentMark = 0;
+    }
 
-	public void openScope() {
-		marks.add(currentMark);
-		currentMark = nodesOnStack;
-	}
+    public void openScope() {
+        marks.add(currentMark);
+        currentMark = nodesOnStack;
+    }
 
-	public void closeScope(Node n) {
-		int a = nodeArity();
-		currentMark = marks.remove(marks.size() - 1);
-		while (a-- > 0) {
-			Node c = popNode();
-			c.setParent(n);
-			n.add(c, a);
-		}
-		pushNode(n);
-	}
-	
-	public void addSingleValue(Node n, Token t) {
-		openScope();
-		n.setValue(t.image);
-		closeScope(n);
-	}
+    public void closeScope(Node n) {
+        int a = nodeArity();
+        currentMark = marks.remove(marks.size() - 1);
+        while (a-- > 0) {
+            Node c = popNode();
+            c.setParent(n);
+            n.add(c, a);
+        }
+        pushNode(n);
+    }
 
-	private int nodeArity() {
-		return nodesOnStack - currentMark;
-	}
-	
-	private Node popNode() {
-		--nodesOnStack;
-		return nodes.remove(nodes.size() - 1);
-	}
-	
-	private void pushNode(Node n) {
-		nodes.add(n);
-		++nodesOnStack;
-	}
+    public void addSingleValue(Node n, Token t) {
+        openScope();
+        n.setValue(t.image);
+        closeScope(n);
+    }
 
-	
+    private int nodeArity() {
+        return nodesOnStack - currentMark;
+    }
+
+    private Node popNode() {
+        --nodesOnStack;
+        return nodes.remove(nodes.size() - 1);
+    }
+
+    private void pushNode(Node n) {
+        nodes.add(n);
+        ++nodesOnStack;
+    }
+
 }
