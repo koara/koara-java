@@ -44,7 +44,7 @@ public class Demo {
 		Document document = parser.parse("Hello World!"); 
 		
 		// Enable which modules to parse (all are parsed by default)
-		//parser.setModules(PARAGRAPHS, HEADINGS, LISTS, LINKS, IMAGES, FORMATTING, BLOCKQUOTES, CODE);
+		parser.setModules(PARAGRAPHS, HEADINGS, LISTS, LINKS, IMAGES, FORMATTING, BLOCKQUOTES, CODE);
 		
 		// Render AST as HTML
 		Html5Renderer renderer = new Html5Renderer();
