@@ -40,11 +40,12 @@ public class Demo {
 	public static void main(String[] args) {
 		
 		Parser parser = new Parser();
-		// Parse string or file and generate AST
-		Document document = parser.parse("Hello World!"); 
 		
 		// Enable which modules to parse (all are parsed by default)
 		parser.setModules(PARAGRAPHS, HEADINGS, LISTS, LINKS, IMAGES, FORMATTING, BLOCKQUOTES, CODE);
+		
+		// Parse string or file and generate AST
+		Document document = parser.parse("Hello World!"); 
 		
 		// Render AST as HTML
 		Html5Renderer renderer = new Html5Renderer();
