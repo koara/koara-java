@@ -62,7 +62,8 @@ public class TreeState {
 
     private Node popNode() {
         --nodesOnStack;
-        return nodes.remove(nodes.size() - 1);
+        Node n = nodes.remove(nodes.size() - 1);
+        return n;
     }
 
     private void pushNode(Node n) {

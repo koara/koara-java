@@ -75,6 +75,7 @@ public class CharStream {
             }
         }
         int i;
+        
         try {
             if ((i = resource.read(buffer, maxNextCharInd, available - maxNextCharInd)) == -1) {
                 resource.close();
@@ -94,7 +95,6 @@ public class CharStream {
 
     public void backup(int amount) {
         inBuf += amount;
-
         if ((bufpos -= amount) < 0) {
             bufpos += bufsize;
         }

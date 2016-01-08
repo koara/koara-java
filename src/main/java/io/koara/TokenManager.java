@@ -46,8 +46,6 @@ public class TokenManager {
     private int[] jjrounds = new int[8];
     private int[] jjstateSet = new int[16];
     private char curChar;
-    private long[] jjbitVec0 = { 0xfffffffffffffffeL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL };
-    private long[] jjbitVec2 = { 0x0L, 0x0L, 0xffffffffffffffffL, 0xffffffffffffffffL };
     private int[] jjnextStates = { 2, 3, 5, };
     private int jjnewStateCnt;
     private int round;
@@ -59,7 +57,6 @@ public class TokenManager {
     }
 
     public Token getNextToken() {
-
         try {
             int curPos = 0;
             while (true) {
@@ -197,7 +194,7 @@ public class TokenManager {
     }
 
     private int moveNfa(int startState, int curPos) {
-        int startsAt = 0;
+    	int startsAt = 0;
         jjnewStateCnt = 8;
         int i = 1;
         jjstateSet[0] = startState;
@@ -205,7 +202,7 @@ public class TokenManager {
         while (true) {
             if (++round == 0x7fffffff) {
                 round = 0x80000001;
-            }
+            }            
             if (curChar < 64) {
                 long l = 1L << curChar;
                 do {
@@ -313,21 +310,14 @@ public class TokenManager {
                     }
                 } while (i != startsAt);
             } else {
-                int hiByte = (curChar >> 8);
-                int i1 = hiByte >> 6;
-                long l1 = 1L << (hiByte & 077);
-                int i2 = (curChar & 0xff) >> 6;
-                long l2 = 1L << (curChar & 077);
                 do {
                     switch (jjstateSet[--i]) {
                     case 6:
                     case 0:
-                        if (canMove(hiByte, i1, i2, l1, l2)) {
-                            if (kind > 4) {
-                                kind = 4;
-                            }
-                            checkNAdd(0);
+                        if (kind > 4) {
+                            kind = 4;
                         }
+                        checkNAdd(0);
                         break;
                     }
                 } while (i != startsAt);
@@ -338,6 +328,8 @@ public class TokenManager {
                 kind = 0x7fffffff;
             }
             ++curPos;
+            
+            
             if ((i = jjnewStateCnt) == (startsAt = 8 - (jjnewStateCnt = startsAt))) {
                 return curPos;
             }
@@ -347,13 +339,6 @@ public class TokenManager {
                 return curPos;
             }
         }
-    }
-
-    private boolean canMove(int hiByte, int i1, int i2, long l1, long l2) {
-        if (hiByte == 0) {
-            return ((jjbitVec2[i2] & l2) != 0L);
-        }
-        return ((jjbitVec0[i1] & l1) != 0L);
     }
 
     private void checkNAddStates(int start, int end) {

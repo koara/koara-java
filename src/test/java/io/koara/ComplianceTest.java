@@ -19,6 +19,8 @@ import static io.koara.TestUtils.readFile;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
