@@ -1,4 +1,5 @@
 /*
+
  * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,14 +30,14 @@ public class CharStream {
     private int column = 0;
     private int line = 1;
     private boolean prevCharIsLF;
-    private Reader resource;
+    private Reader reader;
     private char[] buffer = new char[4096];
     private int maxNextCharInd = 0;
     private int inBuf = 0;
     private int tabSize = 4;
 
-    public CharStream(Reader resource) {
-        this.resource = resource;
+    public CharStream(Reader reader) {
+        this.reader = reader;
     }
 
     public char beginToken() throws IOException {
@@ -77,8 +78,8 @@ public class CharStream {
         int i;
         
         try {
-            if ((i = resource.read(buffer, maxNextCharInd, available - maxNextCharInd)) == -1) {
-                resource.close();
+            if ((i = reader.read(buffer, maxNextCharInd, available - maxNextCharInd)) == -1) {
+            	reader.close();
                 throw new IOException();
             } else {
                 maxNextCharInd += i;

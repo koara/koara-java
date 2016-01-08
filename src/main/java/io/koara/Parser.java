@@ -84,14 +84,14 @@ public class Parser {
     }
 
     public Document parse(String text) {
-        return parse(new StringReader(text));
+        return parseReader(new StringReader(text));
     }
 
-    public Document parse(File file) throws IOException {
-        return parse(new FileReader(file));
+    public Document parseFile(File file) throws IOException {
+        return parseReader(new FileReader(file));
     }
 
-    private Document parse(Reader reader) {
+    private Document parseReader(Reader reader) {
         cs = new CharStream(reader);
         tm = new TokenManager(cs);
         token = new Token();
