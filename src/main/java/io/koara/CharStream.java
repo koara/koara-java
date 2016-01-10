@@ -122,7 +122,7 @@ public class CharStream {
         bufcolumn[bufpos] = column;
     }
 
-    protected String getImage() {
+    public String getImage() {
         if (bufpos >= tokenBegin) {
             return new String(buffer, tokenBegin, bufpos - tokenBegin + 1);
         } else {
