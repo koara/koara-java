@@ -43,4 +43,11 @@ public class CharStreamTest {
 		cs.readChar();
 	}
 	
+	@Test
+	public void testGetImage() throws Exception {
+		cs.readChar();
+		cs.readChar();
+		assertEquals("ab", cs.getImage());
+	}
+	
 }
