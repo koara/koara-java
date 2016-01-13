@@ -129,7 +129,7 @@ public class Parser {
         if (modules.contains(Module.HEADINGS) && headingAhead(1)) {
             heading();
         } else if (modules.contains(Module.BLOCKQUOTES) && getNextTokenKind() == GT) {
-            blockquote();
+            blockQuote();
         } else if (modules.contains(Module.LISTS) && getNextTokenKind() == DASH) {
             unorderedList();
         } else if (modules.contains(Module.LISTS) && hasOrderedListAhead()) {
@@ -173,34 +173,34 @@ public class Parser {
         tree.closeScope(heading);
     }
 
-    private void blockquote() {
-        BlockQuote blockquote = new BlockQuote();
+    private void blockQuote() {
+        BlockQuote blockQuote = new BlockQuote();
         tree.openScope();
         currentQuoteLevel++;
         consumeToken(GT);
-        while (blockquoteHasEmptyLineAhead()) {
-            blockquoteEmptyLine();
+        while (blockQuoteHasEmptyLineAhead()) {
+            blockQuoteEmptyLine();
         }
         whiteSpace();
-        if (blockquoteHasAnyBlockElementseAhead()) {
+        if (blockQuoteHasAnyBlockElementseAhead()) {
             blockElement();
             while (blockAhead(0)) {
                 while (getNextTokenKind() == EOL) {
                     consumeToken(EOL);
                     whiteSpace();
-                    blockquotePrefix();
+                    blockQuotePrefix();
                 }
                 blockElement();
             }
         }
-        while (hasBlockquoteEmptyLinesAhead()) {
-            blockquoteEmptyLine();
+        while (hasBlockQuoteEmptyLinesAhead()) {
+            blockQuoteEmptyLine();
         }
         currentQuoteLevel--;
-        tree.closeScope(blockquote);
+        tree.closeScope(blockQuote);
     }
 
-    private void blockquotePrefix() {
+    private void blockQuotePrefix() {
         int i = 0;
         do {
             consumeToken(GT);
@@ -208,7 +208,7 @@ public class Parser {
         } while (++i < currentQuoteLevel);
     }
 
-    private void blockquoteEmptyLine() {
+    private void blockQuoteEmptyLine() {
         consumeToken(EOL);
         whiteSpace();
         do {
@@ -227,7 +227,7 @@ public class Parser {
             }
             whiteSpace();
             if (currentQuoteLevel > 0) {
-                blockquotePrefix();
+                blockQuotePrefix();
             }
             unorderedListItem();
         }
@@ -247,7 +247,7 @@ public class Parser {
                     consumeToken(EOL);
                     whiteSpace();
                     if (currentQuoteLevel > 0) {
-                        blockquotePrefix();
+                        blockQuotePrefix();
                     }
                 }
                 blockElement();
@@ -267,7 +267,7 @@ public class Parser {
             }
             whiteSpace();
             if (currentQuoteLevel > 0) {
-                blockquotePrefix();
+                blockQuotePrefix();
             }
             orderedListItem();
         }
@@ -287,7 +287,7 @@ public class Parser {
                     consumeToken(EOL);
                     whiteSpace();
                     if (currentQuoteLevel > 0) {
-                        blockquotePrefix();
+                        blockQuotePrefix();
                     }
                 }
                 blockElement();
@@ -1445,11 +1445,11 @@ public class Parser {
         }
     }
 
-    private boolean blockquoteHasEmptyLineAhead() {
+    private boolean blockQuoteHasEmptyLineAhead() {
         lookAhead = 2147483647;
         lastPosition = scanPosition = token;
         try {
-            return !scanBlockquoteEmptyLine();
+            return !scanBlockQuoteEmptyLine();
         } catch (LookaheadSuccess ls) {
             return true;
         }
@@ -1485,7 +1485,7 @@ public class Parser {
         }
     }
 
-    private boolean blockquoteHasAnyBlockElementseAhead() {
+    private boolean blockQuoteHasAnyBlockElementseAhead() {
         lookAhead = 1;
         lastPosition = scanPosition = token;
         try {
@@ -1495,11 +1495,11 @@ public class Parser {
         }
     }
 
-    private boolean hasBlockquoteEmptyLinesAhead() {
+    private boolean hasBlockQuoteEmptyLinesAhead() {
         lookAhead = 2147483647;
         lastPosition = scanPosition = token;
         try {
-            return !scanBlockquoteEmptyLines();
+            return !scanBlockQuoteEmptyLines();
         } catch (LookaheadSuccess ls) {
             return true;
         }
@@ -2730,11 +2730,11 @@ public class Parser {
         return false;
     }
 
-    private boolean scanBlockquoteEmptyLines() {
-        return scanBlockquoteEmptyLine() || scanToken(EOL);
+    private boolean scanBlockQuoteEmptyLines() {
+        return scanBlockQuoteEmptyLine() || scanToken(EOL);
     }
 
-    private boolean scanBlockquoteEmptyLine() {
+    private boolean scanBlockQuoteEmptyLine() {
         if (scanToken(EOL) || scanWhitspaceTokens() || scanToken(GT) || scanWhitspaceTokens()) {
             return true;
         }

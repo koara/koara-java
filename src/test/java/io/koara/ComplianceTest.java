@@ -19,8 +19,6 @@ import static io.koara.TestUtils.readFile;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +50,7 @@ public class ComplianceTest {
         List<Object[]> modules = new ArrayList<Object[]>();
         for (File module : new File(TESTSUITE_FOLDER).listFiles()) {
             if (include.size() == 0 || include.contains(module.getName())) {
-                for (File testcase : module.listFiles()) {
+            	for (File testcase : module.listFiles()) {
                     if (testcase.getName().endsWith(".kd")) {
                         modules.add(new Object[] { module.getName(),
                                 testcase.getName().substring(0, testcase.getName().length() - 3) });
