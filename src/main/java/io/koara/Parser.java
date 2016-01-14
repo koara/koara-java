@@ -88,6 +88,9 @@ public class Parser {
     }
 
     public Document parseFile(File file) throws IOException {
+    	if(!file.getName().toLowerCase().endsWith(".kd")) {
+    		throw new IllegalArgumentException("Can only parse files with extension .kd");
+    	}
         return parseReader(new FileReader(file));
     }
 
