@@ -1,0 +1,273 @@
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+  &lt;head&gt;
+    &lt;!-- Meta, title, CSS, favicons, etc. --&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;meta name=&quot;description&quot; content=&quot;Bootstrap, a sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.&quot;&gt;
+&lt;meta name=&quot;keywords&quot; content=&quot;HTML, CSS, JS, JavaScript, framework, bootstrap, front-end, frontend, web development&quot;&gt;
+&lt;meta name=&quot;author&quot; content=&quot;Mark Otto, Jacob Thornton, and Bootstrap contributors&quot;&gt;
+
+&lt;title&gt;
+
+    Bootstrap &amp;middot; The world's most popular mobile-first and responsive front-end framework.
+
+&lt;/title&gt;
+
+&lt;!-- Bootstrap core CSS --&gt;
+
+&lt;link href=&quot;../dist/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+
+
+
+&lt;!-- Documentation extras --&gt;
+
+&lt;link href=&quot;../assets/css/docs.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+
+&lt;!--[if lt IE 9]&gt;&lt;script src=&quot;../assets/js/ie8-responsive-file-warning.js&quot;&gt;&lt;/script&gt;&lt;![endif]--&gt;
+&lt;script src=&quot;../assets/js/ie-emulation-modes-warning.js&quot;&gt;&lt;/script&gt;
+
+&lt;!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries --&gt;
+&lt;!--[if lt IE 9]&gt;
+  &lt;script src=&quot;https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://oss.maxcdn.com/respond/1.4.2/respond.min.js&quot;&gt;&lt;/script&gt;
+&lt;![endif]--&gt;
+
+&lt;!-- Favicons --&gt;
+&lt;link rel=&quot;apple-touch-icon&quot; href=&quot;/apple-touch-icon.png&quot;&gt;
+&lt;link rel=&quot;icon&quot; href=&quot;/favicon.ico&quot;&gt;
+
+&lt;script&gt;
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-146052-10', 'getbootstrap.com');
+  ga('send', 'pageview');
+&lt;/script&gt;
+
+  &lt;/head&gt;
+  &lt;body class=&quot;bs-docs-home&quot;&gt;
+    &lt;a id=&quot;skippy&quot; class=&quot;sr-only sr-only-focusable&quot; href=&quot;#content&quot;&gt;&lt;div class=&quot;container&quot;&gt;&lt;span class=&quot;skiplink-text&quot;&gt;Skip to main content&lt;/span&gt;&lt;/div&gt;&lt;/a&gt;
+
+    &lt;!-- Docs master nav --&gt;
+    &lt;header class=&quot;navbar navbar-static-top bs-docs-nav&quot; id=&quot;top&quot; role=&quot;banner&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;div class=&quot;navbar-header&quot;&gt;
+      &lt;button class=&quot;navbar-toggle collapsed&quot; type=&quot;button&quot; data-toggle=&quot;collapse&quot; data-target=&quot;#bs-navbar&quot; aria-controls=&quot;bs-navbar&quot; aria-expanded=&quot;false&quot;&gt;
+        &lt;span class=&quot;sr-only&quot;&gt;Toggle navigation&lt;/span&gt;
+        &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+        &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+        &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+      &lt;/button&gt;
+      &lt;a href=&quot;../&quot; class=&quot;navbar-brand&quot;&gt;Bootstrap&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;nav id=&quot;bs-navbar&quot; class=&quot;collapse navbar-collapse&quot;&gt;
+      &lt;ul class=&quot;nav navbar-nav&quot;&gt;
+        &lt;li&gt;
+          &lt;a href=&quot;../getting-started/&quot;&gt;Getting started&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;a href=&quot;../css/&quot;&gt;CSS&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;a href=&quot;../components/&quot;&gt;Components&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;a href=&quot;../javascript/&quot;&gt;JavaScript&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;a href=&quot;../customize/&quot;&gt;Customize&lt;/a&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;ul class=&quot;nav navbar-nav navbar-right&quot;&gt;
+        &lt;li&gt;&lt;a href=&quot;http://expo.getbootstrap.com&quot; onclick=&quot;ga('send', 'event', 'Navbar', 'Community links', 'Expo');&quot;&gt;Expo&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;http://blog.getbootstrap.com&quot; onclick=&quot;ga('send', 'event', 'Navbar', 'Community links', 'Blog');&quot;&gt;Blog&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/nav&gt;
+  &lt;/div&gt;
+&lt;/header&gt;
+
+
+    &lt;!-- Page content of course! --&gt;
+    &lt;main class=&quot;bs-docs-masthead&quot; id=&quot;content&quot; role=&quot;main&quot; tabindex=&quot;-1&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;span class=&quot;bs-docs-booticon bs-docs-booticon-lg bs-docs-booticon-outline&quot;&gt;B&lt;/span&gt;
+    &lt;p class=&quot;lead&quot;&gt;Bootstrap is the most popular HTML, CSS, and JS framework for developing responsive, mobile first projects on the web.&lt;/p&gt;
+    &lt;p class=&quot;lead&quot;&gt;
+      &lt;a href=&quot;getting-started#download&quot; class=&quot;btn btn-outline-inverse btn-lg&quot; onclick=&quot;ga('send', 'event', 'Jumbotron actions', 'Download', 'Download 3.3.5');&quot;&gt;Download Bootstrap&lt;/a&gt;
+    &lt;/p&gt;
+    &lt;p class=&quot;version&quot;&gt;Currently v3.3.5&lt;/p&gt;
+    &lt;div id=&quot;carbonads-container&quot;&gt;&lt;div class=&quot;carbonad&quot;&gt;&lt;div id=&quot;azcarbon&quot;&gt;&lt;/div&gt;&lt;script&gt;var z = document.createElement(&quot;script&quot;); z.async = true; z.src = &quot;http://engine.carbonads.com/z/32341/azcarbon_2_1_0_HORIZ&quot;; var s = document.getElementsByTagName(&quot;script&quot;)[0]; s.parentNode.insertBefore(z, s);&lt;/script&gt;&lt;/div&gt;&lt;/div&gt;
+
+  &lt;/div&gt;
+&lt;/main&gt;
+
+&lt;div class=&quot;bs-docs-featurette&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;h2 class=&quot;bs-docs-featurette-title&quot;&gt;Designed for everyone, everywhere.&lt;/h2&gt;
+    &lt;p class=&quot;lead&quot;&gt;Bootstrap makes front-end web development faster and easier. It's made for folks of all skill levels, devices of all shapes, and projects of all sizes.&lt;/p&gt;
+
+    &lt;hr class=&quot;half-rule&quot;&gt;
+
+    &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-sm-4&quot;&gt;
+        &lt;img src=&quot;assets/img/sass-less.png&quot; alt=&quot;Sass and Less support&quot; class=&quot;img-responsive&quot;&gt;
+        &lt;h3&gt;Preprocessors&lt;/h3&gt;
+        &lt;p&gt;Bootstrap ships with vanilla CSS, but its source code utilizes the two most popular CSS preprocessors, &lt;a href=&quot;../css/#less&quot;&gt;Less&lt;/a&gt; and &lt;a href=&quot;../css/#sass&quot;&gt;Sass&lt;/a&gt;. Quickly get started with precompiled CSS or build on the source.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-sm-4&quot;&gt;
+        &lt;img src=&quot;assets/img/devices.png&quot; alt=&quot;Responsive across devices&quot; class=&quot;img-responsive&quot;&gt;
+        &lt;h3&gt;One framework, every device.&lt;/h3&gt;
+        &lt;p&gt;Bootstrap easily and efficiently scales your websites and applications with a single code base, from phones to tablets to desktops with CSS media queries.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-sm-4&quot;&gt;
+        &lt;img src=&quot;assets/img/components.png&quot; alt=&quot;Components&quot; class=&quot;img-responsive&quot;&gt;
+        &lt;h3&gt;Full of features&lt;/h3&gt;
+        &lt;p&gt;With Bootstrap, you get extensive and beautiful documentation for common HTML elements, dozens of custom HTML and CSS components, and awesome jQuery plugins.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;hr class=&quot;half-rule&quot;&gt;
+
+    &lt;p class=&quot;lead&quot;&gt;Bootstrap is open source. It's hosted, developed, and maintained on GitHub.&lt;/p&gt;
+    &lt;a href=&quot;https://github.com/twbs/bootstrap&quot; class=&quot;btn btn-outline btn-lg&quot;&gt;View the GitHub project&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;bs-docs-featurette&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;h2 class=&quot;bs-docs-featurette-title&quot;&gt;Built with Bootstrap.&lt;/h2&gt;
+    &lt;p class=&quot;lead&quot;&gt;Millions of amazing sites across the web are being built with Bootstrap. Get started on your own with our growing &lt;a href=&quot;../getting-started/#examples&quot;&gt;collection of examples&lt;/a&gt; or by exploring some of our favorites.&lt;/p&gt;
+
+    &lt;hr class=&quot;half-rule&quot;&gt;
+
+    &lt;div class=&quot;row bs-docs-featured-sites&quot;&gt;
+
+      &lt;div class=&quot;col-xs-6 col-sm-3&quot;&gt;
+        &lt;a href=&quot;http://expo.getbootstrap.com/2014/10/29/lyft/&quot; target=&quot;_blank&quot; title=&quot;Lyft&quot;&gt;
+          &lt;img src=&quot;http://expo.getbootstrap.com/thumbs/lyft-thumb.jpg&quot; alt=&quot;Lyft&quot; class=&quot;img-responsive&quot;&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;col-xs-6 col-sm-3&quot;&gt;
+        &lt;a href=&quot;http://expo.getbootstrap.com/2014/09/30/vogue/&quot; target=&quot;_blank&quot; title=&quot;Vogue&quot;&gt;
+          &lt;img src=&quot;http://expo.getbootstrap.com/thumbs/vogue-thumb.jpg&quot; alt=&quot;Vogue&quot; class=&quot;img-responsive&quot;&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;col-xs-6 col-sm-3&quot;&gt;
+        &lt;a href=&quot;http://expo.getbootstrap.com/2014/03/13/riot-design/&quot; target=&quot;_blank&quot; title=&quot;Riot Design&quot;&gt;
+          &lt;img src=&quot;http://expo.getbootstrap.com/thumbs/riot-thumb.jpg&quot; alt=&quot;Riot Design&quot; class=&quot;img-responsive&quot;&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;col-xs-6 col-sm-3&quot;&gt;
+        &lt;a href=&quot;http://expo.getbootstrap.com/2014/02/12/newsweek/&quot; target=&quot;_blank&quot; title=&quot;Newsweek&quot;&gt;
+          &lt;img src=&quot;http://expo.getbootstrap.com/thumbs/newsweek-thumb.jpg&quot; alt=&quot;Newsweek&quot; class=&quot;img-responsive&quot;&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+
+    &lt;/div&gt;
+
+    &lt;hr class=&quot;half-rule&quot;&gt;
+
+    &lt;p class=&quot;lead&quot;&gt;We showcase dozens of inspiring projects built with Bootstrap on the Bootstrap Expo.&lt;/p&gt;
+    &lt;a href=&quot;http://expo.getbootstrap.com&quot; class=&quot;btn btn-outline btn-lg&quot;&gt;Explore the Expo&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+
+    &lt;!-- Footer
+================================================== --&gt;
+&lt;footer class=&quot;bs-docs-footer&quot; role=&quot;contentinfo&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;div class=&quot;bs-docs-social&quot;&gt;
+  &lt;ul class=&quot;bs-docs-social-buttons&quot;&gt;
+    &lt;li&gt;
+      &lt;iframe class=&quot;github-btn&quot; src=&quot;https://ghbtns.com/github-btn.html?user=twbs&amp;amp;repo=bootstrap&amp;amp;type=watch&amp;amp;count=true&quot; width=&quot;100&quot; height=&quot;20&quot; title=&quot;Star on GitHub&quot;&gt;&lt;/iframe&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;iframe class=&quot;github-btn&quot; src=&quot;https://ghbtns.com/github-btn.html?user=twbs&amp;amp;repo=bootstrap&amp;amp;type=fork&amp;amp;count=true&quot; width=&quot;102&quot; height=&quot;20&quot; title=&quot;Fork on GitHub&quot;&gt;&lt;/iframe&gt;
+    &lt;/li&gt;
+    &lt;li class=&quot;follow-btn&quot;&gt;
+      &lt;a href=&quot;https://twitter.com/getbootstrap&quot; class=&quot;twitter-follow-button&quot; data-link-color=&quot;#0069D6&quot; data-show-count=&quot;true&quot;&gt;Follow @getbootstrap&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li class=&quot;tweet-btn&quot;&gt;
+      &lt;a href=&quot;https://twitter.com/share&quot; class=&quot;twitter-share-button&quot; data-url=&quot;http://getbootstrap.com/&quot; data-count=&quot;horizontal&quot; data-via=&quot;getbootstrap&quot; data-related=&quot;mdo:Creator of Bootstrap&quot;&gt;Tweet&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+
+
+    &lt;p&gt;Designed and built with all the love in the world by &lt;a href=&quot;https://twitter.com/mdo&quot; target=&quot;_blank&quot;&gt;@mdo&lt;/a&gt; and &lt;a href=&quot;https://twitter.com/fat&quot; target=&quot;_blank&quot;&gt;@fat&lt;/a&gt;.&lt;/p&gt;
+    &lt;p&gt;Maintained by the &lt;a href=&quot;https://github.com/orgs/twbs/people&quot;&gt;core team&lt;/a&gt; with the help of &lt;a href=&quot;https://github.com/twbs/bootstrap/graphs/contributors&quot;&gt;our contributors&lt;/a&gt;.&lt;/p&gt;
+    &lt;p&gt;Code licensed under &lt;a rel=&quot;license&quot; href=&quot;https://github.com/twbs/bootstrap/blob/master/LICENSE&quot; target=&quot;_blank&quot;&gt;MIT&lt;/a&gt;, documentation under &lt;a rel=&quot;license&quot; href=&quot;https://creativecommons.org/licenses/by/3.0/&quot; target=&quot;_blank&quot;&gt;CC BY 3.0&lt;/a&gt;.&lt;/p&gt;
+    &lt;ul class=&quot;bs-docs-footer-links text-muted&quot;&gt;
+      &lt;li&gt;Currently v3.3.5&lt;/li&gt;
+      &lt;li&gt;&amp;middot;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;https://github.com/twbs/bootstrap&quot;&gt;GitHub&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&amp;middot;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;../getting-started/#examples&quot;&gt;Examples&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&amp;middot;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;../2.3.2/&quot;&gt;v2.3.2 docs&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&amp;middot;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;../about/&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&amp;middot;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;http://expo.getbootstrap.com&quot;&gt;Expo&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&amp;middot;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;http://blog.getbootstrap.com&quot;&gt;Blog&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&amp;middot;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;https://github.com/twbs/bootstrap/issues&quot;&gt;Issues&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&amp;middot;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;https://github.com/twbs/bootstrap/releases&quot;&gt;Releases&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/footer&gt;
+
+&lt;!-- Bootstrap core JavaScript
+================================================== --&gt;
+&lt;!-- Placed at the end of the document so the pages load faster --&gt;
+&lt;script src=&quot;https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js&quot;&gt;&lt;/script&gt;
+
+
+  &lt;script src=&quot;../dist/js/bootstrap.min.js&quot;&gt;&lt;/script&gt;
+
+
+
+  &lt;script src=&quot;../assets/js/docs.min.js&quot;&gt;&lt;/script&gt;
+
+
+
+
+&lt;!-- IE10 viewport hack for Surface/desktop Windows 8 bug --&gt;
+&lt;script src=&quot;../assets/js/ie10-viewport-bug-workaround.js&quot;&gt;&lt;/script&gt;
+
+
+&lt;script&gt;
+  window.twttr = (function (d,s,id) {
+    var t, js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return; js=d.createElement(s); js.id=id; js.async=1;
+    js.src=&quot;https://platform.twitter.com/widgets.js&quot;; fjs.parentNode.insertBefore(js, fjs);
+    return window.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
+  }(document, &quot;script&quot;, &quot;twitter-wjs&quot;));
+&lt;/script&gt;
+
+&lt;!-- Analytics
+================================================== --&gt;
+&lt;script&gt;
+  var _gauges = _gauges || [];
+  (function() {
+    var t   = document.createElement('script');
+    t.async = true;
+    t.id    = 'gauges-tracker';
+    t.setAttribute('data-site-id', '4f0dc9fef5a1f55508000013');
+    t.src = '//secure.gaug.es/track.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(t, s);
+  })();
+&lt;/script&gt;
+
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
