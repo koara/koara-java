@@ -319,14 +319,14 @@ public class Parser {
         }
         while (fencedCodeBlockHasInlineTokens()) {
             switch (getNextTokenKind()) {
+        	case CHAR_SEQUENCE:
+        		s.append(consumeToken(CHAR_SEQUENCE).image);
+        		break;
             case ASTERISK:
                 s.append(consumeToken(ASTERISK).image);
                 break;
             case BACKSLASH:
                 s.append(consumeToken(BACKSLASH).image);
-                break;
-            case CHAR_SEQUENCE:
-                s.append(consumeToken(CHAR_SEQUENCE).image);
                 break;
             case COLON:
                 s.append(consumeToken(COLON).image);
@@ -432,11 +432,11 @@ public class Parser {
         StringBuffer s = new StringBuffer();
         while (textHasTokensAhead()) {
             switch (getNextTokenKind()) {
+        	case CHAR_SEQUENCE:
+        		s.append(consumeToken(CHAR_SEQUENCE).image);
+        		break;
             case BACKSLASH:
                 s.append(consumeToken(BACKSLASH).image);
-                break;
-            case CHAR_SEQUENCE:
-                s.append(consumeToken(CHAR_SEQUENCE).image);
                 break;
             case COLON:
                 s.append(consumeToken(COLON).image);
@@ -627,14 +627,14 @@ public class Parser {
         StringBuffer s = new StringBuffer();
         do {
             switch (getNextTokenKind()) {
+        	case CHAR_SEQUENCE:
+        		s.append(consumeToken(CHAR_SEQUENCE).image);
+        		break;
             case ASTERISK:
                 s.append(consumeToken(ASTERISK).image);
                 break;
             case BACKSLASH:
                 s.append(consumeToken(BACKSLASH).image);
-                break;
-            case CHAR_SEQUENCE:
-                s.append(consumeToken(CHAR_SEQUENCE).image);
                 break;
             case COLON:
                 s.append(consumeToken(COLON).image);
@@ -740,6 +740,9 @@ public class Parser {
         StringBuilder s = new StringBuilder();
         do {
             switch (getNextTokenKind()) {
+        	case CHAR_SEQUENCE:
+        		s.append(consumeToken(CHAR_SEQUENCE).image);
+        		break;
             case ASTERISK:
                 s.append(consumeToken(ASTERISK).image);
                 break;
@@ -748,9 +751,6 @@ public class Parser {
                 break;
             case BACKTICK:
                 s.append(consumeToken(BACKTICK).image);
-                break;
-            case CHAR_SEQUENCE:
-                s.append(consumeToken(CHAR_SEQUENCE).image);
                 break;
             case COLON:
                 s.append(consumeToken(COLON).image);
@@ -833,14 +833,14 @@ public class Parser {
         StringBuilder s = new StringBuilder();
         do {
             switch (getNextTokenKind()) {
+        	case CHAR_SEQUENCE:
+        		s.append(consumeToken(CHAR_SEQUENCE).image);
+        		break;
             case BACKSLASH:
                 s.append(consumeToken(BACKSLASH).image);
                 break;
             case COLON:
                 s.append(consumeToken(COLON).image);
-                break;
-            case CHAR_SEQUENCE:
-                s.append(consumeToken(CHAR_SEQUENCE).image);
                 break;
             case DASH:
                 s.append(consumeToken(DASH).image);
@@ -903,6 +903,9 @@ public class Parser {
         StringBuilder s = new StringBuilder();
         while (resourceTextHasElementsAhead()) {
             switch (getNextTokenKind()) {
+        	case CHAR_SEQUENCE:
+        		s.append(consumeToken(CHAR_SEQUENCE).image);
+        		break;
             case ASTERISK:
                 s.append(consumeToken(ASTERISK).image);
                 break;
@@ -911,9 +914,6 @@ public class Parser {
                 break;
             case BACKTICK:
                 s.append(consumeToken(BACKTICK).image);
-                break;
-            case CHAR_SEQUENCE:
-                s.append(consumeToken(CHAR_SEQUENCE).image);
                 break;
             case COLON:
                 s.append(consumeToken(COLON).image);
@@ -1230,7 +1230,7 @@ public class Parser {
     private boolean blockAhead(int blockBeginColumn) {
         int quoteLevel;
 
-        if (getToken(1).kind == EOL) {
+        if (getNextTokenKind() == EOL) {
             Token t;
             int i = 2;
             quoteLevel = 0;
@@ -1258,7 +1258,7 @@ public class Parser {
     }
 
     private boolean multilineAhead(Integer token) {
-        if (getToken(1).kind == token && getToken(2).kind != token && getToken(2).kind != EOL) {
+        if (getNextTokenKind() == token && getToken(2).kind != token && getToken(2).kind != EOL) {
 
             for (int i = 2;; i++) {
                 Token t = getToken(i);
@@ -1288,7 +1288,7 @@ public class Parser {
     }
 
     private boolean fencesAhead() {
-        if (getToken(1).kind == EOL) {
+        if (getNextTokenKind() == EOL) {
             int i = skip(2, SPACE, TAB, GT);
             if (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK) {
                 i = skip(i + 3, SPACE, TAB);
@@ -1314,7 +1314,7 @@ public class Parser {
     }
 
     private boolean listItemAhead(int listBeginColumn, boolean ordered) {
-        if (getToken(1).kind == EOL) {
+        if (getNextTokenKind() == EOL) {
             for (int i = 2, eol = 1;; i++) {
                 Token t = getToken(i);
 
@@ -1332,7 +1332,7 @@ public class Parser {
     }
 
     private boolean textAhead() {
-        if (getToken(1).kind == EOL && getToken(2).kind != EOL) {
+        if (getNextTokenKind() == EOL && getToken(2).kind != EOL) {
             int i = skip(2, SPACE, TAB);
             int quoteLevel = newQuoteLevel(i);
             if (quoteLevel == currentQuoteLevel || !modules.contains(Module.BLOCKQUOTES)) {
@@ -1370,7 +1370,7 @@ public class Parser {
     private int skip(int offset, Integer... tokens) {
         for (int i = offset;; i++) {
             Token t = getToken(i);
-            if (t.kind == EOF || !Arrays.asList(tokens).contains(t.kind)) {
+            if (!Arrays.asList(tokens).contains(t.kind) || t.kind == EOF) {
                 return i;
             }
         }
@@ -2662,18 +2662,14 @@ public class Parser {
                                                                             if (scanToken(BACKTICK)) {
                                                                                 scanPosition = xsp;
                                                                                 lookingAhead = true;
-                                                                                semanticLookAhead = !nextAfterSpace(EOL,
-                                                                                        EOF);
+                                                                                semanticLookAhead = !nextAfterSpace(EOL, EOF);
                                                                                 lookingAhead = false;
-                                                                                if (!semanticLookAhead
-                                                                                        || scanWhitspaceToken()) {
+                                                                                if (!semanticLookAhead || scanWhitspaceToken()) {
                                                                                     scanPosition = xsp;
                                                                                     lookingAhead = true;
                                                                                     semanticLookAhead = !fencesAhead();
                                                                                     lookingAhead = false;
-                                                                                    return !semanticLookAhead
-                                                                                            || scanToken(EOL)
-                                                                                            || scanWhitspaceTokens();
+                                                                                    return !semanticLookAhead || scanToken(EOL) || scanWhitspaceTokens();
                                                                                 }
                                                                             }
                                                                         }
@@ -2719,17 +2715,17 @@ public class Parser {
         if (scanToken(EOL) || scanWhitspaceTokens()) {
             scanPosition = xsp;
         }
-        while (true) {
-            xsp = scanPosition;
-            if (scanFencedCodeBlockTokens()) {
-                scanPosition = xsp;
-                break;
-            }
-        }
-        xsp = scanPosition;
-        if (scanNoFencedCodeBlockAhead()) {
-            scanPosition = xsp;
-        }
+//        while (true) {
+//            xsp = scanPosition;
+//            if (scanFencedCodeBlockTokens()) {
+//                scanPosition = xsp;
+//                break;
+//            }
+//        }
+//        xsp = scanPosition;
+//        if (scanNoFencedCodeBlockAhead()) {
+//            scanPosition = xsp;
+//        }
         return false;
     }
 

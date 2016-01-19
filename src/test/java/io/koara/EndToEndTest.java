@@ -15,7 +15,7 @@ import static io.koara.Module.*;
 
 public class EndToEndTest {
 
-    private static final String TESTSUITE_FOLDER = "src/test/resources";
+    private static final String TEST_FOLDER = "src/test";
     private Parser parser;
 
     @Before
@@ -1299,8 +1299,8 @@ public class EndToEndTest {
     }
 
     private void assertOutput(String file, Module... modules) throws Exception {
-        File kd = new File(TESTSUITE_FOLDER + "/e2e/e2e.kd");
-        String html = readFile(TESTSUITE_FOLDER + "/e2e/" + file + ".htm");
+        File kd = new File(TEST_FOLDER + "/e2e/e2e.kd");
+        String html = readFile(TEST_FOLDER + "/e2e/" + file + ".htm");
 
         parser.setModules(modules);
         Document document = parser.parseFile(kd);

@@ -34,7 +34,7 @@ import io.koara.renderer.Html5Renderer;
 @RunWith(Parameterized.class)
 public class ComplianceTest {
 
-    private static final String TESTSUITE_FOLDER = "src/test/resources/spec";
+    private static final String TESTSUITE_FOLDER = "src/test/testsuite";
 
     private String module;
     private String testcase;
@@ -50,7 +50,7 @@ public class ComplianceTest {
         List<Object[]> modules = new ArrayList<Object[]>();
         for (File module : new File(TESTSUITE_FOLDER).listFiles()) {
             if (include.size() == 0 || include.contains(module.getName())) {
-            	for (File testcase : module.listFiles()) {
+            	for (File testcase : new File(module, "koara").listFiles()) {
                     if (testcase.getName().endsWith(".kd")) {
                         modules.add(new Object[] { module.getName(),
                                 testcase.getName().substring(0, testcase.getName().length() - 3) });
@@ -62,13 +62,12 @@ public class ComplianceTest {
     }
 
     @Test
-    public void output() throws Exception {
-        String html = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".htm");
-        String kd = readFile(TESTSUITE_FOLDER + "/" + module + "/" + testcase + ".kd");
+    public void testKoaraToHtml5() throws Exception {
+    	String kd = readFile(TESTSUITE_FOLDER + "/" + module + "/koara/" + testcase + ".kd");
+        String html = readFile(TESTSUITE_FOLDER + "/" + module + "/html5/" + testcase + ".htm");
 
         Parser parser = new Parser();
         Document document = parser.parse(kd);
-
         Html5Renderer renderer = new Html5Renderer();
         document.accept(renderer);
         assertEquals(html, renderer.getOutput());

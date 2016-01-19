@@ -24,7 +24,6 @@ public class Token {
 	protected int endColumn;
 	protected String image;
 	protected Token next;
-	protected Token specialToken;
 
 	public Token() {
 	}
