@@ -49,7 +49,7 @@ public class ComplianceTest {
     public static Iterable<Object[]> data() {
         List<Object[]> modules = new ArrayList<Object[]>();
         for (File module : new File(TESTSUITE_FOLDER).listFiles()) {
-            if (include.size() == 0 || include.contains(module.getName())) {
+            if (!module.getName().startsWith("_") && (include.size() == 0 || include.contains(module.getName()))) {
             	for (File testcase : new File(module, "koara").listFiles()) {
                     if (testcase.getName().endsWith(".kd")) {
                         modules.add(new Object[] { module.getName(),

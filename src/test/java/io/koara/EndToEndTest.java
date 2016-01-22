@@ -1299,8 +1299,8 @@ public class EndToEndTest {
     }
 
     private void assertOutput(String file, Module... modules) throws Exception {
-        File kd = new File(TEST_FOLDER + "/e2e/e2e.kd");
-        String html = readFile(TEST_FOLDER + "/e2e/" + file + ".htm");
+        File kd = new File(TEST_FOLDER + "/testsuite/_e2e/koara/e2e.kd");
+        String html = readFile(TEST_FOLDER + "/testsuite/_e2e/html5/" + file + ".htm");
 
         parser.setModules(modules);
         Document document = parser.parseFile(kd);
