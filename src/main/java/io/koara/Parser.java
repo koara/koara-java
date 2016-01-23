@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -317,7 +317,8 @@ public class Parser {
             consumeToken(EOL);
             levelWhiteSpace(beginColumn);
         }
-        while (fencedCodeBlockHasInlineTokens()) {
+        
+        while (getNextTokenKind() != EOF && (getNextTokenKind() != EOL || !fencesAhead())) {
             switch (getNextTokenKind()) {
         	case CHAR_SEQUENCE:
         		s.append(consumeToken(CHAR_SEQUENCE).image);
@@ -1518,16 +1519,6 @@ public class Parser {
         }
     }
 
-    private boolean fencedCodeBlockHasInlineTokens() {
-        lookAhead = 1;
-        lastPosition = scanPosition = token;
-        try {
-            return !scanFencedCodeBlockTokens();
-        } catch (LookaheadSuccess ls) {
-            return true;
-        }
-    }
-
     private boolean hasInlineTextAhead() {
         lookAhead = 1;
         lastPosition = scanPosition = token;
@@ -2608,90 +2599,6 @@ public class Parser {
         return false;
     }
 
-    private boolean scanNoFencedCodeBlockAhead() {
-        if (scanToken(EOL) || scanWhitspaceTokens() || scanToken(BACKTICK)) {
-            return true;
-        }
-        Token xsp;
-        while (true) {
-            xsp = scanPosition;
-            if (scanToken(BACKTICK)) {
-                scanPosition = xsp;
-                break;
-            }
-        }
-        return false;
-    }
-
-    private boolean scanFencedCodeBlockTokens() {
-        Token xsp = scanPosition;
-        if (scanToken(ASTERISK)) {
-            scanPosition = xsp;
-            if (scanToken(BACKSLASH)) {
-                scanPosition = xsp;
-                if (scanToken(CHAR_SEQUENCE)) {
-                    scanPosition = xsp;
-                    if (scanToken(COLON)) {
-                        scanPosition = xsp;
-                        if (scanToken(DASH)) {
-                            scanPosition = xsp;
-                            if (scanToken(DIGITS)) {
-                                scanPosition = xsp;
-                                if (scanToken(DOT)) {
-                                    scanPosition = xsp;
-                                    if (scanToken(EQ)) {
-                                        scanPosition = xsp;
-                                        if (scanToken(ESCAPED_CHAR)) {
-                                            scanPosition = xsp;
-                                            if (scanToken(IMAGE_LABEL)) {
-                                                scanPosition = xsp;
-                                                if (scanToken(LT)) {
-                                                    scanPosition = xsp;
-                                                    if (scanToken(GT)) {
-                                                        scanPosition = xsp;
-                                                        if (scanToken(LBRACK)) {
-                                                            scanPosition = xsp;
-                                                            if (scanToken(RBRACK)) {
-                                                                scanPosition = xsp;
-                                                                if (scanToken(LPAREN)) {
-                                                                    scanPosition = xsp;
-                                                                    if (scanToken(RPAREN)) {
-                                                                        scanPosition = xsp;
-                                                                        if (scanToken(UNDERSCORE)) {
-                                                                            scanPosition = xsp;
-                                                                            if (scanToken(BACKTICK)) {
-                                                                                scanPosition = xsp;
-                                                                                lookingAhead = true;
-                                                                                semanticLookAhead = !nextAfterSpace(EOL, EOF);
-                                                                                lookingAhead = false;
-                                                                                if (!semanticLookAhead || scanWhitspaceToken()) {
-                                                                                    scanPosition = xsp;
-                                                                                    lookingAhead = true;
-                                                                                    semanticLookAhead = !fencesAhead();
-                                                                                    lookingAhead = false;
-                                                                                    return !semanticLookAhead || scanToken(EOL) || scanWhitspaceTokens();
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     private boolean scanFencedCodeBlock() {
         if (scanToken(BACKTICK) || scanToken(BACKTICK) || scanToken(BACKTICK)) {
             return true;
@@ -2715,17 +2622,6 @@ public class Parser {
         if (scanToken(EOL) || scanWhitspaceTokens()) {
             scanPosition = xsp;
         }
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanFencedCodeBlockTokens()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        xsp = scanPosition;
-//        if (scanNoFencedCodeBlockAhead()) {
-//            scanPosition = xsp;
-//        }
         return false;
     }
 
