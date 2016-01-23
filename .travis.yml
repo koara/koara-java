@@ -7,4 +7,4 @@ jdk:
   - oraclejdk8
 
 after_success:
-- gradle cobertura coveralls
+  - if [ "$TRAVIS_JAVA_VERSION" != "oraclejdk8" ]; then gradle cobertura coveralls
