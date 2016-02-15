@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>A blank line is not necassary:</text>
+  </paragraph>
+  <codeblock language="javascript">
+function greeting() {
+  console.log(&quot;Hello World&quot;);
+}  </codeblock>
+</document>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>a</text>
+      </paragraph>
+    </listitem>
+  </list>
+  <list ordered="true">
+    <listitem number="1">
+      <paragraph>
+        <text>b</text>
+      </paragraph>
+    </listitem>
+  </list>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>c</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

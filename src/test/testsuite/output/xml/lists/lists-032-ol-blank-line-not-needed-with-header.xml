@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <heading level="1">
+    <text>one</text>
+  </heading>
+  <list ordered="true">
+    <listitem number="1">
+      <paragraph>
+        <text>two</text>
+      </paragraph>
+    </listitem>
+  </list>
+  <heading level="1">
+    <text>three</text>
+  </heading>
+</document>

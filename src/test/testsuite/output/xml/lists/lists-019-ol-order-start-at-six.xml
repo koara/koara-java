@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Add value to start at another numbering</text>
+  </paragraph>
+  <list ordered="true">
+    <listitem number="6">
+      <paragraph>
+        <text>six</text>
+      </paragraph>
+    </listitem>
+    <listitem number="7">
+      <paragraph>
+        <text>seven</text>
+      </paragraph>
+    </listitem>
+    <listitem number="8">
+      <paragraph>
+        <text>eight</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

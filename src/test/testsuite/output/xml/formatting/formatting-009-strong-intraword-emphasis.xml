@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Intra</text>
+    <strong>
+      <text>word</text>
+    </strong>
+    <text>emphasis is allowed</text>
+  </paragraph>
+</document>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Special tokens in url: </text>
+    <image url="=*%60:,.%3C-%3E()%5B%5D_0%5Cimage:--%3E">
+      <text>text</text>
+    </image>
+  </paragraph>
+</document>

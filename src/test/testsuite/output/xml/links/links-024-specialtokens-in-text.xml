@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Special tokens in text: </text>
+    <link url="http://www.cnn.com">
+      <text>=</text>
+      <text>*</text>
+      <text>`</text>
+      <text>:,.&lt;-&gt;()[]</text>
+      <text>_</text>
+      <text>0\image:--&gt;</text>
+    </link>
+  </paragraph>
+</document>

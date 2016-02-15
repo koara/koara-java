@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>*</text>
+    <strong>
+      <text>foo</text>
+    </strong>
+    <text>*</text>
+  </paragraph>
+</document>

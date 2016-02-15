@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Blank lines around</text>
+  </paragraph>
+  <heading level="6">
+    <text>headings</text>
+  </heading>
+  <paragraph>
+    <text>are not required.</text>
+  </paragraph>
+</document>

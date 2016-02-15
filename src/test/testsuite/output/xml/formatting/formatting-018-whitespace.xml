@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Space </text>
+    <strong>
+      <text>         is   </text>
+    </strong>
+    <text> not </text>
+    <em>
+      <text>    trimmed </text>
+    </em>
+  </paragraph>
+</document>

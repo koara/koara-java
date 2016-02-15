@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <paragraph>
+        <text>one</text>
+      </paragraph>
+  </blockquote>
+  <heading level="1">
+    <text>two</text>
+  </heading>
+</document>

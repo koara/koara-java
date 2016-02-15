@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <codeblock language="hs">
+module Main where
+
+-- Import statements: necessary to use functions from modules like Data.Char
+-- (for toUpper) and System.Random (for randomRIO).
+
+import Data.Char
+import System.IO
+import System.Random
+
+
+-- Declaring a constant, `nLives`.
+
+defaultNLives :: Int
+defaultNLives = 4
+
+
+-- Defining a function, `oneThirdRoundingUp`, that will be used later on.
+
+oneThirdRoundingUp :: Int -&gt; Int
+oneThirdRoundingUp n = (n + 2) `quot` 3
+
+
+-- Defining an *action*. &quot;IO&quot; means that the action is capable of stateful
+-- effects. An `IO a` is an action that returns a value of type `a`.
+
+rollD6 :: IO Int
+rollD6 = randomRIO (1, 6)
+
+
+-- Exercise #1: why is rolling a die stateful? Why does it have the
+-- type signature `IO Int`?
+
+-- Exercise #2: what other conceivable type signatures could &quot;roll a 6-sided
+-- die&quot; have?
+
+
+-- Defining a datatype, `RollResult`.
+
+data RollResult = SnakeEyes | OneRolled | Doubles Int | Normal Int Int
+                deriving (Eq, Show)
+
+-- This is an *algebraic data type*. It's a tagged union that might be:
+--   * the constant, `SnakeEyes`
+--   * the constant, `OneRolled`
+--   * a `Doubles` with an associated `Int`
+--   * a `Normal` with two associated `Int`s (like an ordered pair).
+
+
+-- Defining a function.
+
+rollResult :: [Int] -&gt; RollResult
+rollResult dice =
+  case dice of
+   [die1, die2] -&gt; if die1 == 1 || die2 == 1
+                   then if die1 == die2 then SnakeEyes else OneRolled
+                   else if die1 == die2 then Doubles die1 else Normal die1 die2
+   _            -&gt; error &quot;rollResult expects two dice&quot;
+
+
+scoreResult :: RollResult -&gt; Int
+scoreResult rr = case rr of
+  SnakeEyes    -&gt; 0
+  OneRolled    -&gt; 0
+  Normal d1 d2 -&gt; d1 + d2
+  Doubles d    -&gt; 4 * d
+
+lifeLoss :: RollResult -&gt; Int
+lifeLoss rr = case rr of
+  SnakeEyes    -&gt; 2
+  OneRolled    -&gt; 1
+  Normal _ _   -&gt; 0
+  Doubles _    -&gt; 0
+
+endsRound :: RollResult -&gt; Bool
+endsRound rr = (lifeLoss rr) /= 0
+
+
+-- Combining actions with `do` notation.
+
+-- In English, &quot;perform `rollD6` and call its return value `x1`, then perform
+-- `rollD6` (again) and call its return value `x2`, then return `[x1, x2]`&quot;.
+
+-- This will be covered more formally in Lecture #3.
+
+roll2d6 :: IO [Int]
+roll2d6 = do
+  x1 &lt;- rollD6
+  x2 &lt;- rollD6
+  return [x1, x2]
+
+
+-- Another function. A return of `Nothing` represents failure while a return of
+-- `Just b` means a successful parse of `Bool` `b`.
+
+-- If you're not familiar with `Maybe`, it's a *parameterized* union type.
+--     `data Maybe a = Nothing | Just a`
+-- Typically `Nothing` represents null, an  &quot;n/a&quot; value, or failure. Unlike Java's
+-- null, however, it's type-safe.
+
+readYN :: String -&gt; Maybe Bool
+readYN &quot;&quot; = Nothing
+readYN str =
+  case head (map toUpper str) of
+    'Y' -&gt; Just True
+    'N' -&gt; Just False
+    _   -&gt; Nothing
+
+-- Exercise #3: What do `head` and `map` do?
+-- Hint #1: Hoogle is your friend.
+-- Hint #2: in Haskell, `String` is a synonym for `[Char]`.
+
+
+flush :: IO ()
+flush = hFlush stdout
+
+-- A simple action to get human yes/no input.
+-- Note the recursion on user error.
+humanYN :: String -&gt; IO Bool
+humanYN prompt = do
+  putStr prompt
+  flush
+  input &lt;- getLine
+  case readYN input of
+    Just b -&gt; return b
+    Nothing -&gt; do
+      putStrLn &quot;Bad input! I only understand Y/N.&quot;
+      humanYN prompt
+
+-- This asks the user for input but ignores it.
+humanNoChoice :: String -&gt; IO Bool
+humanNoChoice prompt = do
+  putStr prompt
+  flush
+  input &lt;- getLine
+  case readYN input of
+   Just False -&gt; do
+     putStrLn &quot;Well you're doing it anyway.&quot;  -- &quot;But thou must!&quot;
+     return True
+   _ -&gt; return True
+
+
+-- `blankLine` is an action that prints an empty line to the console. It does IO
+-- but has nothing to return, so it returns `()`, pronounced &quot;unit&quot;.
+blankLine :: IO ()
+blankLine = putStrLn &quot;&quot;
+
+-- A simple product type with record syntax.
+data RoundResult = RoundResult {pointsScored :: Int,
+                                livesLost    :: Int} deriving Show
+
+
+-- `playARound` is the workhorse method. It plays a round of Dodgy Dice.
+
+-- Aside #1: You'll often see the infix operator `$`. This is the function
+-- application operator, with the following type signature:
+
+--   `($) :: (a -&gt; b) -&gt; a -&gt; b`
+
+-- Its purpose is explained in the Course Slides (Lab #1).
+
+playARound :: Int -&gt; IO RoundResult
+playARound roundNum = loop 0 1
+  where loop score rollNum = do
+          cont &lt;- if rollNum &gt; oneThirdRoundingUp roundNum
+                  then humanYN &quot;Roll again (y/n)? &quot;
+                  else humanNoChoice &quot;Forced roll: &quot;
+          if cont
+            then do
+              dice &lt;- roll2d6
+              let result = rollResult dice
+              putStrLn $ &quot;You rolled: &quot; ++ show dice ++ &quot; (&quot; ++ show (scoreResult result) ++ &quot; pts.)&quot;
+              if endsRound result
+                then return $ RoundResult {pointsScored = 0, livesLost = (lifeLoss result)}
+                else do
+                  let newScore = score + (scoreResult result)
+                  putStrLn (&quot;Score for this round: &quot; ++ (show newScore)) &gt;&gt; blankLine
+                  loop newScore (rollNum + 1)
+            else return $ RoundResult {pointsScored = score,
+                                       livesLost    = 0}
+
+
+endGame :: Int -&gt; IO ()
+endGame finalScore = do
+  blankLine
+  blankLine
+  putStrLn $ &quot;GAME OVER: Your final score is &quot; ++ (show finalScore)
+
+playAGame :: Int -&gt; IO ()
+playAGame nLives = do
+  putStrLn &quot;Welcome to Dodgy Dice!&quot;
+  loop nLives 0 1
+    where loop lives score roundNum =
+            if lives &lt;= 0
+            then endGame score
+            else do
+              blankLine &gt;&gt; (putStrLn $ &quot;Round #&quot; ++ (show roundNum)) &gt;&gt; blankLine
+              printStatus lives score
+              RoundResult ptsScored lvsLost &lt;- playARound roundNum
+              if lvsLost &gt; 0
+                then putStrLn (&quot;You lost &quot; ++ (show lvsLost) ++ &quot; lives.&quot;)
+                     &gt;&gt; loop (lives - lvsLost) score (roundNum + 1)
+                else putStrLn (&quot;You scored &quot; ++ (show ptsScored) ++ &quot; points.&quot;)
+                     &gt;&gt; loop lives (score + ptsScored) (roundNum + 1)
+          printStatus lives score =
+            putStrLn $ &quot;Lives left: &quot; ++ (show lives) ++ &quot; Score: &quot; ++ (show score)
+
+-- Exercise #4: Explain what's happening with this line, above:
+--   (RoundResult ptsScored lvsLost &lt;- playARound roundNum)
+
+-- How would that language construct fail? Why is that not an issue in our
+-- particular case? When that does fail, what happens?
+
+
+-- Exercise #5: Currently, when you lose a life on rolling a 1, you see this at
+-- the console:
+
+--    &quot;You lost 1 lives.&quot;
+
+-- How would you change the code so that it says &quot;You lost 1 life.&quot;?
+
+
+-- Exercise #6: Define factorial at ghci like so.
+
+-- ghci&gt; let factorial :: Int -&gt; Int; factorial n = foldl (*) 1 [1..n]
+
+-- Explain why this formulation presents a type error:
+
+-- ghci&gt; factorial factorial 3
+
+-- Fix it in two ways, one using parentheses and one using the `$` operator.
+
+
+-- A Haskell executable, when run, executes an action called `main` with type
+-- `IO ()`.
+
+main :: IO ()
+main = playAGame defaultNLives  </codeblock>
+</document>

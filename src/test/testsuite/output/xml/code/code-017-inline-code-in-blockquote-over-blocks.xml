@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <paragraph>
+        <text>This block does not contain </text>
+        <text>`</text>
+        <text>code</text>
+      </paragraph>
+      <paragraph>
+        <text>over multiple blocks</text>
+        <text>`</text>
+      </paragraph>
+  </blockquote>
+</document>

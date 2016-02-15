@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Stay in the same</text>
+    <linebreak />
+    <text>= paragraph</text>
+    <linebreak />
+    <text>when heading is escaped</text>
+  </paragraph>
+</document>

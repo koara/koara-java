@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <code>
+          <text>Inline code in lists</text>
+          <linebreak />
+          <text>can be multiline</text>
+        </code>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

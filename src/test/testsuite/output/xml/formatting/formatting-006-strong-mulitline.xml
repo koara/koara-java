@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>You can format </text>
+    <strong>
+      <text>more than</text>
+      <linebreak />
+      <text>one line</text>
+    </strong>
+  </paragraph>
+</document>

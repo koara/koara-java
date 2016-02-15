@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <codeblock language="r">
+Kernel &lt;- setRefClass(&quot;Kernel&quot;,
+                fields = c(&quot;connection_info&quot;, &quot;zmqctx&quot;, &quot;sockets&quot;, &quot;executor&quot;),
+                methods= list(
+
+hb_reply = function() {
+    data &lt;- receive.socket(sockets$hb, unserialize = FALSE)
+    send.socket(sockets$hb, data, serialize = FALSE)
+},
+
+#'&lt;brief desc&gt;
+#'
+#'&lt;full description&gt;
+#' @param msg_lst &lt;what param does&gt;
+#' @export
+sign_msg = function(msg_lst) {
+    concat &lt;- unlist(msg_lst)
+    return(hmac(connection_info$key, concat, &quot;sha256&quot;))
+},
+#'&lt;brief desc&gt;
+#'
+#'&lt;full description&gt;
+#' @param parts &lt;what param does&gt;
+#' @import rjson
+#' @export
+wire_to_msg = function(parts) {
+    i &lt;- 1
+    #print(parts)
+    while (!identical(parts[[i]], charToRaw(&quot;&lt;IDS|MSG&gt;&quot;))) {
+        i &lt;- i + 1
+    }
+    if (!identical(connection_info$key, &quot;&quot;)) {
+        signature &lt;- rawToChar(parts[[i + 1]])
+        expected_signature &lt;- sign_msg(parts[(i + 2):(i + 5)])
+        stopifnot(identical(signature, expected_signature))
+    }
+    header &lt;- fromJSON(rawToChar(parts[[i + 2]]))
+    parent_header &lt;- fromJSON(rawToChar(parts[[i + 3]]))
+    metadata &lt;- fromJSON(rawToChar(parts[[i + 4]]))
+    content &lt;- fromJSON(rawToChar(parts[[i + 5]]))
+    if (i &gt; 1) {
+        identities &lt;- parts[1:(i - 1)]
+    } else {
+        identities &lt;- NULL
+    }
+    return(list(header = header, parent_header = parent_header, metadata = metadata,
+        content = content, identities = identities))
+},
+#'&lt;brief desc&gt;
+#'
+#'&lt;full description&gt;
+#' @param msg &lt;what param does&gt;
+#' @export
+msg_to_wire = function(msg) {
+    #print(msg)
+    bodyparts &lt;- list(charToRaw(toJSON(msg$header, auto_unbox=TRUE)),
+                      charToRaw(toJSON(msg$parent_header, auto_unbox=TRUE)),
+                      charToRaw(toJSON(msg$metadata, auto_unbox=TRUE)),
+                      charToRaw(toJSON(msg$content, auto_unbox=TRUE))
+                     )
+    signature &lt;- sign_msg(bodyparts)
+    return(c(msg$identities, list(charToRaw(&quot;&lt;IDS|MSG&gt;&quot;)), list(charToRaw(signature)), bodyparts))
+},
+#'&lt;brief desc&gt;
+#'
+#'&lt;full description&gt;
+#' @param msg_type &lt;what param does&gt;
+#' @param  parent_msg &lt;what param does&gt;
+#' @export
+new_reply = function(msg_type, parent_msg) {
+    header &lt;- list(msg_id = UUIDgenerate(), username = parent_msg$header$username,
+        session = parent_msg$header$session, msg_type = msg_type, version='5.0')
+    return(list(header = header, parent_header = parent_msg$header, identities = parent_msg$identities,
+        metadata = namedlist()  # Ensure this is {} in JSON, not []
+        ))
+},
+#'&lt;brief desc&gt;
+#'
+#'&lt;full description&gt;
+#' @param msg_type &lt;what param does&gt;
+#' @param  parent_msg &lt;what param does&gt;
+#' @param  socket &lt;what param does&gt;
+#' @param  content &lt;what param does&gt;
+#' @export
+send_response = function(msg_type, parent_msg, socket_name, content) {
+    msg &lt;- new_reply(msg_type, parent_msg)
+    msg$content &lt;- content
+    socket &lt;- sockets[socket_name][[1]]
+    send.multipart(socket, msg_to_wire(msg))
+},
+#'&lt;brief desc&gt;
+#'
+#'&lt;full description&gt;
+#' @param  &lt;what param does&gt;
+#' @export
+handle_shell = function() {
+    parts &lt;- receive.multipart(sockets$shell)
+    msg &lt;- wire_to_msg(parts)
+    if (msg$header$msg_type == &quot;execute_request&quot;) {
+        executor$execute(msg)
+    } else if (msg$header$msg_type == &quot;kernel_info_request&quot;) {
+        kernel_info(msg)
+    } else if (msg$header$msg_type == &quot;history_request&quot;) {
+        history(msg)
+    } else if (msg$header$msg_type == &quot;complete_request&quot;) {
+        complete(msg)
+    } else if (msg$header$msg_type == &quot;is_complete_request&quot;) {
+        is_complete(msg)
+    } else {
+        print(c(&quot;Got unhandled msg_type:&quot;, msg$header$msg_type))
+    }
+},
+#'Checks whether the code in the rest is complete
+#'
+#' @param  request the is_complete request
+#' @export
+is_complete = function(request) {
+    code &lt;- request$content$code
+    message &lt;- tryCatch({
+        parse_all(code)
+        # the code compiles, so we are complete (either no code at all / only
+        # comments or syntactically correct code)
+        &quot;complete&quot; # no function, so no return!
+    }, error = function(e)e$message)
+    # One of 'complete', 'incomplete', 'invalid', 'unknown'
+    status &lt;- if(message == &quot;complete&quot;){
+        # syntactical complete code
+        &quot;complete&quot;
+    } else if (grepl(&quot;unexpected end of input&quot;, message)){
+        # missing closing parenthesis
+        &quot;incomplete&quot;
+    } else if (grepl(&quot;unexpected INCOMPLETE_STRING&quot;, message)){
+        # missing closing quotes
+        &quot;incomplete&quot;
+    } else {
+        # all else
+        &quot;invalid&quot;
+    }
+    content &lt;- list(status = status)
+    if (status == &quot;incomplete&quot;){
+        # we don't try to guess the indention level and just return zero indention
+        # That's fine because R has braces... :-)
+        # TODO: do some guessing?
+        content &lt;- c(content, indent = &quot;&quot;)
+    }
+    send_response('is_complete_reply', request, 'shell', content)
+},
+
+complete = function(request) {
+    # 5.0 protocol:
+    code &lt;- request$content$code
+    cursor_pos &lt;- request$content$cursor_pos
+
+    # Find which line we're on and position within that line
+    lines &lt;- strsplit(code, '\n', fixed=T)[[1]]
+    chars_before_line = 0
+    for (line in lines) {
+        new_cursor_pos &lt;- cursor_pos - (nchar(line) + 1) # +1 for the newline
+        if (new_cursor_pos &lt; 0) {
+            break
+        }
+        cursor_pos &lt;- new_cursor_pos
+        chars_before_line &lt;- chars_before_line + (nchar(line) + 1)
+    }
+
+    utils:::.assignLinebuffer(line)
+    utils:::.assignEnd(cursor_pos)
+    utils:::.guessTokenFromLine()
+    utils:::.completeToken()
+
+    # .guessTokenFromLine, like most other functions here usually sets variables in .CompletionEnv.
+    # When specifying update = FALSE, it instead returns a list(token = ..., start = ...)
+    c.info &lt;- c(list(comps = utils:::.retrieveCompletions()),
+                utils:::.guessTokenFromLine(update = FALSE))
+
+    # good coding style for completions
+    comps &lt;- gsub('=$', ' = ', c.info$comps)
+
+    start_position = chars_before_line + c.info$start
+    send_response('complete_reply', request, 'shell', list(
+        matches = as.list(comps),  # make single strings not explode into letters
+        metadata = namedlist(),
+        status = 'ok',
+        cursor_start = start_position,
+        cursor_end = start_position + nchar(c.info$token)
+    ))
+},
+
+history = function(request) {
+  send_response(&quot;history_reply&quot;, request, 'shell', list(history=list()))
+},
+
+kernel_info = function(request) {
+  rversion = paste(version$major, '.', version$minor, sep=&quot;&quot;)
+  send_response(&quot;kernel_info_reply&quot;, request, 'shell',
+                list(protocol_version='5.0', implementation='IRkernel',
+                     implementation_version='0.2',
+                     language_info=list(name=&quot;R&quot;, codemirror_mode=&quot;r&quot;,
+                        pygments_lexer=&quot;r&quot;, mimetype=&quot;text/x-r-source&quot;,
+                        file_extension=&quot;.r&quot;, version=rversion
+                     ),
+                     banner=version$version.string
+                    )
+                )
+},
+
+handle_control = function() {
+  parts = receive.multipart(sockets$control)
+  msg = wire_to_msg(parts)
+  if (msg$header$msg_type == &quot;shutdown_request&quot;) {
+    shutdown(msg)
+  } else {
+    print(c(&quot;Unhandled control message, msg_type:&quot;, msg$header$msg_type))
+  }
+},
+
+shutdown = function(request) {
+  send_response('shutdown_reply', request, 'control',
+                list(restart=request$content$restart))
+  quit('no')
+},
+
+initialize = function(connection_file) {
+    connection_info &lt;&lt;- fromJSON(connection_file)
+    url &lt;- paste(connection_info$transport, &quot;://&quot;, connection_info$ip, sep = &quot;&quot;)
+    url_with_port &lt;- function(port_name) {
+        return(paste(url, &quot;:&quot;, connection_info[port_name], sep = &quot;&quot;))
+    }
+
+    # ZMQ Socket setup
+    zmqctx &lt;&lt;- init.context()
+    sockets &lt;&lt;- list(
+        hb = init.socket(zmqctx, &quot;ZMQ_REP&quot;),
+        iopub = init.socket(zmqctx, &quot;ZMQ_PUB&quot;),
+        control = init.socket(zmqctx, &quot;ZMQ_ROUTER&quot;),
+        stdin = init.socket(zmqctx, &quot;ZMQ_ROUTER&quot;),
+        shell = init.socket(zmqctx, &quot;ZMQ_ROUTER&quot;)
+    )
+    bind.socket(sockets$hb, url_with_port(&quot;hb_port&quot;))
+    bind.socket(sockets$iopub, url_with_port(&quot;iopub_port&quot;))
+    bind.socket(sockets$control, url_with_port(&quot;control_port&quot;))
+    bind.socket(sockets$stdin, url_with_port(&quot;stdin_port&quot;))
+    bind.socket(sockets$shell, url_with_port(&quot;shell_port&quot;))
+
+    executor &lt;&lt;- Executor$new(kernel=.self)
+},
+
+run = function() {
+    while (1) {
+        events &lt;- poll.socket(list(sockets$hb, sockets$shell, sockets$control),
+                              list(&quot;read&quot;, &quot;read&quot;, &quot;read&quot;), timeout = -1L)
+        if (events[[1]]$read) {
+            # heartbeat
+            hb_reply()
+        }
+        if (events[[2]]$read) {
+            # Shell socket
+            handle_shell()
+        }
+
+        if (events[[3]]$read) {  # Control socket
+            handle_control()
+        }
+    }
+})
+)
+
+#'Initialise and run the kernel
+#'
+#'@param connection_file The path to the IPython connection file, written by the frontend
+#'@export
+main &lt;- function(connection_file=&quot;&quot;) {
+    if (connection_file == &quot;&quot;) {
+        # On Windows, passing the connection file in as a string literal fails,
+        # because the \U in C:\Users looks like a unicode escape. So, we have to
+        # pass it as a separate command line argument.
+        connection_file = commandArgs(T)[1]
+    }
+    kernel &lt;- Kernel$new(connection_file=connection_file)
+    kernel$run()
+}
+
+#'Install the kernelspec to tell IPython (&gt;= 3) about IRkernel
+#'
+#'@param user Install into user directory ~/.ipython or globally?
+#'@export
+installspec &lt;- function(user=T) {
+    srcdir = system.file(&quot;kernelspec&quot;, package=&quot;IRkernel&quot;)
+    srcdir = paste(&quot;\&quot;&quot;,srcdir,&quot;\&quot;&quot;,sep=&quot;&quot;)
+    user_flag=ifelse(user, &quot;--user&quot;, &quot;&quot;)
+    cmd = paste(&quot;ipython kernelspec install --replace --name ir&quot;, user_flag,srcdir, sep=&quot; &quot;)
+    system(cmd, wait=TRUE)
+}  </codeblock>
+</document>

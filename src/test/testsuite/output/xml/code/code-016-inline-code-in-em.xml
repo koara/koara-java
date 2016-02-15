@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>This </text>
+    <em>
+      <text>text also </text>
+      <code>
+        <text>contains</text>
+      </code>
+      <text> code</text>
+    </em>
+  </paragraph>
+</document>

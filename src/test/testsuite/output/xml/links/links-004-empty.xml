@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Empty links </text>
+    <text>[</text>
+    <text>] and </text>
+    <text>[</text>
+    <text>]() are not allowed.</text>
+  </paragraph>
+</document>

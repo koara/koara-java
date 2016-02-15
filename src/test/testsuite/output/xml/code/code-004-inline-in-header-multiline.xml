@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <heading level="1">
+    <text>`</text>
+    <text>Inline code on</text>
+  </heading>
+  <paragraph>
+    <text>multiple lines does not work</text>
+    <text>`</text>
+  </paragraph>
+</document>

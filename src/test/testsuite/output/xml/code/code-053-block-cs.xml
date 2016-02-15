@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <codeblock language="cs">
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using JetBrains.Annotations;
+
+namespace Microsoft.Data.Entity.Internal
+{
+    [DebuggerStepThrough]
+    public static class EnumerableExtensions
+    {
+        public static IOrderedEnumerable&lt;TSource&gt; OrderByOrdinal&lt;TSource&gt;(
+            [NotNull] this IEnumerable&lt;TSource&gt; source,
+            [NotNull] Func&lt;TSource, string&gt; keySelector)
+            =&gt; source.OrderBy(keySelector, StringComparer.Ordinal);
+
+        public static IEnumerable&lt;T&gt; Distinct&lt;T&gt;(
+            [NotNull] this IEnumerable&lt;T&gt; source,
+            [NotNull] Func&lt;T, T, bool&gt; comparer)
+            where T : class
+            =&gt; source.Distinct(new DynamicEqualityComparer&lt;T&gt;(comparer));
+
+        private sealed class DynamicEqualityComparer&lt;T&gt; : IEqualityComparer&lt;T&gt;
+            where T : class
+        {
+            private readonly Func&lt;T, T, bool&gt; _func;
+
+            public DynamicEqualityComparer(Func&lt;T, T, bool&gt; func)
+            {
+                _func = func;
+            }
+
+            public bool Equals(T x, T y) =&gt; _func(x, y);
+
+            public int GetHashCode(T obj) =&gt; 0;
+        }
+
+        public static string Join(
+            [NotNull] this IEnumerable&lt;object&gt; source,
+            [NotNull] string separator = &quot;, &quot;)
+            =&gt; string.Join(separator, source);
+
+        public static bool StructuralSequenceEqual&lt;TSource&gt;(
+            [NotNull] this IEnumerable&lt;TSource&gt; first,
+            [NotNull] IEnumerable&lt;TSource&gt; second)
+        {
+            if (ReferenceEquals(first, second))
+            {
+                return true;
+            }
+
+            var firstEnumerator = first.GetEnumerator();
+            var secondEnumerator = second.GetEnumerator();
+
+            while (firstEnumerator.MoveNext())
+            {
+                if (!secondEnumerator.MoveNext()
+                    || !StructuralComparisons.StructuralEqualityComparer
+                        .Equals(firstEnumerator.Current, secondEnumerator.Current))
+                {
+                    return false;
+                }
+            }
+
+            return !secondEnumerator.MoveNext();
+        }
+
+        public static IEnumerable&lt;TSource&gt; Finally&lt;TSource&gt;(
+            [NotNull] this IEnumerable&lt;TSource&gt; source, [NotNull] Action finallyAction)
+        {
+            try
+            {
+                foreach (var item in source)
+                {
+                    yield return item;
+                }
+            }
+            finally
+            {
+                finallyAction();
+            }
+        }
+    }
+}  </codeblock>
+</document>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>You can format </text>
+    <em>
+      <text>more than one word</text>
+    </em>
+  </paragraph>
+</document>

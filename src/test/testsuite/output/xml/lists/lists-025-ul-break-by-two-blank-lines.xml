@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Unordered lists can be broken into to lists by using 2 blank lines:</text>
+  </paragraph>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>Item 1</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item 2</text>
+      </paragraph>
+    </listitem>
+  </list>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>Item 1</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item 2</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

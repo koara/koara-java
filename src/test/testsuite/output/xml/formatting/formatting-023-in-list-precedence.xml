@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>If you try to </text>
+        <text>*</text>
+        <text>format over</text>
+      </paragraph>
+    </listitem>
+  </list>
+  <paragraph>
+    <text>several lines</text>
+    <text>*</text>
+    <text>, block items always win.</text>
+  </paragraph>
+</document>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <paragraph>
+        <text>This block contains </text>
+        <code>
+          <text>code</text>
+          <linebreak />
+          <text>over multiple lines</text>
+        </code>
+      </paragraph>
+  </blockquote>
+</document>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <image url="http://also.not.in/*url*">
+      <text>*</text>
+      <text>this does not works</text>
+      <text>*</text>
+    </image>
+  </paragraph>
+</document>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <image url="">
+      <text>Text will stop at </text>
+      <text>[</text>
+      <text>image:the</text>
+    </image>
+    <image url="">
+      <text>first</text>
+    </image>
+    <text> closing bracket]</text>
+  </paragraph>
+</document>

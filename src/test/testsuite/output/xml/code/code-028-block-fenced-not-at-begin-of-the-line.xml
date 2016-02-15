@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Fenced code blocks </text>
+    <text>`</text>
+    <text>`</text>
+    <text>`</text>
+    <linebreak />
+    <text>should always begin at a line</text>
+  </paragraph>
+  <codeblock />
+</document>

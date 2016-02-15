@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <list ordered="true">
+        <listitem number="1">
+          <blockquote>
+              <paragraph>
+                <text>Blockquote</text>
+              </paragraph>
+          </blockquote>
+        </listitem>
+      </list>
+  </blockquote>
+</document>

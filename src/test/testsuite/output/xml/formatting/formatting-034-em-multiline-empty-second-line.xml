@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>_</text>
+    <text>foo bar</text>
+    <linebreak />
+    <text>_</text>
+  </paragraph>
+</document>

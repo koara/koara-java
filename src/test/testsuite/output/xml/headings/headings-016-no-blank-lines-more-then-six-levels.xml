@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Blank lines around</text>
+    <linebreak />
+    <text>======= headings</text>
+    <linebreak />
+    <text>are not required.</text>
+  </paragraph>
+</document>

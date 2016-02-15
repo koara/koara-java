@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <link url="/url">
+      <text>backticks (</text>
+      <code>
+        <text>)](/url) takes precedence over [anchors (</text>
+      </code>
+      <text>)</text>
+    </link>
+    <text>.</text>
+  </paragraph>
+</document>

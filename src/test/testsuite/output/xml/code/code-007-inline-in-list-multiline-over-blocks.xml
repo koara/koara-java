@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>`</text>
+        <text>Inline code can</text>
+        <linebreak />
+        <text>be at more than one line</text>
+      </paragraph>
+      <paragraph>
+        <text>but never over multiple</text>
+        <linebreak />
+        <text>blocks</text>
+        <text>`</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>*</text>
+    <text> a</text>
+  </paragraph>
+  <blockquote>
+      <paragraph>
+        <text>b</text>
+      </paragraph>
+  </blockquote>
+  <paragraph>
+    <text>*</text>
+    <text> c</text>
+  </paragraph>
+</document>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <blockquote>
+          <paragraph>
+            <text>sentence&gt;  &gt;</text>
+            <linebreak />
+            <text>sentence</text>
+          </paragraph>
+      </blockquote>
+  </blockquote>
+</document>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <paragraph>
+        <text>hello</text>
+      </paragraph>
+      <list ordered="false">
+        <listitem>
+          <paragraph>
+            <text>this is a list</text>
+            <linebreak />
+            <text>there</text>
+          </paragraph>
+        </listitem>
+      </list>
+  </blockquote>
+</document>

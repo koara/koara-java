@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>Item 1</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item 2</text>
+      </paragraph>
+      <list ordered="false">
+        <listitem>
+          <paragraph>
+            <text>Item 2A</text>
+          </paragraph>
+        </listitem>
+        <listitem>
+          <paragraph>
+            <text>Item 2B</text>
+          </paragraph>
+        </listitem>
+      </list>
+    </listitem>
+  </list>
+</document>

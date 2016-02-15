@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <code>
+      <text> </text>
+    </code>
+    <text> </text>
+    <text>`</text>
+    <linebreak />
+    <text>With spaces</text>
+    <linebreak />
+    <code>
+      <text> </text>
+    </code>
+    <text> </text>
+    <text>`</text>
+  </paragraph>
+</document>

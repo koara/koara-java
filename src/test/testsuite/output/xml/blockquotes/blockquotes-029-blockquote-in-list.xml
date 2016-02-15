@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>hello</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <blockquote>
+          <paragraph>
+            <text>this is a quote</text>
+          </paragraph>
+      </blockquote>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>there</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

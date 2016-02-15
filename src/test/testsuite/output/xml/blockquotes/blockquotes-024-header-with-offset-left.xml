@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <heading level="1">
+        <text>Foo</text>
+      </heading>
+      <paragraph>
+        <text>bar</text>
+        <linebreak />
+        <text>baz</text>
+      </paragraph>
+  </blockquote>
+</document>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>[</text>
+    <strong>
+      <text>this is</text>
+      <linebreak />
+      <text>not</text>
+    </strong>
+    <text>] a link</text>
+  </paragraph>
+</document>

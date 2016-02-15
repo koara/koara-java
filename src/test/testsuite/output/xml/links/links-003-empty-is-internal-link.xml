@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>This is also an internal </text>
+    <link url="">
+      <text>link</text>
+    </link>
+    <text>.</text>
+  </paragraph>
+</document>

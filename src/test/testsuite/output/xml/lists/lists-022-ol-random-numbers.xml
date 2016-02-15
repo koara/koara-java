@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Completely random numbering</text>
+  </paragraph>
+  <list ordered="true">
+    <listitem number="5">
+      <paragraph>
+        <text>five</text>
+      </paragraph>
+    </listitem>
+    <listitem number="8">
+      <paragraph>
+        <text>eight</text>
+      </paragraph>
+    </listitem>
+    <listitem number="1">
+      <paragraph>
+        <text>one</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

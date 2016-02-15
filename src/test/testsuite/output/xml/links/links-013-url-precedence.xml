@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <link url="(foo">
+      <text>link</text>
+    </link>
+    <text>and(bar))</text>
+  </paragraph>
+</document>

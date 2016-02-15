@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Between this sentence</text>
+  </paragraph>
+  <heading level="1">
+    <text>and this heading there are spaces, so it is parsed as a blank line.</text>
+  </heading>
+</document>

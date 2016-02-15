@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>Links in lists</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <link url="http://www.google.com">
+          <text>a</text>
+        </link>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>should work.</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

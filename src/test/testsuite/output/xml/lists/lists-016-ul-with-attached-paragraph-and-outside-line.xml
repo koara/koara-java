@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Unordered lists use 2 character indentation:</text>
+  </paragraph>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>This is the first paragraph of text</text>
+        <linebreak />
+        <text>which has multiple lines.</text>
+      </paragraph>
+      <paragraph>
+        <text>If you don't start the paragraph at the beginning of the line,</text>
+        <linebreak />
+        <text>you are still inside the list item.</text>
+      </paragraph>
+    </listitem>
+  </list>
+  <paragraph>
+    <text>Outside this list</text>
+  </paragraph>
+</document>

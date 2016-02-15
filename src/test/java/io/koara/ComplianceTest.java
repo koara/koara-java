@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -30,6 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import io.koara.ast.Document;
 import io.koara.renderer.Html5Renderer;
+import io.koara.renderer.XmlRenderer;
 
 @RunWith(Parameterized.class)
 public class ComplianceTest {
@@ -38,7 +38,6 @@ public class ComplianceTest {
 
     private String module;
     private String testcase;
-    private static List<String> include = Arrays.asList();
 
     public ComplianceTest(String module, String testcase) {
         this.module = module;
@@ -48,27 +47,39 @@ public class ComplianceTest {
     @Parameters(name = "{0}: {1}")
     public static Iterable<Object[]> data() {
         List<Object[]> modules = new ArrayList<Object[]>();
-        for (File module : new File(TESTSUITE_FOLDER).listFiles()) {
-            if (!module.getName().startsWith("_") && (include.size() == 0 || include.contains(module.getName()))) {
-            	for (File testcase : new File(module, "koara").listFiles()) {
-                    if (testcase.getName().endsWith(".kd")) {
-                        modules.add(new Object[] { module.getName(),
-                                testcase.getName().substring(0, testcase.getName().length() - 3) });
-                    }
-                }
-            }
+        for (File module : new File(TESTSUITE_FOLDER + "/input").listFiles()) {
+        	if(!module.getName().startsWith("end2end")) {
+        		for (File testcase : module.listFiles()) {
+        			System.out.println("-" + testcase.getName().substring(0, testcase.getName().length() - 3));
+        			modules.add(new Object[] { module.getName(),
+                          testcase.getName().substring(0, testcase.getName().length() - 3) });
+        		}
+        		
+        	}
         }
         return modules;
     }
 
     @Test
     public void testKoaraToHtml5() throws Exception {
-    	String kd = readFile(TESTSUITE_FOLDER + "/" + module + "/koara/" + testcase + ".kd");
-        String html = readFile(TESTSUITE_FOLDER + "/" + module + "/html5/" + testcase + ".htm");
+    	String kd = readFile(TESTSUITE_FOLDER + "/input/" + module + "/" + testcase + ".kd");
+        String html = readFile(TESTSUITE_FOLDER + "/output/html5/" + module + "/" + testcase + ".htm");
 
         Parser parser = new Parser();
         Document document = parser.parse(kd);
         Html5Renderer renderer = new Html5Renderer();
+        document.accept(renderer);
+        assertEquals(html, renderer.getOutput());
+    }
+    
+    @Test
+    public void testKoaraToXml() throws Exception {
+    	String kd = readFile(TESTSUITE_FOLDER + "/input/" + module + "/" + testcase + ".kd");
+        String html = readFile(TESTSUITE_FOLDER + "/output/xml/" + module + "/" + testcase + ".xml");
+
+        Parser parser = new Parser();
+        Document document = parser.parse(kd);
+        XmlRenderer renderer = new XmlRenderer();
         document.accept(renderer);
         assertEquals(html, renderer.getOutput());
     }

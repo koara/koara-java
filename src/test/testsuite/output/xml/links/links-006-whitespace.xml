@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Trim whitespace </text>
+    <link url="http://www.google.com">
+      <text>text</text>
+    </link>
+  </paragraph>
+</document>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <blockquote>
+          <blockquote>
+              <paragraph>
+                <text>Blockquote 1</text>
+              </paragraph>
+          </blockquote>
+          <paragraph>
+            <text>Blockquote 2</text>
+          </paragraph>
+      </blockquote>
+      <paragraph>
+        <text>Blockquote 3</text>
+      </paragraph>
+  </blockquote>
+</document>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <paragraph>
+        <text>This is a blockquote.</text>
+        <linebreak />
+        <text>blockquotes can contain breaks</text>
+      </paragraph>
+  </blockquote>
+</document>

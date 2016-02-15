@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>There can not be any space between the brackets and parentheses </text>
+    <image url="">
+      <text>a</text>
+    </image>
+    <text> (b)</text>
+  </paragraph>
+</document>

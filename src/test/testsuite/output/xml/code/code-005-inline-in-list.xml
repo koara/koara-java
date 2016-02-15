@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <code>
+          <text>Inline</text>
+        </code>
+        <text> code in </text>
+        <code>
+          <text>lists</text>
+        </code>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

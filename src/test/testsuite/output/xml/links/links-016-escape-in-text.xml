@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Escape in text: </text>
+    <link url="/url">
+      <text>hi]</text>
+    </link>
+  </paragraph>
+</document>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Inline </text>
+    <code>
+      <text>code can span</text>
+      <linebreak />
+      <text>multiple lines</text>
+    </code>
+  </paragraph>
+</document>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>~~~</text>
+    <linebreak />
+    <text>This is just text</text>
+    <linebreak />
+    <text>~~~</text>
+  </paragraph>
+</document>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <image url="">
+      <text>You can </text>
+      <text>[</text>
+      <text>image:escape]</text>
+      <text>[</text>
+      <text>image:brackets] like this</text>
+    </image>
+  </paragraph>
+</document>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <list ordered="false">
+        <listitem>
+          <paragraph>
+            <text>foo</text>
+          </paragraph>
+        </listitem>
+      </list>
+  </blockquote>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>bar</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

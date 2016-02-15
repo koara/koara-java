@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <heading level="1">
+    <text>Heading 1</text>
+  </heading>
+  <heading level="2">
+    <text>Heading 2</text>
+  </heading>
+  <heading level="3">
+    <text>Heading 3</text>
+  </heading>
+  <heading level="4">
+    <text>Heading 4</text>
+  </heading>
+  <heading level="5">
+    <text>Heading 5</text>
+  </heading>
+  <heading level="6">
+    <text>Heading 6</text>
+  </heading>
+</document>

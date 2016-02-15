@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <list ordered="false">
+        <listitem>
+          <paragraph>
+            <text>A</text>
+          </paragraph>
+        </listitem>
+        <listitem>
+          <paragraph>
+            <text>B</text>
+          </paragraph>
+        </listitem>
+      </list>
+  </blockquote>
+</document>

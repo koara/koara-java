@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>First sentence.</text>
+  </paragraph>
+  <paragraph>
+    <text>Multiple blank lines are reduced to one.</text>
+  </paragraph>
+</document>

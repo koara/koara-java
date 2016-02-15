@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Ordered lists can contain paragraphs:</text>
+  </paragraph>
+  <list ordered="true">
+    <listitem number="1">
+      <paragraph>
+        <text>This is the first paragraph of text</text>
+        <linebreak />
+        <text>which has multiple lines.</text>
+      </paragraph>
+      <paragraph>
+        <text>If you don't start the paragraph at the beginning of the line,</text>
+        <linebreak />
+        <text>you are still inside the list item.</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

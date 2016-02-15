@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <strong>
+      <em>
+        <image url="url">
+          <text>image</text>
+        </image>
+      </em>
+    </strong>
+  </paragraph>
+</document>

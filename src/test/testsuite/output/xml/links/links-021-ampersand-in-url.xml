@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>There is an </text>
+    <link url="http://validator.w3.org/check?uri=http://www.w3.org/&verbose=1">
+      <text>ampersand</text>
+    </link>
+    <text> in the URI.</text>
+  </paragraph>
+</document>

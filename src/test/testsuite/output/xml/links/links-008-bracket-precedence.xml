@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <link url="">
+      <text>Text will stop at </text>
+      <text>[</text>
+      <text>the</text>
+    </link>
+    <link url="">
+      <text>first</text>
+    </link>
+    <text> closing bracket]</text>
+  </paragraph>
+</document>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <paragraph>
+        <text>Blockquotes can also be nested</text>
+      </paragraph>
+      <blockquote>
+          <paragraph>
+            <text>This is the nested blockquote</text>
+          </paragraph>
+      </blockquote>
+      <paragraph>
+        <text>Back to the first level</text>
+      </paragraph>
+  </blockquote>
+</document>

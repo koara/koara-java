@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>The prefix should </text>
+    <link url="">
+      <text>start image: right</text>
+    </link>
+    <text> after the bracket.</text>
+  </paragraph>
+</document>

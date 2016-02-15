@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>No value:</text>
+  </paragraph>
+  <list ordered="true">
+    <listitem number="1">
+      <paragraph>
+        <text>one</text>
+      </paragraph>
+    </listitem>
+    <listitem number="2">
+      <paragraph>
+        <text>two</text>
+      </paragraph>
+    </listitem>
+    <listitem number="3">
+      <paragraph>
+        <text>three</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

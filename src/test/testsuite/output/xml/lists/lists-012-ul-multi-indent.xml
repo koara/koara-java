@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <list ordered="false">
+    <listitem>
+      <paragraph>
+        <text>Item A</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item B</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item C</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item D</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item E</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item F</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item G</text>
+      </paragraph>
+    </listitem>
+    <listitem>
+      <paragraph>
+        <text>Item H</text>
+      </paragraph>
+    </listitem>
+  </list>
+</document>

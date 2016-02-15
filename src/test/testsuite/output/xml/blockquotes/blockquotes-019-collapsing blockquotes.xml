@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <paragraph>
+        <text>one</text>
+      </paragraph>
+  </blockquote>
+  <blockquote>
+      <paragraph>
+        <text>two</text>
+      </paragraph>
+  </blockquote>
+  <blockquote>
+      <paragraph>
+        <text>three</text>
+        <linebreak />
+        <text>four</text>
+      </paragraph>
+  </blockquote>
+</document>

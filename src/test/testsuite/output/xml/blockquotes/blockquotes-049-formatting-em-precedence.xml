@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <paragraph>
+        <text>_</text>
+        <text>block items</text>
+      </paragraph>
+      <blockquote>
+          <paragraph>
+            <text>always win</text>
+            <text>_</text>
+          </paragraph>
+      </blockquote>
+  </blockquote>
+</document>

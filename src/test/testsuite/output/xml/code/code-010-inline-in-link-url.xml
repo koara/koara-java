@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <link url="http://www.%60koara%60.io">
+      <text>links</text>
+    </link>
+    <text> cannot contain code inside the url</text>
+  </paragraph>
+</document>

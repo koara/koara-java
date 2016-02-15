@@ -1,0 +1,1894 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <codeblock language="shell">
+# Node Version Manager
+# Implemented as a POSIX-compliant function
+# Should work on sh, dash, bash, ksh, zsh
+# To use source this file from your bash profile
+#
+# Implemented by Tim Caswell &lt;tim@creationix.com&gt;
+# with much bash help from Matthew Ranney
+
+{ # this ensures the entire script is downloaded #
+
+NVM_SCRIPT_SOURCE=&quot;$_&quot;
+
+nvm_has() {
+  type &quot;$1&quot; &gt; /dev/null 2&gt;&amp;1
+}
+
+nvm_is_alias() {
+  # this is intentionally not &quot;command alias&quot; so it works in zsh.
+  \alias &quot;$1&quot; &gt; /dev/null 2&gt;&amp;1
+}
+
+nvm_get_latest() {
+  local NVM_LATEST_URL
+  if nvm_has &quot;curl&quot;; then
+    NVM_LATEST_URL=&quot;$(curl -q -w &quot;%{url_effective}\n&quot; -L -s -S http://latest.nvm.sh -o /dev/null)&quot;
+  elif nvm_has &quot;wget&quot;; then
+    NVM_LATEST_URL=&quot;$(wget http://latest.nvm.sh --server-response -O /dev/null 2&gt;&amp;1 | awk '/^  Location: /{DEST=$2} END{ print DEST }')&quot;
+  else
+    &gt;&amp;2 echo 'nvm needs curl or wget to proceed.'
+    return 1
+  fi
+  if [ &quot;_$NVM_LATEST_URL&quot; = &quot;_&quot; ]; then
+    &gt;&amp;2 echo &quot;http://latest.nvm.sh did not redirect to the latest release on Github&quot;
+    return 2
+  else
+    echo &quot;$NVM_LATEST_URL&quot; | awk -F'/' '{print $NF}'
+  fi
+}
+
+nvm_download() {
+  if nvm_has &quot;curl&quot;; then
+    curl -q $*
+  elif nvm_has &quot;wget&quot;; then
+    # Emulate curl with wget
+    ARGS=$(echo &quot;$*&quot; | command sed -e 's/--progress-bar /--progress=bar /' \
+                           -e 's/-L //' \
+                           -e 's/-I /--server-response /' \
+                           -e 's/-s /-q /' \
+                           -e 's/-o /-O /' \
+                           -e 's/-C - /-c /')
+    eval wget $ARGS
+  fi
+}
+
+nvm_has_system_node() {
+  [ &quot;$(nvm deactivate &gt;/dev/null 2&gt;&amp;1 &amp;&amp; command -v node)&quot; != '' ]
+}
+
+nvm_has_system_iojs() {
+  [ &quot;$(nvm deactivate &gt;/dev/null 2&gt;&amp;1 &amp;&amp; command -v iojs)&quot; != '' ]
+}
+
+nvm_print_npm_version() {
+  if nvm_has &quot;npm&quot;; then
+    echo &quot; (npm v$(npm --version 2&gt;/dev/null))&quot;
+  fi
+}
+
+# Make zsh glob matching behave same as bash
+# This fixes the &quot;zsh: no matches found&quot; errors
+if nvm_has &quot;unsetopt&quot;; then
+  unsetopt nomatch 2&gt;/dev/null
+  NVM_CD_FLAGS=&quot;-q&quot;
+fi
+
+# Auto detect the NVM_DIR when not set
+if [ -z &quot;$NVM_DIR&quot; ]; then
+  if [ -n &quot;$BASH_SOURCE&quot; ]; then
+    NVM_SCRIPT_SOURCE=&quot;${BASH_SOURCE[0]}&quot;
+  fi
+  export NVM_DIR=$(cd $NVM_CD_FLAGS $(dirname &quot;${NVM_SCRIPT_SOURCE:-$0}&quot;) &gt; /dev/null &amp;&amp; \pwd)
+fi
+unset NVM_SCRIPT_SOURCE 2&gt; /dev/null
+
+
+# Setup mirror location if not already set
+if [ -z &quot;$NVM_NODEJS_ORG_MIRROR&quot; ]; then
+  export NVM_NODEJS_ORG_MIRROR=&quot;https://nodejs.org/dist&quot;
+fi
+
+if [ -z &quot;$NVM_IOJS_ORG_MIRROR&quot; ]; then
+  export NVM_IOJS_ORG_MIRROR=&quot;https://iojs.org/dist&quot;
+fi
+
+nvm_tree_contains_path() {
+  local tree
+  tree=&quot;$1&quot;
+  local node_path
+  node_path=&quot;$2&quot;
+
+  if [ &quot;@$tree@&quot; = &quot;@@&quot; ] || [ &quot;@$node_path@&quot; = &quot;@@&quot; ]; then
+    &gt;&amp;2 echo &quot;both the tree and the node path are required&quot;
+    return 2
+  fi
+
+  local pathdir
+  pathdir=$(dirname &quot;$node_path&quot;)
+  while [ &quot;$pathdir&quot; != &quot;&quot; ] &amp;&amp; [ &quot;$pathdir&quot; != &quot;.&quot; ] &amp;&amp; [ &quot;$pathdir&quot; != &quot;/&quot; ] &amp;&amp; [ &quot;$pathdir&quot; != &quot;$tree&quot; ]; do
+    pathdir=$(dirname &quot;$pathdir&quot;)
+  done
+  [ &quot;$pathdir&quot; = &quot;$tree&quot; ]
+}
+
+# Traverse up in directory tree to find containing folder
+nvm_find_up() {
+  local path
+  path=$PWD
+  while [ &quot;$path&quot; != &quot;&quot; ] &amp;&amp; [ ! -f &quot;$path/$1&quot; ]; do
+    path=${path%/*}
+  done
+  echo &quot;$path&quot;
+}
+
+
+nvm_find_nvmrc() {
+  local dir
+  dir=&quot;$(nvm_find_up '.nvmrc')&quot;
+  if [ -e &quot;$dir/.nvmrc&quot; ]; then
+    echo &quot;$dir/.nvmrc&quot;
+  fi
+}
+
+# Obtain nvm version from rc file
+nvm_rc_version() {
+  export NVM_RC_VERSION=''
+  local NVMRC_PATH
+  NVMRC_PATH=&quot;$(nvm_find_nvmrc)&quot;
+  if [ -e &quot;$NVMRC_PATH&quot; ]; then
+    read NVM_RC_VERSION &lt; &quot;$NVMRC_PATH&quot;
+    echo &quot;Found '$NVMRC_PATH' with version &lt;$NVM_RC_VERSION&gt;&quot;
+  else
+    &gt;&amp;2 echo &quot;No .nvmrc file found&quot;
+    return 1
+  fi
+}
+
+nvm_version_greater() {
+  local LHS
+  LHS=$(nvm_normalize_version &quot;$1&quot;)
+  local RHS
+  RHS=$(nvm_normalize_version &quot;$2&quot;)
+  [ $LHS -gt $RHS ];
+}
+
+nvm_version_greater_than_or_equal_to() {
+  local LHS
+  LHS=$(nvm_normalize_version &quot;$1&quot;)
+  local RHS
+  RHS=$(nvm_normalize_version &quot;$2&quot;)
+  [ $LHS -ge $RHS ];
+}
+
+nvm_version_dir() {
+  local NVM_WHICH_DIR
+  NVM_WHICH_DIR=&quot;$1&quot;
+  if [ -z &quot;$NVM_WHICH_DIR&quot; ] || [ &quot;_$NVM_WHICH_DIR&quot; = &quot;_new&quot; ]; then
+    echo &quot;$NVM_DIR/versions/node&quot;
+  elif [ &quot;_$NVM_WHICH_DIR&quot; = &quot;_iojs&quot; ]; then
+    echo &quot;$NVM_DIR/versions/io.js&quot;
+  elif [ &quot;_$NVM_WHICH_DIR&quot; = &quot;_old&quot; ]; then
+    echo &quot;$NVM_DIR&quot;
+  else
+    echo &quot;unknown version dir&quot; &gt;&amp;2
+    return 3
+  fi
+}
+
+nvm_alias_path() {
+  echo &quot;$(nvm_version_dir old)/alias&quot;
+}
+
+nvm_version_path() {
+  local VERSION
+  VERSION=&quot;$1&quot;
+  if [ -z &quot;$VERSION&quot; ]; then
+    echo &quot;version is required&quot; &gt;&amp;2
+    return 3
+  elif nvm_is_iojs_version &quot;$VERSION&quot;; then
+    echo &quot;$(nvm_version_dir iojs)/$(nvm_strip_iojs_prefix &quot;$VERSION&quot;)&quot;
+  elif nvm_version_greater 0.12.0 &quot;$VERSION&quot;; then
+    echo &quot;$(nvm_version_dir old)/$VERSION&quot;
+  else
+    echo &quot;$(nvm_version_dir new)/$VERSION&quot;
+  fi
+}
+
+nvm_ensure_version_installed() {
+  local PROVIDED_VERSION
+  PROVIDED_VERSION=&quot;$1&quot;
+  local LOCAL_VERSION
+  local EXIT_CODE
+  LOCAL_VERSION=&quot;$(nvm_version &quot;$PROVIDED_VERSION&quot;)&quot;
+  EXIT_CODE=&quot;$?&quot;
+  local NVM_VERSION_DIR
+  if [ &quot;_$EXIT_CODE&quot; = &quot;_0&quot; ]; then
+    NVM_VERSION_DIR=&quot;$(nvm_version_path &quot;$LOCAL_VERSION&quot;)&quot;
+  fi
+  if [ &quot;_$EXIT_CODE&quot; != &quot;_0&quot; ] || [ ! -d &quot;$NVM_VERSION_DIR&quot; ]; then
+    VERSION=&quot;$(nvm_resolve_alias &quot;$PROVIDED_VERSION&quot;)&quot;
+    if [ $? -eq 0 ]; then
+      echo &quot;N/A: version \&quot;$PROVIDED_VERSION -&gt; $VERSION\&quot; is not yet installed&quot; &gt;&amp;2
+    else
+      echo &quot;N/A: version \&quot;$(nvm_ensure_version_prefix &quot;$PROVIDED_VERSION&quot;)\&quot; is not yet installed&quot; &gt;&amp;2
+    fi
+    return 1
+  fi
+}
+
+# Expand a version using the version cache
+nvm_version() {
+  local PATTERN
+  PATTERN=$1
+  local VERSION
+  # The default version is the current one
+  if [ -z &quot;$PATTERN&quot; ]; then
+    PATTERN='current'
+  fi
+
+  if [ &quot;$PATTERN&quot; = &quot;current&quot; ]; then
+    nvm_ls_current
+    return $?
+  fi
+
+  local NVM_NODE_PREFIX
+  NVM_NODE_PREFIX=&quot;$(nvm_node_prefix)&quot;
+  case &quot;_$PATTERN&quot; in
+    &quot;_$NVM_NODE_PREFIX&quot; | &quot;_$NVM_NODE_PREFIX-&quot;)
+      PATTERN=&quot;stable&quot;
+    ;;
+  esac
+  VERSION=&quot;$(nvm_ls &quot;$PATTERN&quot; | tail -n1)&quot;
+  if [ -z &quot;$VERSION&quot; ] || [ &quot;_$VERSION&quot; = &quot;_N/A&quot; ]; then
+    echo &quot;N/A&quot;
+    return 3;
+  else
+    echo &quot;$VERSION&quot;
+  fi
+}
+
+nvm_remote_version() {
+  local PATTERN
+  PATTERN=&quot;$1&quot;
+  local VERSION
+  if nvm_validate_implicit_alias &quot;$PATTERN&quot; 2&gt; /dev/null ; then
+    case &quot;_$PATTERN&quot; in
+      &quot;_$(nvm_iojs_prefix)&quot;)
+        VERSION=&quot;$(nvm_ls_remote_iojs | tail -n1)&quot;
+      ;;
+      *)
+        VERSION=&quot;$(nvm_ls_remote &quot;$PATTERN&quot;)&quot;
+      ;;
+    esac
+  else
+    VERSION=&quot;$(nvm_remote_versions &quot;$PATTERN&quot; | tail -n1)&quot;
+  fi
+  echo &quot;$VERSION&quot;
+  if [ &quot;_$VERSION&quot; = '_N/A' ]; then
+    return 3
+  fi
+}
+
+nvm_remote_versions() {
+  local NVM_IOJS_PREFIX
+  NVM_IOJS_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+  local PATTERN
+  PATTERN=&quot;$1&quot;
+  case &quot;_$PATTERN&quot; in
+    &quot;_$NVM_IOJS_PREFIX&quot; | &quot;_io.js&quot;)
+      VERSIONS=&quot;$(nvm_ls_remote_iojs)&quot;
+    ;;
+    &quot;_$(nvm_node_prefix)&quot;)
+      VERSIONS=&quot;$(nvm_ls_remote)&quot;
+    ;;
+    *)
+      if nvm_validate_implicit_alias &quot;$PATTERN&quot; 2&gt; /dev/null ; then
+        echo &gt;&amp;2 &quot;Implicit aliases are not supported in nvm_remote_versions.&quot;
+        return 1
+      fi
+      VERSIONS=&quot;$(echo &quot;$(nvm_ls_remote &quot;$PATTERN&quot;)
+$(nvm_ls_remote_iojs &quot;$PATTERN&quot;)&quot; | command grep -v &quot;N/A&quot; | command sed '/^$/d')&quot;
+    ;;
+  esac
+
+  if [ -z &quot;$VERSIONS&quot; ]; then
+    echo &quot;N/A&quot;
+    return 3
+  else
+    echo &quot;$VERSIONS&quot;
+  fi
+}
+
+nvm_is_valid_version() {
+  if nvm_validate_implicit_alias &quot;$1&quot; 2&gt; /dev/null; then
+    return 0
+  fi
+  case &quot;$1&quot; in
+    &quot;$(nvm_iojs_prefix)&quot; | \
+    &quot;$(nvm_node_prefix)&quot;)
+      return 0
+    ;;
+    *)
+      local VERSION
+      VERSION=&quot;$(nvm_strip_iojs_prefix &quot;$1&quot;)&quot;
+      nvm_version_greater &quot;$VERSION&quot;
+    ;;
+  esac
+}
+
+nvm_normalize_version() {
+  echo &quot;${1#v}&quot; | command awk -F. '{ printf(&quot;%d%06d%06d\n&quot;, $1,$2,$3); }'
+}
+
+nvm_ensure_version_prefix() {
+  local NVM_VERSION
+  NVM_VERSION=&quot;$(nvm_strip_iojs_prefix &quot;$1&quot; | command sed -e 's/^\([0-9]\)/v\1/g')&quot;
+  if nvm_is_iojs_version &quot;$1&quot;; then
+    echo &quot;$(nvm_add_iojs_prefix &quot;$NVM_VERSION&quot;)&quot;
+  else
+    echo &quot;$NVM_VERSION&quot;
+  fi
+}
+
+nvm_format_version() {
+  local VERSION
+  VERSION=&quot;$(nvm_ensure_version_prefix &quot;$1&quot;)&quot;
+  if [ &quot;_$(nvm_num_version_groups &quot;$VERSION&quot;)&quot; != &quot;_3&quot; ]; then
+    nvm_format_version &quot;${VERSION%.}.0&quot;
+  else
+    echo &quot;$VERSION&quot;
+  fi
+}
+
+nvm_num_version_groups() {
+  local VERSION
+  VERSION=&quot;$1&quot;
+  VERSION=&quot;${VERSION#v}&quot;
+  VERSION=&quot;${VERSION%.}&quot;
+  if [ -z &quot;$VERSION&quot; ]; then
+    echo &quot;0&quot;
+    return
+  fi
+  local NVM_NUM_DOTS
+  NVM_NUM_DOTS=$(echo &quot;$VERSION&quot; | command sed -e 's/[^\.]//g')
+  local NVM_NUM_GROUPS
+  NVM_NUM_GROUPS=&quot;.$NVM_NUM_DOTS&quot; # add extra dot, since it's (n - 1) dots at this point
+  echo &quot;${#NVM_NUM_GROUPS}&quot;
+}
+
+nvm_strip_path() {
+  echo &quot;$1&quot; | command sed \
+    -e &quot;s#$NVM_DIR/[^/]*$2[^:]*:##g&quot; \
+    -e &quot;s#:$NVM_DIR/[^/]*$2[^:]*##g&quot; \
+    -e &quot;s#$NVM_DIR/[^/]*$2[^:]*##g&quot; \
+    -e &quot;s#$NVM_DIR/versions/[^/]*/[^/]*$2[^:]*:##g&quot; \
+    -e &quot;s#:$NVM_DIR/versions/[^/]*/[^/]*$2[^:]*##g&quot; \
+    -e &quot;s#$NVM_DIR/versions/[^/]*/[^/]*$2[^:]*##g&quot;
+}
+
+nvm_prepend_path() {
+  if [ -z &quot;$1&quot; ]; then
+    echo &quot;$2&quot;
+  else
+    echo &quot;$2:$1&quot;
+  fi
+}
+
+nvm_binary_available() {
+  # binaries started with node 0.8.6
+  local FIRST_VERSION_WITH_BINARY
+  FIRST_VERSION_WITH_BINARY=&quot;0.8.6&quot;
+  nvm_version_greater_than_or_equal_to &quot;$(nvm_strip_iojs_prefix $1)&quot; &quot;$FIRST_VERSION_WITH_BINARY&quot;
+}
+
+nvm_alias() {
+  local ALIAS
+  ALIAS=&quot;$1&quot;
+  if [ -z &quot;$ALIAS&quot; ]; then
+    echo &gt;&amp;2 'An alias is required.'
+    return 1
+  fi
+
+  local NVM_ALIAS_PATH
+  NVM_ALIAS_PATH=&quot;$(nvm_alias_path)/$ALIAS&quot;
+  if [ ! -f &quot;$NVM_ALIAS_PATH&quot; ]; then
+    echo &gt;&amp;2 'Alias does not exist.'
+    return 2
+  fi
+
+  cat &quot;$NVM_ALIAS_PATH&quot;
+}
+
+nvm_ls_current() {
+  local NVM_LS_CURRENT_NODE_PATH
+  NVM_LS_CURRENT_NODE_PATH=&quot;$(command which node 2&gt; /dev/null)&quot;
+  if [ $? -ne 0 ]; then
+    echo 'none'
+  elif nvm_tree_contains_path &quot;$(nvm_version_dir iojs)&quot; &quot;$NVM_LS_CURRENT_NODE_PATH&quot;; then
+    echo &quot;$(nvm_add_iojs_prefix $(iojs --version 2&gt;/dev/null))&quot;
+  elif nvm_tree_contains_path &quot;$NVM_DIR&quot; &quot;$NVM_LS_CURRENT_NODE_PATH&quot;; then
+    local VERSION
+    VERSION=&quot;$(node --version 2&gt;/dev/null)&quot;
+    if [ &quot;$VERSION&quot; = &quot;v0.6.21-pre&quot; ]; then
+      echo &quot;v0.6.21&quot;
+    else
+      echo &quot;$VERSION&quot;
+    fi
+  else
+    echo 'system'
+  fi
+}
+
+nvm_resolve_alias() {
+  if [ -z &quot;$1&quot; ]; then
+    return 1
+  fi
+
+  local PATTERN
+  PATTERN=&quot;$1&quot;
+
+  local ALIAS
+  ALIAS=&quot;$PATTERN&quot;
+  local ALIAS_TEMP
+
+  local SEEN_ALIASES
+  SEEN_ALIASES=&quot;$ALIAS&quot;
+  while true; do
+    ALIAS_TEMP=&quot;$(nvm_alias &quot;$ALIAS&quot; 2&gt; /dev/null)&quot;
+
+    if [ -z &quot;$ALIAS_TEMP&quot; ]; then
+      break
+    fi
+
+    if [ -n &quot;$ALIAS_TEMP&quot; ] \
+      &amp;&amp; printf &quot;$SEEN_ALIASES&quot; | command grep -e &quot;^$ALIAS_TEMP$&quot; &gt; /dev/null; then
+      ALIAS=&quot;∞&quot;
+      break
+    fi
+
+    SEEN_ALIASES=&quot;$SEEN_ALIASES\n$ALIAS_TEMP&quot;
+    ALIAS=&quot;$ALIAS_TEMP&quot;
+  done
+
+  if [ -n &quot;$ALIAS&quot; ] &amp;&amp; [ &quot;_$ALIAS&quot; != &quot;_$PATTERN&quot; ]; then
+    local NVM_IOJS_PREFIX
+    NVM_IOJS_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+    local NVM_NODE_PREFIX
+    NVM_NODE_PREFIX=&quot;$(nvm_node_prefix)&quot;
+    case &quot;_$ALIAS&quot; in
+      &quot;_∞&quot; | \
+      &quot;_$NVM_IOJS_PREFIX&quot; | &quot;_$NVM_IOJS_PREFIX-&quot; | \
+      &quot;_$NVM_NODE_PREFIX&quot; )
+        echo &quot;$ALIAS&quot;
+      ;;
+      *)
+        nvm_ensure_version_prefix &quot;$ALIAS&quot;
+      ;;
+    esac
+    return 0
+  fi
+
+  if nvm_validate_implicit_alias &quot;$PATTERN&quot; 2&gt; /dev/null ; then
+    local IMPLICIT
+    IMPLICIT=&quot;$(nvm_print_implicit_alias local &quot;$PATTERN&quot; 2&gt; /dev/null)&quot;
+    if [ -n &quot;$IMPLICIT&quot; ]; then
+      nvm_ensure_version_prefix &quot;$IMPLICIT&quot;
+    fi
+  fi
+
+  return 2
+}
+
+nvm_resolve_local_alias() {
+  if [ -z &quot;$1&quot; ]; then
+    return 1
+  fi
+
+  local VERSION
+  local EXIT_CODE
+  VERSION=&quot;$(nvm_resolve_alias &quot;$1&quot;)&quot;
+  EXIT_CODE=$?
+  if [ -z &quot;$VERSION&quot; ]; then
+    return $EXIT_CODE
+  fi
+  if [ &quot;_$VERSION&quot; != &quot;_∞&quot; ]; then
+    nvm_version &quot;$VERSION&quot;
+  else
+    echo &quot;$VERSION&quot;
+  fi
+}
+
+nvm_iojs_prefix() {
+  echo &quot;iojs&quot;
+}
+nvm_node_prefix() {
+  echo &quot;node&quot;
+}
+
+nvm_is_iojs_version() {
+  case &quot;$1&quot; in iojs-*) return 0 ;; esac
+  return 1
+}
+
+nvm_add_iojs_prefix() {
+  command echo &quot;$(nvm_iojs_prefix)-$(nvm_ensure_version_prefix &quot;$(nvm_strip_iojs_prefix &quot;$1&quot;)&quot;)&quot;
+}
+
+nvm_strip_iojs_prefix() {
+  local NVM_IOJS_PREFIX
+  NVM_IOJS_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+  if [ &quot;_$1&quot; = &quot;_$NVM_IOJS_PREFIX&quot; ]; then
+    echo
+  else
+    echo &quot;${1#&quot;$NVM_IOJS_PREFIX&quot;-}&quot;
+  fi
+}
+
+nvm_ls() {
+  local PATTERN
+  PATTERN=&quot;$1&quot;
+  local VERSIONS
+  VERSIONS=''
+  if [ &quot;$PATTERN&quot; = 'current' ]; then
+    nvm_ls_current
+    return
+  fi
+
+  local NVM_IOJS_PREFIX
+  NVM_IOJS_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+  local NVM_NODE_PREFIX
+  NVM_NODE_PREFIX=&quot;$(nvm_node_prefix)&quot;
+  local NVM_VERSION_DIR_IOJS
+  NVM_VERSION_DIR_IOJS=&quot;$(nvm_version_dir &quot;$NVM_IOJS_PREFIX&quot;)&quot;
+  local NVM_VERSION_DIR_NEW
+  NVM_VERSION_DIR_NEW=&quot;$(nvm_version_dir new)&quot;
+  local NVM_VERSION_DIR_OLD
+  NVM_VERSION_DIR_OLD=&quot;$(nvm_version_dir old)&quot;
+
+  case &quot;$PATTERN&quot; in
+    &quot;$NVM_IOJS_PREFIX&quot; | &quot;$NVM_NODE_PREFIX&quot; )
+      PATTERN=&quot;$PATTERN-&quot;
+    ;;
+    *)
+      if nvm_resolve_local_alias &quot;$PATTERN&quot;; then
+        return
+      fi
+      PATTERN=$(nvm_ensure_version_prefix $PATTERN)
+    ;;
+  esac
+  # If it looks like an explicit version, don't do anything funny
+  local NVM_PATTERN_STARTS_WITH_V
+  case $PATTERN in
+    v*) NVM_PATTERN_STARTS_WITH_V=true ;;
+    *) NVM_PATTERN_STARTS_WITH_V=false ;;
+  esac
+  if [ $NVM_PATTERN_STARTS_WITH_V = true ] &amp;&amp; [ &quot;_$(nvm_num_version_groups &quot;$PATTERN&quot;)&quot; = &quot;_3&quot; ]; then
+    if [ -d &quot;$(nvm_version_path &quot;$PATTERN&quot;)&quot; ]; then
+      VERSIONS=&quot;$PATTERN&quot;
+    elif [ -d &quot;$(nvm_version_path &quot;$(nvm_add_iojs_prefix &quot;$PATTERN&quot;)&quot;)&quot; ]; then
+      VERSIONS=&quot;$(nvm_add_iojs_prefix &quot;$PATTERN&quot;)&quot;
+    fi
+  else
+    case &quot;$PATTERN&quot; in
+      &quot;$NVM_IOJS_PREFIX-&quot; | &quot;$NVM_NODE_PREFIX-&quot; | &quot;system&quot;) ;;
+      *)
+        local NUM_VERSION_GROUPS
+        NUM_VERSION_GROUPS=&quot;$(nvm_num_version_groups &quot;$PATTERN&quot;)&quot;
+        if [ &quot;_$NUM_VERSION_GROUPS&quot; = &quot;_2&quot; ] || [ &quot;_$NUM_VERSION_GROUPS&quot; = &quot;_1&quot; ]; then
+          PATTERN=&quot;${PATTERN%.}.&quot;
+        fi
+      ;;
+    esac
+
+    local ZHS_HAS_SHWORDSPLIT_UNSET
+    ZHS_HAS_SHWORDSPLIT_UNSET=1
+    if nvm_has &quot;setopt&quot;; then
+      ZHS_HAS_SHWORDSPLIT_UNSET=$(setopt | command grep shwordsplit &gt; /dev/null ; echo $?)
+      setopt shwordsplit
+    fi
+
+    local NVM_DIRS_TO_TEST_AND_SEARCH
+    local NVM_DIRS_TO_SEARCH
+    local NVM_ADD_SYSTEM
+    NVM_ADD_SYSTEM=false
+    if nvm_is_iojs_version &quot;$PATTERN&quot;; then
+      NVM_DIRS_TO_TEST_AND_SEARCH=&quot;$NVM_VERSION_DIR_IOJS&quot;
+      PATTERN=&quot;$(nvm_strip_iojs_prefix &quot;$PATTERN&quot;)&quot;
+      if nvm_has_system_iojs; then
+        NVM_ADD_SYSTEM=true
+      fi
+    elif [ &quot;_$PATTERN&quot; = &quot;_$NVM_NODE_PREFIX-&quot; ]; then
+      NVM_DIRS_TO_TEST_AND_SEARCH=&quot;$NVM_VERSION_DIR_OLD $NVM_VERSION_DIR_NEW&quot;
+      PATTERN=''
+      if nvm_has_system_node; then
+        NVM_ADD_SYSTEM=true
+      fi
+    else
+      NVM_DIRS_TO_TEST_AND_SEARCH=&quot;$NVM_VERSION_DIR_OLD $NVM_VERSION_DIR_NEW $NVM_VERSION_DIR_IOJS&quot;
+      if nvm_has_system_iojs || nvm_has_system_node; then
+        NVM_ADD_SYSTEM=true
+      fi
+    fi
+    for NVM_VERSION_DIR in $NVM_DIRS_TO_TEST_AND_SEARCH; do
+      if [ -d &quot;$NVM_VERSION_DIR&quot; ]; then
+        NVM_DIRS_TO_SEARCH=&quot;$NVM_VERSION_DIR $NVM_DIRS_TO_SEARCH&quot;
+      fi
+    done
+
+    if [ -z &quot;$PATTERN&quot; ]; then
+      PATTERN='v'
+    fi
+    if [ -n &quot;$NVM_DIRS_TO_SEARCH&quot; ]; then
+      VERSIONS=&quot;$(command find $NVM_DIRS_TO_SEARCH -maxdepth 1 -type d -name &quot;$PATTERN*&quot; \
+        | command sed &quot;
+            s#$NVM_VERSION_DIR_IOJS/#$NVM_IOJS_PREFIX-#;
+            \#$NVM_VERSION_DIR_IOJS# d;
+            s#^$NVM_DIR/##;
+            \#^versions\$# d;
+            s#^versions/##;
+            s#^v#$NVM_NODE_PREFIX-v#;
+            s#^\($NVM_IOJS_PREFIX\)[-/]v#\1.v#;
+            s#^\($NVM_NODE_PREFIX\)[-/]v#\1.v#&quot; \
+        | command sort -t. -u -k 2.2,2n -k 3,3n -k 4,4n \
+        | command sort -s -t- -k1.1,1.1 \
+        | command sed &quot;
+            s/^\($NVM_IOJS_PREFIX\)\./\1-/;
+            s/^$NVM_NODE_PREFIX\.//&quot; \
+      )&quot;
+    fi
+
+    if [ $ZHS_HAS_SHWORDSPLIT_UNSET -eq 1 ] &amp;&amp; nvm_has &quot;unsetopt&quot;; then
+      unsetopt shwordsplit
+    fi
+  fi
+
+  if [ &quot;$NVM_ADD_SYSTEM&quot; = true ]; then
+    if [ -z &quot;$PATTERN&quot; ] || [ &quot;_$PATTERN&quot; = &quot;_v&quot; ]; then
+      VERSIONS=&quot;$VERSIONS$(command printf '\n%s' 'system')&quot;
+    elif [ &quot;$PATTERN&quot; = 'system' ]; then
+      VERSIONS=&quot;$(command printf '%s' 'system')&quot;
+    fi
+  fi
+
+  if [ -z &quot;$VERSIONS&quot; ]; then
+    echo &quot;N/A&quot;
+    return 3
+  fi
+
+  echo &quot;$VERSIONS&quot;
+}
+
+nvm_ls_remote() {
+  local PATTERN
+  PATTERN=&quot;$1&quot;
+  local VERSIONS
+  local GREP_OPTIONS
+  GREP_OPTIONS=''
+  if nvm_validate_implicit_alias &quot;$PATTERN&quot; 2&gt; /dev/null ; then
+    PATTERN=&quot;$(nvm_ls_remote &quot;$(nvm_print_implicit_alias remote &quot;$PATTERN&quot;)&quot; | tail -n1)&quot;
+  elif [ -n &quot;$PATTERN&quot; ]; then
+    PATTERN=&quot;$(nvm_ensure_version_prefix &quot;$PATTERN&quot;)&quot;
+  else
+    PATTERN=&quot;.*&quot;
+  fi
+  VERSIONS=`nvm_download -L -s $NVM_NODEJS_ORG_MIRROR/ -o - \
+              | \egrep -o 'v[0-9]+\.[0-9]+\.[0-9]+' \
+              | command grep -w &quot;${PATTERN}&quot; \
+              | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n`
+  if [ -z &quot;$VERSIONS&quot; ]; then
+    echo &quot;N/A&quot;
+    return 3
+  fi
+  echo &quot;$VERSIONS&quot;
+}
+
+nvm_ls_remote_iojs() {
+  nvm_ls_remote_iojs_org std &quot;$NVM_IOJS_ORG_MIRROR&quot; &quot;$1&quot;
+}
+
+nvm_ls_remote_iojs_org() {
+  local PREFIX
+  if [ &quot;_$1&quot; = &quot;_std&quot; ]; then
+    PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+  else
+    echo &quot;unknown type of io.js release&quot; &gt;&amp;2
+    return 4
+  fi
+  local MIRROR
+  MIRROR=&quot;$2&quot;
+  local PATTERN
+  PATTERN=&quot;$3&quot;
+  local VERSIONS
+  if [ -n &quot;$PATTERN&quot; ]; then
+    PATTERN=&quot;$(nvm_ensure_version_prefix $(nvm_strip_iojs_prefix &quot;$PATTERN&quot;))&quot;
+  else
+    PATTERN=&quot;.*&quot;
+  fi
+  VERSIONS=&quot;$(nvm_download -L -s &quot;$MIRROR/index.tab&quot; -o - \
+    | command sed &quot;
+        1d;
+        s/^/$PREFIX-/;
+        s/[[:blank:]].*//&quot; \
+    | command grep -w &quot;$PATTERN&quot; \
+    | command sort)&quot;
+  if [ -z &quot;$VERSIONS&quot; ]; then
+    echo &quot;N/A&quot;
+    return 3
+  fi
+  echo &quot;$VERSIONS&quot;
+}
+
+nvm_checksum() {
+  local NVM_CHECKSUM
+  if nvm_has &quot;sha1sum&quot; &amp;&amp; ! nvm_is_alias &quot;sha1sum&quot;; then
+    NVM_CHECKSUM=&quot;$(command sha1sum &quot;$1&quot; | command awk '{print $1}')&quot;
+  elif nvm_has &quot;sha1&quot; &amp;&amp; ! nvm_is_alias &quot;sha1&quot;; then
+    NVM_CHECKSUM=&quot;$(command sha1 -q &quot;$1&quot;)&quot;
+  elif nvm_has &quot;shasum&quot; &amp;&amp; ! nvm_is_alias &quot;shasum&quot;; then
+    NVM_CHECKSUM=&quot;$(shasum &quot;$1&quot; | command awk '{print $1}')&quot;
+  else
+    echo &quot;Unaliased sha1sum, sha1, or shasum not found.&quot; &gt;&amp;2
+    return 2
+  fi
+
+  if [ &quot;_$NVM_CHECKSUM&quot; = &quot;_$2&quot; ]; then
+    return
+  elif [ -z &quot;$2&quot; ]; then
+    echo 'Checksums empty' #missing in raspberry pi binary
+    return
+  else
+    echo 'Checksums do not match.' &gt;&amp;2
+    return 1
+  fi
+}
+
+nvm_print_versions() {
+  local VERSION
+  local FORMAT
+  local NVM_CURRENT
+  NVM_CURRENT=$(nvm_ls_current)
+  echo &quot;$1&quot; | while read VERSION; do
+    if [ &quot;_$VERSION&quot; = &quot;_$NVM_CURRENT&quot; ]; then
+      FORMAT='\033[0;32m-&gt; %12s\033[0m'
+    elif [ &quot;$VERSION&quot; = &quot;system&quot; ]; then
+      FORMAT='\033[0;33m%15s\033[0m'
+    elif [ -d &quot;$(nvm_version_path &quot;$VERSION&quot; 2&gt; /dev/null)&quot; ]; then
+      FORMAT='\033[0;34m%15s\033[0m'
+    else
+      FORMAT='%15s'
+    fi
+    printf &quot;$FORMAT\n&quot; $VERSION
+  done
+}
+
+nvm_validate_implicit_alias() {
+  local NVM_IOJS_PREFIX
+  NVM_IOJS_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+  local NVM_NODE_PREFIX
+  NVM_NODE_PREFIX=&quot;$(nvm_node_prefix)&quot;
+
+  case &quot;$1&quot; in
+    &quot;stable&quot; | &quot;unstable&quot; | &quot;$NVM_IOJS_PREFIX&quot; | &quot;$NVM_NODE_PREFIX&quot; )
+      return
+    ;;
+    *)
+      echo &quot;Only implicit aliases 'stable', 'unstable', '$NVM_IOJS_PREFIX', and '$NVM_NODE_PREFIX' are supported.&quot; &gt;&amp;2
+      return 1
+    ;;
+  esac
+}
+
+nvm_print_implicit_alias() {
+  if [ &quot;_$1&quot; != &quot;_local&quot; ] &amp;&amp; [ &quot;_$1&quot; != &quot;_remote&quot; ]; then
+    echo &quot;nvm_print_implicit_alias must be specified with local or remote as the first argument.&quot; &gt;&amp;2
+    return 1
+  fi
+
+  local NVM_IMPLICIT
+  NVM_IMPLICIT=&quot;$2&quot;
+  if ! nvm_validate_implicit_alias &quot;$NVM_IMPLICIT&quot;; then
+    return 2
+  fi
+
+  local ZHS_HAS_SHWORDSPLIT_UNSET
+
+  local NVM_IOJS_PREFIX
+  NVM_IOJS_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+  local NVM_NODE_PREFIX
+  NVM_NODE_PREFIX=&quot;$(nvm_node_prefix)&quot;
+  local NVM_COMMAND
+  local NVM_ADD_PREFIX_COMMAND
+  local LAST_TWO
+  case &quot;$NVM_IMPLICIT&quot; in
+    &quot;$NVM_IOJS_PREFIX&quot; | &quot;$NVM_IOJS_RC_PREFIX&quot;)
+      NVM_COMMAND=&quot;nvm_ls_remote_iojs&quot;
+      NVM_ADD_PREFIX_COMMAND=&quot;nvm_add_iojs_prefix&quot;
+      if [ &quot;_$1&quot; = &quot;_local&quot; ]; then
+        NVM_COMMAND=&quot;nvm_ls &quot;$NVM_IMPLICIT&quot;&quot;
+      fi
+
+      ZHS_HAS_SHWORDSPLIT_UNSET=1
+      if nvm_has &quot;setopt&quot;; then
+        ZHS_HAS_SHWORDSPLIT_UNSET=$(setopt | command grep shwordsplit &gt; /dev/null ; echo $?)
+        setopt shwordsplit
+      fi
+
+      local NVM_IOJS_VERSION
+      NVM_IOJS_VERSION=&quot;$($NVM_COMMAND | sed &quot;s/^&quot;$NVM_IMPLICIT&quot;-//&quot; | command grep -e '^v' | cut -c2- | cut -d . -f 1,2 | uniq | tail -1)&quot;
+      local EXIT_CODE
+      EXIT_CODE=&quot;$?&quot;
+
+      if [ $ZHS_HAS_SHWORDSPLIT_UNSET -eq 1 ] &amp;&amp; nvm_has &quot;unsetopt&quot;; then
+        unsetopt shwordsplit
+      fi
+
+      echo &quot;$($NVM_ADD_PREFIX_COMMAND &quot;$NVM_IOJS_VERSION&quot;)&quot;
+      return $EXIT_CODE
+    ;;
+    &quot;$NVM_NODE_PREFIX&quot;)
+      echo &quot;stable&quot;
+      return
+    ;;
+    *)
+      NVM_COMMAND=&quot;nvm_ls_remote&quot;
+      if [ &quot;_$1&quot; = &quot;_local&quot; ]; then
+        NVM_COMMAND=&quot;nvm_ls node&quot;
+      fi
+
+      ZHS_HAS_SHWORDSPLIT_UNSET=1
+      if nvm_has &quot;setopt&quot;; then
+        ZHS_HAS_SHWORDSPLIT_UNSET=$(setopt | command grep shwordsplit &gt; /dev/null ; echo $?)
+        setopt shwordsplit
+      fi
+
+      LAST_TWO=$($NVM_COMMAND | command grep -e '^v' | cut -c2- | cut -d . -f 1,2 | uniq)
+
+      if [ $ZHS_HAS_SHWORDSPLIT_UNSET -eq 1 ] &amp;&amp; nvm_has &quot;unsetopt&quot;; then
+        unsetopt shwordsplit
+      fi
+    ;;
+  esac
+  local MINOR
+  local STABLE
+  local UNSTABLE
+  local MOD
+
+  ZHS_HAS_SHWORDSPLIT_UNSET=1
+  if nvm_has &quot;setopt&quot;; then
+    ZHS_HAS_SHWORDSPLIT_UNSET=$(setopt | command grep shwordsplit &gt; /dev/null ; echo $?)
+    setopt shwordsplit
+  fi
+  for MINOR in $LAST_TWO; do
+    MOD=$(expr &quot;$(nvm_normalize_version &quot;$MINOR&quot;)&quot; \/ 1000000 \% 2)
+    if [ $MOD -eq 0 ]; then
+      STABLE=&quot;$MINOR&quot;
+    elif [ $MOD -eq 1 ]; then
+      UNSTABLE=&quot;$MINOR&quot;
+    fi
+  done
+  if [ $ZHS_HAS_SHWORDSPLIT_UNSET -eq 1 ] &amp;&amp; nvm_has &quot;unsetopt&quot;; then
+    unsetopt shwordsplit
+  fi
+
+  if [ &quot;_$2&quot; = &quot;_stable&quot; ]; then
+    echo $STABLE
+  elif [ &quot;_$2&quot; = &quot;_unstable&quot; ]; then
+    echo $UNSTABLE
+  fi
+}
+
+nvm_get_os() {
+  local NVM_UNAME
+  NVM_UNAME=&quot;$(uname -a)&quot;
+  local NVM_OS
+  case &quot;$NVM_UNAME&quot; in
+    Linux\ *) NVM_OS=linux ;;
+    Darwin\ *) NVM_OS=darwin ;;
+    SunOS\ *) NVM_OS=sunos ;;
+    FreeBSD\ *) NVM_OS=freebsd ;;
+  esac
+  echo &quot;$NVM_OS&quot;
+}
+
+nvm_get_arch() {
+  local NVM_UNAME
+  NVM_UNAME=&quot;$(uname -m)&quot;
+  local NVM_ARCH
+  case &quot;$NVM_UNAME&quot; in
+    x86_64) NVM_ARCH=&quot;x64&quot; ;;
+    i*86) NVM_ARCH=&quot;x86&quot; ;;
+    *) NVM_ARCH=&quot;$NVM_UNAME&quot; ;;
+  esac
+  echo &quot;$NVM_ARCH&quot;
+}
+
+nvm_ensure_default_set() {
+  local VERSION
+  VERSION=&quot;$1&quot;
+  if [ -z &quot;$VERSION&quot; ]; then
+    echo 'nvm_ensure_default_set: a version is required' &gt;&amp;2
+    return 1
+  fi
+  if nvm_alias default &gt;/dev/null 2&gt;&amp;1; then
+    # default already set
+    return 0
+  fi
+  local OUTPUT
+  OUTPUT=&quot;$(nvm alias default &quot;$VERSION&quot;)&quot;
+  local EXIT_CODE
+  EXIT_CODE=&quot;$?&quot;
+  echo &quot;Creating default alias: $OUTPUT&quot;
+  return $EXIT_CODE
+}
+
+nvm_install_iojs_binary() {
+  local NVM_IOJS_TYPE
+  NVM_IOJS_TYPE=&quot;$1&quot;
+  local MIRROR
+  if [ &quot;_$NVM_IOJS_TYPE&quot; = &quot;_std&quot; ]; then
+    MIRROR=&quot;$NVM_IOJS_ORG_MIRROR&quot;
+  else
+    echo &quot;unknown type of io.js release&quot; &gt;&amp;2
+    return 4
+  fi
+  local PREFIXED_VERSION
+  PREFIXED_VERSION=&quot;$2&quot;
+  local REINSTALL_PACKAGES_FROM
+  REINSTALL_PACKAGES_FROM=&quot;$3&quot;
+
+  if ! nvm_is_iojs_version &quot;$PREFIXED_VERSION&quot;; then
+    echo 'nvm_install_iojs_binary requires an iojs-prefixed version.' &gt;&amp;2
+    return 10
+  fi
+
+  local VERSION
+  VERSION=&quot;$(nvm_strip_iojs_prefix &quot;$PREFIXED_VERSION&quot;)&quot;
+  local VERSION_PATH
+  VERSION_PATH=&quot;$(nvm_version_path &quot;$PREFIXED_VERSION&quot;)&quot;
+  local NVM_OS
+  NVM_OS=&quot;$(nvm_get_os)&quot;
+  local t
+  local url
+  local sum
+
+  if [ -n &quot;$NVM_OS&quot; ]; then
+    if nvm_binary_available &quot;$VERSION&quot;; then
+      t=&quot;$VERSION-$NVM_OS-$(nvm_get_arch)&quot;
+      url=&quot;$MIRROR/$VERSION/$(nvm_iojs_prefix)-${t}.tar.gz&quot;
+      sum=&quot;$(nvm_download -L -s $MIRROR/$VERSION/SHASUMS256.txt -o - | command grep $(nvm_iojs_prefix)-${t}.tar.gz | command awk '{print $1}')&quot;
+      local tmpdir
+      tmpdir=&quot;$NVM_DIR/bin/iojs-${t}&quot;
+      local tmptarball
+      tmptarball=&quot;$tmpdir/iojs-${t}.tar.gz&quot;
+      local NVM_INSTALL_ERRORED
+      command mkdir -p &quot;$tmpdir&quot; &amp;&amp; \
+        nvm_download -L -C - --progress-bar $url -o &quot;$tmptarball&quot; || \
+        NVM_INSTALL_ERRORED=true
+      if grep '404 Not Found' &quot;$tmptarball&quot; &gt;/dev/null; then
+        NVM_INSTALL_ERRORED=true
+        echo &gt;&amp;2 &quot;HTTP 404 at URL $url&quot;;
+      fi
+      if (
+        [ &quot;$NVM_INSTALL_ERRORED&quot; != true ] &amp;&amp; \
+        echo &quot;WARNING: checksums are currently disabled for io.js&quot; &gt;&amp;2 &amp;&amp; \
+        # nvm_checksum &quot;$tmptarball&quot; $sum &amp;&amp; \
+        command tar -xzf &quot;$tmptarball&quot; -C &quot;$tmpdir&quot; --strip-components 1 &amp;&amp; \
+        command rm -f &quot;$tmptarball&quot; &amp;&amp; \
+        command mkdir -p &quot;$VERSION_PATH&quot; &amp;&amp; \
+        command mv &quot;$tmpdir&quot;/* &quot;$VERSION_PATH&quot;
+      ); then
+        return 0
+      else
+        echo &gt;&amp;2 &quot;Binary download failed, trying source.&quot; &gt;&amp;2
+        command rm -rf &quot;$tmptarball&quot; &quot;$tmpdir&quot;
+        return 1
+      fi
+    fi
+  fi
+  return 2
+}
+
+nvm_install_node_binary() {
+  local VERSION
+  VERSION=&quot;$1&quot;
+  local REINSTALL_PACKAGES_FROM
+  REINSTALL_PACKAGES_FROM=&quot;$2&quot;
+
+  if nvm_is_iojs_version &quot;$PREFIXED_VERSION&quot;; then
+    echo 'nvm_install_node_binary does not allow an iojs-prefixed version.' &gt;&amp;2
+    return 10
+  fi
+
+  local VERSION_PATH
+  VERSION_PATH=&quot;$(nvm_version_path &quot;$VERSION&quot;)&quot;
+  local NVM_OS
+  NVM_OS=&quot;$(nvm_get_os)&quot;
+  local t
+  local url
+  local sum
+
+  if [ -n &quot;$NVM_OS&quot; ]; then
+    if nvm_binary_available &quot;$VERSION&quot;; then
+      local NVM_ARCH
+      NVM_ARCH=&quot;$(nvm_get_arch)&quot;
+      if [ $NVM_ARCH = &quot;armv6l&quot; ] || [ $NVM_ARCH = &quot;armv7l&quot; ]; then
+         NVM_ARCH=&quot;arm-pi&quot;
+      fi
+      t=&quot;$VERSION-$NVM_OS-$NVM_ARCH&quot;
+      url=&quot;$NVM_NODEJS_ORG_MIRROR/$VERSION/node-${t}.tar.gz&quot;
+      sum=`nvm_download -L -s $NVM_NODEJS_ORG_MIRROR/$VERSION/SHASUMS.txt -o - | command grep node-${t}.tar.gz | command awk '{print $1}'`
+      local tmpdir
+      tmpdir=&quot;$NVM_DIR/bin/node-${t}&quot;
+      local tmptarball
+      tmptarball=&quot;$tmpdir/node-${t}.tar.gz&quot;
+      local NVM_INSTALL_ERRORED
+      command mkdir -p &quot;$tmpdir&quot; &amp;&amp; \
+        nvm_download -L -C - --progress-bar $url -o &quot;$tmptarball&quot; || \
+        NVM_INSTALL_ERRORED=true
+      if grep '404 Not Found' &quot;$tmptarball&quot; &gt;/dev/null; then
+        NVM_INSTALL_ERRORED=true
+        echo &gt;&amp;2 &quot;HTTP 404 at URL $url&quot;;
+      fi
+      if (
+        [ &quot;$NVM_INSTALL_ERRORED&quot; != true ] &amp;&amp; \
+        nvm_checksum &quot;$tmptarball&quot; $sum &amp;&amp; \
+        command tar -xzf &quot;$tmptarball&quot; -C &quot;$tmpdir&quot; --strip-components 1 &amp;&amp; \
+        command rm -f &quot;$tmptarball&quot; &amp;&amp; \
+        command mkdir -p &quot;$VERSION_PATH&quot; &amp;&amp; \
+        command mv &quot;$tmpdir&quot;/* &quot;$VERSION_PATH&quot;
+      ); then
+        return 0
+      else
+        echo &gt;&amp;2 &quot;Binary download failed, trying source.&quot;
+        command rm -rf &quot;$tmptarball&quot; &quot;$tmpdir&quot;
+        return 1
+      fi
+    fi
+  fi
+  return 2
+}
+
+nvm_install_node_source() {
+  local VERSION
+  VERSION=&quot;$1&quot;
+  local ADDITIONAL_PARAMETERS
+  ADDITIONAL_PARAMETERS=&quot;$2&quot;
+
+  local NVM_ARCH
+  NVM_ARCH=&quot;$(nvm_get_arch)&quot;
+  if [ $NVM_ARCH = &quot;armv6l&quot; ] || [ $NVM_ARCH = &quot;armv7l&quot; ]; then
+    ADDITIONAL_PARAMETERS=&quot;--without-snapshot $ADDITIONAL_PARAMETERS&quot;
+  fi
+
+  if [ -n &quot;$ADDITIONAL_PARAMETERS&quot; ]; then
+    echo &quot;Additional options while compiling: $ADDITIONAL_PARAMETERS&quot;
+  fi
+
+  local VERSION_PATH
+  VERSION_PATH=&quot;$(nvm_version_path &quot;$VERSION&quot;)&quot;
+  local NVM_OS
+  NVM_OS=&quot;$(nvm_get_os)&quot;
+
+  local tarball
+  tarball=''
+  local sum
+  sum=''
+  local make
+  make='make'
+  if [ &quot;_$NVM_OS&quot; = &quot;_freebsd&quot; ]; then
+    make='gmake'
+    MAKE_CXX=&quot;CXX=c++&quot;
+  fi
+  local tmpdir
+  tmpdir=&quot;$NVM_DIR/src&quot;
+  local tmptarball
+  tmptarball=&quot;$tmpdir/node-$VERSION.tar.gz&quot;
+
+  if [ &quot;`nvm_download -L -s -I &quot;$NVM_NODEJS_ORG_MIRROR/$VERSION/node-$VERSION.tar.gz&quot; -o - 2&gt;&amp;1 | command grep '200 OK'`&quot; != '' ]; then
+    tarball=&quot;$NVM_NODEJS_ORG_MIRROR/$VERSION/node-$VERSION.tar.gz&quot;
+    sum=`nvm_download -L -s $NVM_NODEJS_ORG_MIRROR/$VERSION/SHASUMS.txt -o - | command grep &quot;node-$VERSION.tar.gz&quot; | command awk '{print $1}'`
+  elif [ &quot;`nvm_download -L -s -I &quot;$NVM_NODEJS_ORG_MIRROR/node-$VERSION.tar.gz&quot; -o - | command grep '200 OK'`&quot; != '' ]; then
+    tarball=&quot;$NVM_NODEJS_ORG_MIRROR/node-$VERSION.tar.gz&quot;
+  fi
+
+  if (
+    [ -n &quot;$tarball&quot; ] &amp;&amp; \
+    command mkdir -p &quot;$tmpdir&quot; &amp;&amp; \
+    nvm_download -L --progress-bar $tarball -o &quot;$tmptarball&quot; &amp;&amp; \
+    nvm_checksum &quot;$tmptarball&quot; $sum &amp;&amp; \
+    command tar -xzf &quot;$tmptarball&quot; -C &quot;$tmpdir&quot; &amp;&amp; \
+    cd &quot;$tmpdir/node-$VERSION&quot; &amp;&amp; \
+    ./configure --prefix=&quot;$VERSION_PATH&quot; $ADDITIONAL_PARAMETERS &amp;&amp; \
+    $make $MAKE_CXX &amp;&amp; \
+    command rm -f &quot;$VERSION_PATH&quot; 2&gt;/dev/null &amp;&amp; \
+    $make $MAKE_CXX install
+    )
+  then
+    if ! nvm_has &quot;npm&quot; ; then
+      echo &quot;Installing npm...&quot;
+      if nvm_version_greater 0.2.0 &quot;$VERSION&quot;; then
+        echo &quot;npm requires node v0.2.3 or higher&quot; &gt;&amp;2
+      elif nvm_version_greater_than_or_equal_to &quot;$VERSION&quot; 0.2.0; then
+        if nvm_version_greater 0.2.3 &quot;$VERSION&quot;; then
+          echo &quot;npm requires node v0.2.3 or higher&quot; &gt;&amp;2
+        else
+          nvm_download -L https://npmjs.org/install.sh -o - | clean=yes npm_install=0.2.19 sh
+        fi
+      else
+        nvm_download -L https://npmjs.org/install.sh -o - | clean=yes sh
+      fi
+    fi
+  else
+    echo &quot;nvm: install $VERSION failed!&quot; &gt;&amp;2
+    return 1
+  fi
+
+  return $?
+}
+
+nvm_match_version() {
+  local NVM_IOJS_PREFIX
+  NVM_IOJS_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+  local PROVIDED_VERSION
+  PROVIDED_VERSION=&quot;$1&quot;
+  case &quot;_$PROVIDED_VERSION&quot; in
+    &quot;_$NVM_IOJS_PREFIX&quot; | &quot;_io.js&quot;)
+      echo &quot;$(nvm_version $NVM_IOJS_PREFIX)&quot;
+    ;;
+    &quot;_system&quot;)
+      echo &quot;system&quot;
+    ;;
+    *)
+      echo &quot;$(nvm_version &quot;$PROVIDED_VERSION&quot;)&quot;
+    ;;
+  esac
+}
+
+nvm_npm_global_modules() {
+  local NPMLIST
+  local VERSION
+  VERSION=&quot;$1&quot;
+  if [ &quot;_$VERSION&quot; = &quot;_system&quot; ]; then
+    NPMLIST=$(nvm use system &gt; /dev/null &amp;&amp; npm list -g --depth=0 | command tail -n +2)
+  else
+    NPMLIST=$(nvm use &quot;$VERSION&quot; &gt; /dev/null &amp;&amp; npm list -g --depth=0 | command tail -n +2)
+  fi
+
+  local INSTALLS
+  INSTALLS=$(echo &quot;$NPMLIST&quot; | command sed -e '/ -&gt; / d' -e '/\(empty\)/ d' -e 's/^.* \(.*@[^ ]*\).*/\1/' -e '/^npm@[^ ]*.*$/ d' | command xargs)
+
+  local LINKS
+  LINKS=&quot;$(echo &quot;$NPMLIST&quot; | command sed -n 's/.* -&gt; \(.*\)/\1/ p')&quot;
+
+  echo &quot;$INSTALLS //// $LINKS&quot;
+}
+
+nvm() {
+  if [ $# -lt 1 ]; then
+    nvm help
+    return
+  fi
+
+  local GREP_OPTIONS
+  GREP_OPTIONS=''
+
+  # initialize local variables
+  local VERSION
+  local ADDITIONAL_PARAMETERS
+  local ALIAS
+
+  case $1 in
+    &quot;help&quot; )
+      echo
+      echo &quot;Node Version Manager&quot;
+      echo
+      echo &quot;Usage:&quot;
+      echo &quot;  nvm help                              Show this message&quot;
+      echo &quot;  nvm --version                         Print out the latest released version of nvm&quot;
+      echo &quot;  nvm install [-s] &lt;version&gt;            Download and install a &lt;version&gt;, [-s] from source. Uses .nvmrc if available&quot;
+      echo &quot;  nvm uninstall &lt;version&gt;               Uninstall a version&quot;
+      echo &quot;  nvm use &lt;version&gt;                     Modify PATH to use &lt;version&gt;. Uses .nvmrc if available&quot;
+      echo &quot;  nvm run &lt;version&gt; [&lt;args&gt;]            Run &lt;version&gt; with &lt;args&gt; as arguments. Uses .nvmrc if available for &lt;version&gt;&quot;
+      echo &quot;  nvm current                           Display currently activated version&quot;
+      echo &quot;  nvm ls                                List installed versions&quot;
+      echo &quot;  nvm ls &lt;version&gt;                      List versions matching a given description&quot;
+      echo &quot;  nvm ls-remote                         List remote versions available for install&quot;
+      echo &quot;  nvm deactivate                        Undo effects of \`nvm\` on current shell&quot;
+      echo &quot;  nvm alias [&lt;pattern&gt;]                 Show all aliases beginning with &lt;pattern&gt;&quot;
+      echo &quot;  nvm alias &lt;name&gt; &lt;version&gt;            Set an alias named &lt;name&gt; pointing to &lt;version&gt;&quot;
+      echo &quot;  nvm unalias &lt;name&gt;                    Deletes the alias named &lt;name&gt;&quot;
+      echo &quot;  nvm reinstall-packages &lt;version&gt;      Reinstall global \`npm\` packages contained in &lt;version&gt; to current version&quot;
+      echo &quot;  nvm unload                            Unload \`nvm\` from shell&quot;
+      echo &quot;  nvm which [&lt;version&gt;]                 Display path to installed node version. Uses .nvmrc if available&quot;
+      echo
+      echo &quot;Example:&quot;
+      echo &quot;  nvm install v0.10.32                  Install a specific version number&quot;
+      echo &quot;  nvm use 0.10                          Use the latest available 0.10.x release&quot;
+      echo &quot;  nvm run 0.10.32 app.js                Run app.js using node v0.10.32&quot;
+      echo &quot;  nvm exec 0.10.32 node app.js          Run \`node app.js\` with the PATH pointing to node v0.10.32&quot;
+      echo &quot;  nvm alias default 0.10.32             Set default node version on a shell&quot;
+      echo
+      echo &quot;Note:&quot;
+      echo &quot;  to remove, delete, or uninstall nvm - just remove ~/.nvm, ~/.npm, and ~/.bower folders&quot;
+      echo
+    ;;
+
+    &quot;debug&quot; )
+      local ZHS_HAS_SHWORDSPLIT_UNSET
+      if nvm_has &quot;setopt&quot;; then
+        ZHS_HAS_SHWORDSPLIT_UNSET=$(setopt | command grep shwordsplit &gt; /dev/null ; echo $?)
+        setopt shwordsplit
+      fi
+      echo &gt;&amp;2 &quot;\$SHELL: $SHELL&quot;
+      echo &gt;&amp;2 &quot;\$NVM_DIR: $(echo $NVM_DIR | sed &quot;s#$HOME#\$HOME#g&quot;)&quot;
+      local NVM_DEBUG_OUTPUT
+      for NVM_DEBUG_COMMAND in 'nvm current' 'which node' 'which iojs' 'which npm' 'npm config get prefix' 'npm root -g'
+      do
+        NVM_DEBUG_OUTPUT=&quot;$($NVM_DEBUG_COMMAND 2&gt;&amp;1 | sed &quot;s#$NVM_DIR#\$NVM_DIR#g&quot;)&quot;
+        echo &gt;&amp;2 &quot;$NVM_DEBUG_COMMAND: $NVM_DEBUG_OUTPUT&quot;
+      done
+      if [ &quot;_$ZHS_HAS_SHWORDSPLIT_UNSET&quot; = &quot;_1&quot; ] &amp;&amp; nvm_has &quot;unsetopt&quot;; then
+        unsetopt shwordsplit
+      fi
+      return 42
+    ;;
+
+    &quot;install&quot; | &quot;i&quot; )
+      local nobinary
+      local version_not_provided
+      version_not_provided=0
+      local provided_version
+      local NVM_OS
+      NVM_OS=&quot;$(nvm_get_os)&quot;
+
+      if ! nvm_has &quot;curl&quot; &amp;&amp; ! nvm_has &quot;wget&quot;; then
+        echo 'nvm needs curl or wget to proceed.' &gt;&amp;2;
+        return 1
+      fi
+
+      if [ $# -lt 2 ]; then
+        version_not_provided=1
+        nvm_rc_version
+        if [ -z &quot;$NVM_RC_VERSION&quot; ]; then
+          &gt;&amp;2 nvm help
+          return 127
+        fi
+      fi
+
+      shift
+
+      nobinary=0
+      if [ &quot;_$1&quot; = &quot;_-s&quot; ]; then
+        nobinary=1
+        shift
+      fi
+
+      provided_version=&quot;$1&quot;
+
+      if [ -z &quot;$provided_version&quot; ]; then
+        if [ $version_not_provided -ne 1 ]; then
+          nvm_rc_version
+        fi
+        provided_version=&quot;$NVM_RC_VERSION&quot;
+      else
+        shift
+      fi
+
+      VERSION=&quot;$(nvm_remote_version &quot;$provided_version&quot;)&quot;
+
+      if [ &quot;_$VERSION&quot; = &quot;_N/A&quot; ]; then
+        echo &quot;Version '$provided_version' not found - try \`nvm ls-remote\` to browse available versions.&quot; &gt;&amp;2
+        return 3
+      fi
+
+      ADDITIONAL_PARAMETERS=''
+      local PROVIDED_REINSTALL_PACKAGES_FROM
+      local REINSTALL_PACKAGES_FROM
+
+      while [ $# -ne 0 ]
+      do
+        case &quot;$1&quot; in
+          --reinstall-packages-from=*)
+            PROVIDED_REINSTALL_PACKAGES_FROM=&quot;$(echo &quot;$1&quot; | command cut -c 27-)&quot;
+            REINSTALL_PACKAGES_FROM=&quot;$(nvm_version &quot;$PROVIDED_REINSTALL_PACKAGES_FROM&quot;)&quot;
+          ;;
+          --copy-packages-from=*)
+            PROVIDED_REINSTALL_PACKAGES_FROM=&quot;$(echo &quot;$1&quot; | command cut -c 22-)&quot;
+            REINSTALL_PACKAGES_FROM=&quot;$(nvm_version &quot;$PROVIDED_REINSTALL_PACKAGES_FROM&quot;)&quot;
+          ;;
+          *)
+            ADDITIONAL_PARAMETERS=&quot;$ADDITIONAL_PARAMETERS $1&quot;
+          ;;
+        esac
+        shift
+      done
+
+      if [ &quot;_$(nvm_ensure_version_prefix &quot;$PROVIDED_REINSTALL_PACKAGES_FROM&quot;)&quot; = &quot;_$VERSION&quot; ]; then
+        echo &quot;You can't reinstall global packages from the same version of node you're installing.&quot; &gt;&amp;2
+        return 4
+      elif [ ! -z &quot;$PROVIDED_REINSTALL_PACKAGES_FROM&quot; ] &amp;&amp; [ &quot;_$REINSTALL_PACKAGES_FROM&quot; = &quot;_N/A&quot; ]; then
+        echo &quot;If --reinstall-packages-from is provided, it must point to an installed version of node.&quot; &gt;&amp;2
+        return 5
+      fi
+
+      local NVM_IOJS
+      if nvm_is_iojs_version &quot;$VERSION&quot;; then
+        NVM_IOJS=true
+      fi
+
+      local VERSION_PATH
+      VERSION_PATH=&quot;$(nvm_version_path &quot;$VERSION&quot;)&quot;
+      if [ -d &quot;$VERSION_PATH&quot; ]; then
+        echo &quot;$VERSION is already installed.&quot; &gt;&amp;2
+        if nvm use &quot;$VERSION&quot; &amp;&amp; [ ! -z &quot;$REINSTALL_PACKAGES_FROM&quot; ] &amp;&amp; [ &quot;_$REINSTALL_PACKAGES_FROM&quot; != &quot;_N/A&quot; ]; then
+          nvm reinstall-packages &quot;$REINSTALL_PACKAGES_FROM&quot;
+        fi
+        return $?
+      fi
+
+      if [ &quot;_$NVM_OS&quot; = &quot;_freebsd&quot; ]; then
+        # node.js and io.js do not have a FreeBSD binary
+        nobinary=1
+      elif [ &quot;_$NVM_OS&quot; = &quot;_sunos&quot; ] &amp;&amp; [ &quot;$NVM_IOJS&quot; = true ]; then
+        # io.js does not have a SunOS binary
+        nobinary=1
+      fi
+      local NVM_INSTALL_SUCCESS
+      # skip binary install if &quot;nobinary&quot; option specified.
+      if [ $nobinary -ne 1 ] &amp;&amp; nvm_binary_available &quot;$VERSION&quot;; then
+        if [ &quot;$NVM_IOJS&quot; = true ] &amp;&amp; nvm_install_iojs_binary std &quot;$VERSION&quot; &quot;$REINSTALL_PACKAGES_FROM&quot;; then
+          NVM_INSTALL_SUCCESS=true
+        elif [ &quot;$NVM_IOJS&quot; != true ] &amp;&amp; nvm_install_node_binary &quot;$VERSION&quot; &quot;$REINSTALL_PACKAGES_FROM&quot;; then
+          NVM_INSTALL_SUCCESS=true
+        fi
+      fi
+      if [ &quot;$NVM_INSTALL_SUCCESS&quot; != true ]; then
+        if [ &quot;$NVM_IOJS&quot; = true ]; then
+          # nvm_install_iojs_source &quot;$VERSION&quot; &quot;$ADDITIONAL_PARAMETERS&quot;
+          echo &quot;Installing iojs from source is not currently supported&quot; &gt;&amp;2
+          return 105
+        elif nvm_install_node_source &quot;$VERSION&quot; &quot;$ADDITIONAL_PARAMETERS&quot;; then
+          NVM_INSTALL_SUCCESS=true
+        fi
+      fi
+
+      if [ &quot;$NVM_INSTALL_SUCCESS&quot; = true ] &amp;&amp; nvm use &quot;$VERSION&quot;; then
+        if [ ! -z &quot;$REINSTALL_PACKAGES_FROM&quot; ] \
+          &amp;&amp; [ &quot;_$REINSTALL_PACKAGES_FROM&quot; != &quot;_N/A&quot; ]; then
+          nvm reinstall-packages &quot;$REINSTALL_PACKAGES_FROM&quot;
+        fi
+      fi
+      return $?
+    ;;
+    &quot;uninstall&quot; )
+      if [ $# -ne 2 ]; then
+        &gt;&amp;2 nvm help
+        return 127
+      fi
+
+      local PATTERN
+      PATTERN=&quot;$2&quot;
+      case &quot;_$PATTERN&quot; in
+        &quot;_$(nvm_iojs_prefix)&quot; | &quot;_$(nvm_iojs_prefix)-&quot; \
+        | &quot;_$(nvm_node_prefix)&quot; | &quot;_$(nvm_node_prefix)-&quot;)
+          VERSION=&quot;$(nvm_version &quot;$PATTERN&quot;)&quot;
+        ;;
+        *)
+          VERSION=&quot;$(nvm_version &quot;$PATTERN&quot;)&quot;
+        ;;
+      esac
+      if [ &quot;_$VERSION&quot; = &quot;_$(nvm_ls_current)&quot; ]; then
+        if nvm_is_iojs_version &quot;$VERSION&quot;; then
+          echo &quot;nvm: Cannot uninstall currently-active io.js version, $VERSION (inferred from $PATTERN).&quot; &gt;&amp;2
+        else
+          echo &quot;nvm: Cannot uninstall currently-active node version, $VERSION (inferred from $PATTERN).&quot; &gt;&amp;2
+        fi
+        return 1
+      fi
+
+      local VERSION_PATH
+      VERSION_PATH=&quot;$(nvm_version_path &quot;$VERSION&quot;)&quot;
+      if [ ! -d &quot;$VERSION_PATH&quot; ]; then
+        echo &quot;$VERSION version is not installed...&quot; &gt;&amp;2
+        return;
+      fi
+
+      t=&quot;$VERSION-$(nvm_get_os)-$(nvm_get_arch)&quot;
+
+      local NVM_PREFIX
+      local NVM_SUCCESS_MSG
+      if nvm_is_iojs_version &quot;$VERSION&quot;; then
+        NVM_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+        NVM_SUCCESS_MSG=&quot;Uninstalled io.js $(nvm_strip_iojs_prefix $VERSION)&quot;
+      else
+        NVM_PREFIX=&quot;$(nvm_node_prefix)&quot;
+        NVM_SUCCESS_MSG=&quot;Uninstalled node $VERSION&quot;
+      fi
+      # Delete all files related to target version.
+      command rm -rf &quot;$NVM_DIR/src/$NVM_PREFIX-$VERSION&quot; \
+             &quot;$NVM_DIR/src/$NVM_PREFIX-$VERSION.tar.gz&quot; \
+             &quot;$NVM_DIR/bin/$NVM_PREFIX-${t}&quot; \
+             &quot;$NVM_DIR/bin/$NVM_PREFIX-${t}.tar.gz&quot; \
+             &quot;$VERSION_PATH&quot; 2&gt;/dev/null
+      echo &quot;$NVM_SUCCESS_MSG&quot;
+
+      # rm any aliases that point to uninstalled version.
+      for ALIAS in `command grep -l $VERSION &quot;$(nvm_alias_path)/*&quot; 2&gt;/dev/null`
+      do
+        nvm unalias &quot;$(command basename &quot;$ALIAS&quot;)&quot;
+      done
+    ;;
+    &quot;deactivate&quot; )
+      local NEWPATH
+      NEWPATH=&quot;$(nvm_strip_path &quot;$PATH&quot; &quot;/bin&quot;)&quot;
+      if [ &quot;_$PATH&quot; = &quot;_$NEWPATH&quot; ]; then
+        echo &quot;Could not find $NVM_DIR/*/bin in \$PATH&quot; &gt;&amp;2
+      else
+        export PATH=&quot;$NEWPATH&quot;
+        hash -r
+        echo &quot;$NVM_DIR/*/bin removed from \$PATH&quot;
+      fi
+
+      NEWPATH=&quot;$(nvm_strip_path &quot;$MANPATH&quot; &quot;/share/man&quot;)&quot;
+      if [ &quot;_$MANPATH&quot; = &quot;_$NEWPATH&quot; ]; then
+        echo &quot;Could not find $NVM_DIR/*/share/man in \$MANPATH&quot; &gt;&amp;2
+      else
+        export MANPATH=&quot;$NEWPATH&quot;
+        echo &quot;$NVM_DIR/*/share/man removed from \$MANPATH&quot;
+      fi
+
+      NEWPATH=&quot;$(nvm_strip_path &quot;$NODE_PATH&quot; &quot;/lib/node_modules&quot;)&quot;
+      if [ &quot;_$NODE_PATH&quot; != &quot;_$NEWPATH&quot; ]; then
+        export NODE_PATH=&quot;$NEWPATH&quot;
+        echo &quot;$NVM_DIR/*/lib/node_modules removed from \$NODE_PATH&quot;
+      fi
+    ;;
+    &quot;use&quot; )
+      local PROVIDED_VERSION
+      if [ $# -eq 1 ]; then
+        nvm_rc_version
+        if [ -n &quot;$NVM_RC_VERSION&quot; ]; then
+          PROVIDED_VERSION=&quot;$NVM_RC_VERSION&quot;
+          VERSION=&quot;$(nvm_version &quot;$PROVIDED_VERSION&quot;)&quot;
+        fi
+      else
+        PROVIDED_VERSION=&quot;$2&quot;
+        VERSION=&quot;$(nvm_match_version &quot;$PROVIDED_VERSION&quot;)&quot;
+      fi
+
+      if [ -z &quot;$VERSION&quot; ]; then
+        &gt;&amp;2 nvm help
+        return 127
+      fi
+
+      if [ &quot;_$VERSION&quot; = '_system' ]; then
+        if nvm_has_system_node &amp;&amp; nvm deactivate &gt;/dev/null 2&gt;&amp;1; then
+          echo &quot;Now using system version of node: $(node -v 2&gt;/dev/null)$(nvm_print_npm_version)&quot;
+          return
+        elif nvm_has_system_iojs &amp;&amp; nvm deactivate &gt;/dev/null 2&gt;&amp;1; then
+          echo &quot;Now using system version of io.js: $(iojs --version 2&gt;/dev/null)$(nvm_print_npm_version)&quot;
+          return
+        else
+          echo &quot;System version of node not found.&quot; &gt;&amp;2
+          return 127
+        fi
+      elif [ &quot;_$VERSION&quot; = &quot;_∞&quot; ]; then
+        echo &quot;The alias \&quot;$PROVIDED_VERSION\&quot; leads to an infinite loop. Aborting.&quot; &gt;&amp;2
+        return 8
+      fi
+
+      # This nvm_ensure_version_installed call can be a performance bottleneck
+      # on shell startup. Perhaps we can optimize it away or make it faster.
+      nvm_ensure_version_installed &quot;$PROVIDED_VERSION&quot;
+      EXIT_CODE=$?
+      if [ &quot;$EXIT_CODE&quot; != &quot;0&quot; ]; then
+        return $EXIT_CODE
+      fi
+
+      local NVM_VERSION_DIR
+      NVM_VERSION_DIR=&quot;$(nvm_version_path &quot;$VERSION&quot;)&quot;
+
+      # Strip other version from PATH
+      PATH=&quot;$(nvm_strip_path &quot;$PATH&quot; &quot;/bin&quot;)&quot;
+      # Prepend current version
+      PATH=&quot;$(nvm_prepend_path &quot;$PATH&quot; &quot;$NVM_VERSION_DIR/bin&quot;)&quot;
+      if nvm_has manpath; then
+        if [ -z &quot;$MANPATH&quot; ]; then
+          MANPATH=$(manpath)
+        fi
+        # Strip other version from MANPATH
+        MANPATH=&quot;$(nvm_strip_path &quot;$MANPATH&quot; &quot;/share/man&quot;)&quot;
+        # Prepend current version
+        MANPATH=&quot;$(nvm_prepend_path &quot;$MANPATH&quot; &quot;$NVM_VERSION_DIR/share/man&quot;)&quot;
+        export MANPATH
+      fi
+      export PATH
+      hash -r
+      export NVM_PATH=&quot;$NVM_VERSION_DIR/lib/node&quot;
+      export NVM_BIN=&quot;$NVM_VERSION_DIR/bin&quot;
+      if [ &quot;$NVM_SYMLINK_CURRENT&quot; = true ]; then
+        command rm -f &quot;$NVM_DIR/current&quot; &amp;&amp; ln -s &quot;$NVM_VERSION_DIR&quot; &quot;$NVM_DIR/current&quot;
+      fi
+      if nvm_is_iojs_version &quot;$VERSION&quot;; then
+        echo &quot;Now using io.js $(nvm_strip_iojs_prefix &quot;$VERSION&quot;)$(nvm_print_npm_version)&quot;
+      else
+        echo &quot;Now using node $VERSION$(nvm_print_npm_version)&quot;
+      fi
+    ;;
+    &quot;run&quot; )
+      local provided_version
+      local has_checked_nvmrc
+      has_checked_nvmrc=0
+      # run given version of node
+      shift
+      if [ $# -lt 1 ]; then
+        nvm_rc_version &amp;&amp; has_checked_nvmrc=1
+        if [ -n &quot;$NVM_RC_VERSION&quot; ]; then
+          VERSION=&quot;$(nvm_version &quot;$NVM_RC_VERSION&quot;)&quot;
+        else
+          VERSION='N/A'
+        fi
+        if [ $VERSION = &quot;N/A&quot; ]; then
+          &gt;&amp;2 nvm help
+          return 127
+        fi
+      fi
+
+      provided_version=$1
+      if [ -n &quot;$provided_version&quot; ]; then
+        VERSION=&quot;$(nvm_version &quot;$provided_version&quot;)&quot;
+        if [ &quot;_$VERSION&quot; = &quot;_N/A&quot; ] &amp;&amp; ! nvm_is_valid_version &quot;$provided_version&quot;; then
+          provided_version=''
+          if [ $has_checked_nvmrc -ne 1 ]; then
+            nvm_rc_version &amp;&amp; has_checked_nvmrc=1
+          fi
+          VERSION=&quot;$(nvm_version &quot;$NVM_RC_VERSION&quot;)&quot;
+        else
+          shift
+        fi
+      fi
+
+      local NVM_IOJS
+      if nvm_is_iojs_version &quot;$VERSION&quot;; then
+        NVM_IOJS=true
+      fi
+
+      local ARGS
+      ARGS=&quot;$@&quot;
+      local OUTPUT
+      local EXIT_CODE
+
+      local ZHS_HAS_SHWORDSPLIT_UNSET
+      ZHS_HAS_SHWORDSPLIT_UNSET=1
+      if nvm_has &quot;setopt&quot;; then
+        ZHS_HAS_SHWORDSPLIT_UNSET=$(setopt | command grep shwordsplit &gt; /dev/null ; echo $?)
+        setopt shwordsplit
+      fi
+      if [ &quot;_$VERSION&quot; = &quot;_N/A&quot; ]; then
+        echo &quot;$(nvm_ensure_version_prefix &quot;$provided_version&quot;) is not installed yet&quot; &gt;&amp;2
+        EXIT_CODE=1
+      elif [ -z &quot;$ARGS&quot; ]; then
+        if [ &quot;$NVM_IOJS&quot; = true ]; then
+          nvm exec &quot;$VERSION&quot; iojs
+        else
+          nvm exec &quot;$VERSION&quot; node
+        fi
+        EXIT_CODE=&quot;$?&quot;
+      elif [ &quot;$NVM_IOJS&quot; = true ]; then
+        echo &quot;Running io.js $(nvm_strip_iojs_prefix &quot;$VERSION&quot;)&quot;
+        OUTPUT=&quot;$(nvm use &quot;$VERSION&quot; &gt;/dev/null &amp;&amp; iojs $ARGS)&quot;
+        EXIT_CODE=&quot;$?&quot;
+      else
+        echo &quot;Running node $VERSION&quot;
+        OUTPUT=&quot;$(nvm use &quot;$VERSION&quot; &gt;/dev/null &amp;&amp; node $ARGS)&quot;
+        EXIT_CODE=&quot;$?&quot;
+      fi
+      if [ $ZHS_HAS_SHWORDSPLIT_UNSET -eq 1 ] &amp;&amp; nvm_has &quot;unsetopt&quot;; then
+        unsetopt shwordsplit
+      fi
+      if [ -n &quot;$OUTPUT&quot; ]; then
+        echo &quot;$OUTPUT&quot;
+      fi
+      return $EXIT_CODE
+    ;;
+    &quot;exec&quot; )
+      shift
+
+      local provided_version
+      provided_version=&quot;$1&quot;
+      if [ -n &quot;$provided_version&quot; ]; then
+        VERSION=&quot;$(nvm_version &quot;$provided_version&quot;)&quot;
+        if [ &quot;_$VERSION&quot; = &quot;_N/A&quot; ]; then
+          nvm_rc_version
+          provided_version=&quot;$NVM_RC_VERSION&quot;
+          VERSION=&quot;$(nvm_version &quot;$provided_version&quot;)&quot;
+        else
+          shift
+        fi
+      fi
+
+      nvm_ensure_version_installed &quot;$provided_version&quot;
+      EXIT_CODE=$?
+      if [ &quot;$EXIT_CODE&quot; != &quot;0&quot; ]; then
+        return $EXIT_CODE
+      fi
+
+      echo &quot;Running node $VERSION&quot;
+      NODE_VERSION=&quot;$VERSION&quot; $NVM_DIR/nvm-exec &quot;$@&quot;
+    ;;
+    &quot;ls&quot; | &quot;list&quot; )
+      local NVM_LS_OUTPUT
+      local NVM_LS_EXIT_CODE
+      NVM_LS_OUTPUT=$(nvm_ls &quot;$2&quot;)
+      NVM_LS_EXIT_CODE=$?
+      nvm_print_versions &quot;$NVM_LS_OUTPUT&quot;
+      if [ $# -eq 1 ]; then
+        nvm alias
+      fi
+      return $NVM_LS_EXIT_CODE
+    ;;
+    &quot;ls-remote&quot; | &quot;list-remote&quot; )
+      local PATTERN
+      PATTERN=&quot;$2&quot;
+      local NVM_IOJS_PREFIX
+      NVM_IOJS_PREFIX=&quot;$(nvm_iojs_prefix)&quot;
+      local NVM_NODE_PREFIX
+      NVM_NODE_PREFIX=&quot;$(nvm_node_prefix)&quot;
+      local NVM_FLAVOR
+      case &quot;_$PATTERN&quot; in
+        &quot;_$NVM_IOJS_PREFIX&quot; | &quot;_$NVM_NODE_PREFIX&quot; )
+          NVM_FLAVOR=&quot;$PATTERN&quot;
+          PATTERN=&quot;$3&quot;
+        ;;
+      esac
+
+      local NVM_LS_REMOTE_EXIT_CODE
+      NVM_LS_REMOTE_EXIT_CODE=0
+      local NVM_LS_REMOTE_OUTPUT
+      NVM_LS_REMOTE_OUTPUT=''
+      if [ &quot;_$NVM_FLAVOR&quot; != &quot;_$NVM_IOJS_PREFIX&quot; ]; then
+        NVM_LS_REMOTE_OUTPUT=$(nvm_ls_remote &quot;$PATTERN&quot;)
+        NVM_LS_REMOTE_EXIT_CODE=$?
+      fi
+
+      local NVM_LS_REMOTE_IOJS_EXIT_CODE
+      NVM_LS_REMOTE_IOJS_EXIT_CODE=0
+      local NVM_LS_REMOTE_IOJS_OUTPUT
+      NVM_LS_REMOTE_IOJS_OUTPUT=''
+      if [ &quot;_$NVM_FLAVOR&quot; != &quot;_$NVM_NODE_PREFIX&quot; ]; then
+        NVM_LS_REMOTE_IOJS_OUTPUT=$(nvm_ls_remote_iojs &quot;$PATTERN&quot;)
+        NVM_LS_REMOTE_IOJS_EXIT_CODE=$?
+      fi
+
+      local NVM_OUTPUT
+      NVM_OUTPUT=&quot;$(echo &quot;$NVM_LS_REMOTE_OUTPUT
+$NVM_LS_REMOTE_IOJS_OUTPUT&quot; | command grep -v &quot;N/A&quot; | sed '/^$/d')&quot;
+      if [ -n &quot;$NVM_OUTPUT&quot; ]; then
+        nvm_print_versions &quot;$NVM_OUTPUT&quot;
+        return $NVM_LS_REMOTE_EXIT_CODE || $NVM_LS_REMOTE_IOJS_EXIT_CODE
+      else
+        nvm_print_versions &quot;N/A&quot;
+        return 3
+      fi
+    ;;
+    &quot;current&quot; )
+      nvm_version current
+    ;;
+    &quot;which&quot; )
+      local provided_version
+      provided_version=&quot;$2&quot;
+      if [ $# -eq 1 ]; then
+        nvm_rc_version
+        if [ -n &quot;$NVM_RC_VERSION&quot; ]; then
+          provided_version=&quot;$NVM_RC_VERSION&quot;
+          VERSION=$(nvm_version &quot;$NVM_RC_VERSION&quot;)
+        fi
+      elif [ &quot;_$2&quot; != '_system' ]; then
+        VERSION=&quot;$(nvm_version &quot;$provided_version&quot;)&quot;
+      else
+        VERSION=&quot;$2&quot;
+      fi
+      if [ -z &quot;$VERSION&quot; ]; then
+        &gt;&amp;2 nvm help
+        return 127
+      fi
+
+      if [ &quot;_$VERSION&quot; = '_system' ]; then
+        if nvm_has_system_iojs &gt;/dev/null 2&gt;&amp;1 || nvm_has_system_node &gt;/dev/null 2&gt;&amp;1; then
+          local NVM_BIN
+          NVM_BIN=&quot;$(nvm use system &gt;/dev/null 2&gt;&amp;1 &amp;&amp; command which node)&quot;
+          if [ -n &quot;$NVM_BIN&quot; ]; then
+            echo &quot;$NVM_BIN&quot;
+            return
+          else
+            return 1
+          fi
+        else
+          echo &quot;System version of node not found.&quot; &gt;&amp;2
+          return 127
+        fi
+      elif [ &quot;_$VERSION&quot; = &quot;_∞&quot; ]; then
+        echo &quot;The alias \&quot;$2\&quot; leads to an infinite loop. Aborting.&quot; &gt;&amp;2
+        return 8
+      fi
+
+      nvm_ensure_version_installed &quot;$provided_version&quot;
+      EXIT_CODE=$?
+      if [ &quot;$EXIT_CODE&quot; != &quot;0&quot; ]; then
+        return $EXIT_CODE
+      fi
+      local NVM_VERSION_DIR
+      NVM_VERSION_DIR=&quot;$(nvm_version_path &quot;$VERSION&quot;)&quot;
+      echo &quot;$NVM_VERSION_DIR/bin/node&quot;
+    ;;
+    &quot;alias&quot; )
+      local NVM_ALIAS_DIR
+      NVM_ALIAS_DIR=&quot;$(nvm_alias_path)&quot;
+      command mkdir -p &quot;$NVM_ALIAS_DIR&quot;
+      if [ $# -le 2 ]; then
+        local DEST
+        for ALIAS_PATH in &quot;$NVM_ALIAS_DIR&quot;/&quot;$2&quot;*; do
+          ALIAS=&quot;$(command basename &quot;$ALIAS_PATH&quot;)&quot;
+          DEST=&quot;$(nvm_alias &quot;$ALIAS&quot; 2&gt; /dev/null)&quot;
+          if [ -n &quot;$DEST&quot; ]; then
+            VERSION=&quot;$(nvm_version &quot;$DEST&quot;)&quot;
+            if [ &quot;_$DEST&quot; = &quot;_$VERSION&quot; ]; then
+              echo &quot;$ALIAS -&gt; $DEST&quot;
+            else
+              echo &quot;$ALIAS -&gt; $DEST (-&gt; $VERSION)&quot;
+            fi
+          fi
+        done
+
+        for ALIAS in &quot;$(nvm_node_prefix)&quot; &quot;stable&quot; &quot;unstable&quot; &quot;$(nvm_iojs_prefix)&quot;; do
+          if [ ! -f &quot;$NVM_ALIAS_DIR/$ALIAS&quot; ]; then
+            if [ $# -lt 2 ] || [ &quot;~$ALIAS&quot; = &quot;~$2&quot; ]; then
+              DEST=&quot;$(nvm_print_implicit_alias local &quot;$ALIAS&quot;)&quot;
+              if [ &quot;_$DEST&quot; != &quot;_&quot; ]; then
+                VERSION=&quot;$(nvm_version &quot;$DEST&quot;)&quot;
+                echo &quot;$ALIAS -&gt; $DEST (-&gt; $VERSION) (default)&quot;
+              fi
+            fi
+          fi
+        done
+        return
+      fi
+      if [ -z &quot;$3&quot; ]; then
+        command rm -f &quot;$NVM_ALIAS_DIR/$2&quot;
+        echo &quot;$2 -&gt; *poof*&quot;
+        return
+      fi
+      VERSION=&quot;$(nvm_version &quot;$3&quot;)&quot;
+      if [ $? -ne 0 ]; then
+        echo &quot;! WARNING: Version '$3' does not exist.&quot; &gt;&amp;2
+      fi
+      echo &quot;$3&quot; | tee &quot;$NVM_ALIAS_DIR/$2&quot; &gt;/dev/null
+      if [ ! &quot;_$3&quot; = &quot;_$VERSION&quot; ]; then
+        echo &quot;$2 -&gt; $3 (-&gt; $VERSION)&quot;
+      else
+        echo &quot;$2 -&gt; $3&quot;
+      fi
+    ;;
+    &quot;unalias&quot; )
+      local NVM_ALIAS_DIR
+      NVM_ALIAS_DIR=&quot;$(nvm_alias_path)&quot;
+      command mkdir -p &quot;$NVM_ALIAS_DIR&quot;
+      if [ $# -ne 2 ]; then
+        &gt;&amp;2 nvm help
+        return 127
+      fi
+      [ ! -f &quot;$NVM_ALIAS_DIR/$2&quot; ] &amp;&amp; echo &quot;Alias $2 doesn't exist!&quot; &gt;&amp;2 &amp;&amp; return
+      command rm -f &quot;$NVM_ALIAS_DIR/$2&quot;
+      echo &quot;Deleted alias $2&quot;
+    ;;
+    &quot;reinstall-packages&quot; | &quot;copy-packages&quot; )
+      if [ $# -ne 2 ]; then
+        &gt;&amp;2 nvm help
+        return 127
+      fi
+
+      local PROVIDED_VERSION
+      PROVIDED_VERSION=&quot;$2&quot;
+
+      if [ &quot;$PROVIDED_VERSION&quot; = &quot;$(nvm_ls_current)&quot; ] || [ &quot;$(nvm_version &quot;$PROVIDED_VERSION&quot;)&quot; = &quot;$(nvm_ls_current)&quot; ]; then
+        echo 'Can not reinstall packages from the current version of node.' &gt;&amp;2
+        return 2
+      fi
+
+      local VERSION
+      if [ &quot;_$PROVIDED_VERSION&quot; = &quot;_system&quot; ]; then
+        if ! nvm_has_system_node &amp;&amp; ! nvm_has_system_iojs; then
+          echo 'No system version of node or io.js detected.' &gt;&amp;2
+          return 3
+        fi
+        VERSION=&quot;system&quot;
+      else
+        VERSION=&quot;$(nvm_version &quot;$PROVIDED_VERSION&quot;)&quot;
+      fi
+
+      local NPMLIST
+      NPMLIST=&quot;$(nvm_npm_global_modules &quot;$VERSION&quot;)&quot;
+      local INSTALLS
+      local LINKS
+      INSTALLS=&quot;${NPMLIST%% //// *}&quot;
+      LINKS=&quot;${NPMLIST##* //// }&quot;
+
+      echo &quot;Reinstalling global packages from $VERSION...&quot;
+      echo &quot;$INSTALLS&quot; | command xargs npm install -g --quiet
+
+      echo &quot;Linking global packages from $VERSION...&quot;
+      set -f; IFS='
+' # necessary to turn off variable expansion except for newlines
+      for LINK in $LINKS; do
+        set +f; unset IFS # restore variable expansion
+        if [ -n &quot;$LINK&quot; ]; then
+          (cd &quot;$LINK&quot; &amp;&amp; npm link)
+        fi
+      done
+      set +f; unset IFS # restore variable expansion in case $LINKS was empty
+    ;;
+    &quot;clear-cache&quot; )
+      command rm -f $NVM_DIR/v* &quot;$(nvm_version_dir)&quot; 2&gt;/dev/null
+      echo &quot;Cache cleared.&quot;
+    ;;
+    &quot;version&quot; )
+      nvm_version $2
+    ;;
+    &quot;--version&quot; )
+      echo &quot;0.25.4&quot;
+    ;;
+    &quot;unload&quot; )
+      unset -f nvm nvm_print_versions nvm_checksum \
+        nvm_iojs_prefix nvm_node_prefix \
+        nvm_add_iojs_prefix nvm_strip_iojs_prefix \
+        nvm_is_iojs_version nvm_is_alias \
+        nvm_ls_remote nvm_ls_remote_iojs nvm_ls_remote_iojs_org \
+        nvm_ls nvm_remote_version nvm_remote_versions \
+        nvm_install_iojs_binary nvm_install_node_binary \
+        nvm_install_node_source \
+        nvm_version nvm_rc_version nvm_match_version \
+        nvm_ensure_default_set nvm_get_arch nvm_get_os \
+        nvm_print_implicit_alias nvm_validate_implicit_alias \
+        nvm_resolve_alias nvm_ls_current nvm_alias \
+        nvm_binary_available nvm_prepend_path nvm_strip_path \
+        nvm_num_version_groups nvm_format_version nvm_ensure_version_prefix \
+        nvm_normalize_version nvm_is_valid_version \
+        nvm_ensure_version_installed \
+        nvm_version_path nvm_alias_path nvm_version_dir \
+        nvm_find_nvmrc nvm_find_up nvm_tree_contains_path \
+        nvm_version_greater nvm_version_greater_than_or_equal_to \
+        nvm_print_npm_version nvm_npm_global_modules \
+        nvm_has_system_node nvm_has_system_iojs \
+        nvm_download nvm_get_latest nvm_has nvm_get_latest \
+        nvm_supports_source_options &gt; /dev/null 2&gt;&amp;1
+      unset RC_VERSION NVM_NODEJS_ORG_MIRROR NVM_DIR NVM_CD_FLAGS &gt; /dev/null 2&gt;&amp;1
+    ;;
+    * )
+      &gt;&amp;2 nvm help
+      return 127
+    ;;
+  esac
+}
+
+nvm_supports_source_options() {
+  [ &quot;_$(echo 'echo $1' | . /dev/stdin yes 2&gt; /dev/null)&quot; = &quot;_yes&quot; ]
+}
+
+VERSION=&quot;$(nvm_alias default 2&gt;/dev/null || echo)&quot;
+if nvm_supports_source_options &amp;&amp; [ &quot;_$1&quot; = &quot;_--install&quot; ]; then
+  if [ -n &quot;$VERSION&quot; ]; then
+    nvm install &quot;$VERSION&quot; &gt;/dev/null
+  elif nvm_rc_version &gt;/dev/null 2&gt;&amp;1; then
+    nvm install &gt;/dev/null
+  fi
+elif [ -n &quot;$VERSION&quot; ]; then
+  nvm use &quot;$VERSION&quot; &gt;/dev/null
+elif nvm_rc_version &gt;/dev/null 2&gt;&amp;1; then
+  nvm use &gt;/dev/null
+fi
+
+} # this ensures the entire script is downloaded #  </codeblock>
+</document>

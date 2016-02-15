@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <paragraph>
+    <text>Koara supports </text>
+    <strong>
+      <text>strong</text>
+    </strong>
+    <text> and </text>
+    <em>
+      <text>emphasis</text>
+    </em>
+  </paragraph>
+</document>

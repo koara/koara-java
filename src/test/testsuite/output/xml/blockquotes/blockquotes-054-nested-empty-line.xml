@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <blockquote>
+      <blockquote>
+          <paragraph>
+            <text>test</text>
+          </paragraph>
+      </blockquote>
+      <paragraph>
+        <text>test</text>
+      </paragraph>
+  </blockquote>
+</document>
