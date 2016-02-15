@@ -75,13 +75,13 @@ public class ComplianceTest {
     @Test
     public void testKoaraToXml() throws Exception {
     	String kd = readFile(TESTSUITE_FOLDER + "/input/" + module + "/" + testcase + ".kd");
-        String html = readFile(TESTSUITE_FOLDER + "/output/xml/" + module + "/" + testcase + ".xml");
+        String xml = readFile(TESTSUITE_FOLDER + "/output/xml/" + module + "/" + testcase + ".xml");
 
         Parser parser = new Parser();
         Document document = parser.parse(kd);
         XmlRenderer renderer = new XmlRenderer();
         document.accept(renderer);
-        assertEquals(html, renderer.getOutput());
+        assertEquals(xml, renderer.getOutput());
     }
 
 }
