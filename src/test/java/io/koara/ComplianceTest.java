@@ -50,7 +50,6 @@ public class ComplianceTest {
         for (File module : new File(TESTSUITE_FOLDER + "/input").listFiles()) {
         	if(!module.getName().startsWith("end2end")) {
         		for (File testcase : module.listFiles()) {
-        			System.out.println("-" + testcase.getName().substring(0, testcase.getName().length() - 3));
         			modules.add(new Object[] { module.getName(),
                           testcase.getName().substring(0, testcase.getName().length() - 3) });
         		}
