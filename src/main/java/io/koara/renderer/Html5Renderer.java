@@ -76,7 +76,7 @@ public class Html5Renderer implements Renderer {
 		Integer seq = listSequence.peek() + 1;		
 		listSequence.set(listSequence.size() - 1, seq);
 		out.append(indent() + "<li");
-		if(node.getNumber() != null && (seq != node.getNumber())) {
+		if(node.getNumber() != null && (seq.equals(node.getNumber()))) {
 			out.append(" value=\"" + node.getNumber() + "\"");
 			listSequence.push(node.getNumber());
 		}
