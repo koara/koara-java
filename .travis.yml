@@ -8,3 +8,6 @@ jdk:
 
 after_success:
   - gradle cobertura coveralls
+  
+script:
+  - gradle test --info
