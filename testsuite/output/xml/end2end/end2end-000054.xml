@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <heading level="1">
+    <text>Lorem ipsum dolor</text>
+  </heading>
+  <list ordered="false">
+    <listitem>
+    </listitem>
+    <listitem>
+      <list ordered="false">
+        <listitem>
+        </listitem>
+      </list>
+    </listitem>
+    <listitem>
+    </listitem>
+  </list>
+  <list ordered="true">
+    <listitem number="1">
+    </listitem>
+    <listitem number="2">
+      <list ordered="true">
+        <listitem number="1">
+        </listitem>
+      </list>
+    </listitem>
+    <listitem number="3">
+    </listitem>
+  </list>
+  <heading level="2">
+    <text>Integer </text>
+    <em>
+      <image url="dui">
+        <text>facilisis.=</text>
+      </image>
+    </em>
+  </heading>
+  <heading level="1">
+    <strong>
+      <em>
+        <text>Quisque </text>
+        <text>`</text>
+        <text>eget</text>
+        <text>`</text>
+      </em>
+    </strong>
+    <text> libero </text>
+    <text>`</text>
+    <text>felis &lt;</text>
+    <text>`</text>
+  </heading>
+</document>

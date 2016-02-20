@@ -1,0 +1,5 @@
+rootProject.name = "koara-parent"
+
+include "koara"
+include "koara-html5"
+include "koara-xml"
