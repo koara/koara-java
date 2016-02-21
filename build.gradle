@@ -12,12 +12,12 @@ subprojects {
 
 project("koara-html5") {
 	dependencies {
-		compile(project(":koara"))
+		compile(project(":koara-core"))
 	}
 }
 
 project("koara-xml") {
 	dependencies {
-		compile(project(":koara"))
+		compile(project(":koara-core"))
 	}
 }
