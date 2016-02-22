@@ -1,13 +1,87 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.github.townsfolk:gradle-release:1.2'
+		classpath 'net.saliman:gradle-cobertura-plugin:2.0.0'
+		classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:1.0.2'
+	}
+}
+	
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'cobertura'
+	apply plugin: 'com.github.kt3k.coveralls'
+	apply plugin: 'java'
+	apply plugin: 'maven'
+	apply plugin: 'release'
+	apply plugin: 'signing'
     
     repositories {
 		mavenCentral()
 	}
 
+	cobertura.coverageFormats = ['html', 'xml']
+
     dependencies {
 		testCompile("junit:junit:4.11")
 	}
+	
+	task sourcesJar(type: Jar, dependsOn:classes) {
+		classifier = "sources"
+		from sourceSets.main.allJava.srcDirs
+	}
+	
+	task javadocJar(type: Jar) {
+		classifier = "javadoc"
+		from javadoc
+	}
+	
+	artifacts {
+		archives jar
+		archives javadocJar
+		archives sourcesJar
+	}
+	
+	uploadArchives {
+		repositories {
+			mavenDeployer {
+				beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+					ext.sonatypeUsername = rootProject.hasProperty('sonatypeUsername') ? rootProject.sonatypeUsername : ''
+					ext.sonatypePassword = rootProject.hasProperty('sonatypePassword') ? rootProject.sonatypePassword : ''
+					authentication(userName: sonatypeUsername, password: sonatypePassword)
+				}
+	
+				pom.project {
+					name 'koara'
+					packaging 'jar'
+					description 'Koara to HTML5 parser written in Java'
+					url 'http://www.koara.io'
+	
+					scm {
+						url 'https://github.com/koara/koara-java.git'
+						connection 'https://github.com/koara/koara-java.git'
+						developerConnection 'https://github.com/koara/koara-java.git'
+					}
+					licenses {
+						license {
+							name 'The Apache Software License, Version 2.0'
+							url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+							distribution 'repo'
+						}
+					}
+					developers {
+						developer {
+							id 'andyvdh'
+							name 'Andy Van Den Heuvel'
+						}
+					}
+				}
+			}
+		}
+	}
+	
 }
 
 project("koara-html5") {
@@ -20,4 +94,30 @@ project("koara-xml") {
 	dependencies {
 		compile(project(":koara-core"))
 	}
+}
+
+task releaseMax << {
+	def currentVersion = project.version.split('\\.');
+	currentVersion[0] = currentVersion[0].toInteger() + 1;
+	currentVersion[1] = 0;
+	currentVersion[2] = 0;
+	doRelease(project.version, currentVersion.join('.'));
+}
+
+task releaseMin << {
+	def currentVersion = project.version.split('\\.');
+	currentVersion[1] = currentVersion[1].toInteger() + 1;
+	currentVersion[2] = 0;
+	doRelease(project.version, currentVersion.join('.'));
+}
+
+task releaseFix << {
+	def currentVersion = project.version.split('\\.');
+	currentVersion[2] = currentVersion[2].toInteger() + 1;
+	doRelease(project.version, currentVersion.join('.'));
+}
+
+def doRelease(oldVersion, newVersion) {
+	println "Bump version $oldVersion -> $newVersion"
+	ant.replace(file: 'gradle.properties', token: oldVersion, value: newVersion)
 }
