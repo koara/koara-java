@@ -14,10 +14,9 @@ each time learn a different language and jeopardizes portability between applica
 [Koara](http://www.koara.io) is a modular lightweight markup language. The developer decides which parts of the syntax are 
 allowed to be parsed. The rest will render as plain text.
 
-## Usage
-- [Generate as HTML](http://www.github.com/koara/koara-java/koara-html5)
-
-- [Generate as XML](http://www.github.com/koara/koara-java/koara-xml)
+## Koara
+- [Generate as HTML](https://github.com/koara/koara-java/tree/master/koara-html5)
+- [Generate as XML](https://github.com/koara/koara-java/tree/master/koara-xml)
 
 <!-- FOOTER -->
 ## Community
