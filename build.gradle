@@ -37,12 +37,7 @@ subprojects {
 	
 	task docs << {
 		def hMatcher = new File(rootProject.projectDir.toString() + '/README.md').getText('UTF-8') =~ /(?m)<!-- HEADER -->([\s\S]*)<!-- HEADER:END -->/
-   		def fMatcher = new File(rootProject.projectDir.toString() + '/README.md').getText('UTF-8') =~ /(?m)<!-- FOOTER -->([\s\S]*)<!-- FOOTER:END -->/
-
 		ant.replaceregexp(match:'<!-- HEADER -->.*<!-- HEADER:END -->', replace:'<!-- HEADER -->' + hMatcher[0][1] + '<!-- HEADER -->', flags:'gis', byline: false) {
-      		fileset(dir: project.projectDir, includes: 'README.md')
-   		}
-		ant.replaceregexp(match:'<!-- FOOTER -->.*<!-- FOOTER:END -->', replace:'<!-- FOOTER -->' + fMatcher[0][1] + '<!-- FOOTER -->', flags:'gis', byline: false) {
       		fileset(dir: project.projectDir, includes: 'README.md')
    		}
 	}

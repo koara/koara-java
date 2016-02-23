@@ -1,8 +1,6 @@
 <!-- HEADER -->
 [![Koara](http://www.koara.io/logo.png)](http://www.koara.io)
 
-**A modular lightweight markup language**
-
 [![Build Status](https://img.shields.io/travis/koara/koara-java.svg)](https://travis-ci.org/koara/koara-java)
 [![Coverage Status](https://img.shields.io/coveralls/koara/koara-java.svg)](https://coveralls.io/github/koara/koara-java?branch=master)
 [![Latest Version](https://img.shields.io/maven-central/v/io.koara/koara.svg?label=Maven Central)](http://search.maven.org/#search%7Cga%7C1%7Ckoara)
@@ -12,12 +10,12 @@
 # Koara HTML5
 
 ## Getting Started
-- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara-html5/0.9.1/koara-html5-0.9.1.jar)
+- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara-html5/0.9.0/koara-html5-0.9.0.jar)
 - Gradle
 
   ```groovy
   dependencies {
-	compile "io.koara:koara-html5:0.9.1"
+	compile "io.koara:koara-html5:0.9.0"
   }
   ```
   
@@ -27,7 +25,7 @@
   <dependency>
     <groupId>io.koara</groupId>
     <artifactId>koara-html5</artifactId>
-    <version>0.9.1</version>
+    <version>0.9.0</version>
   </dependency>
   ```
   
@@ -60,9 +58,3 @@ public class Demo {
 	
 }
 ```
-
-<!-- FOOTER -->
-## Community
-- Mailing Lists: [archive](http://groups.google.com/group/koara-users/topics), [subscribe](mailto:koara-users+subscribe@googlegroups.com), [unsubscribe](mailto:koara-users+unsubscribe@googlegroups.com)
-- Projects: [http://koara.io/projects.html](http://koara.io/projects)
-<!-- FOOTER:END -->
