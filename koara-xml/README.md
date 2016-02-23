@@ -1,0 +1,68 @@
+<!-- HEADER -->
+[![Koara](http://www.koara.io/logo.png)](http://www.koara.io)
+
+**A modular lightweight markup language**
+
+[![Build Status](https://img.shields.io/travis/koara/koara-java.svg)](https://travis-ci.org/koara/koara-java)
+[![Coverage Status](https://img.shields.io/coveralls/koara/koara-java.svg)](https://coveralls.io/github/koara/koara-java?branch=master)
+[![Latest Version](https://img.shields.io/maven-central/v/io.koara/koara.svg?label=Maven Central)](http://search.maven.org/#search%7Cga%7C1%7Ckoara)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/koara/koara-java/blob/master/LICENSE)
+<!-- HEADER:END -->
+
+# Koara XML
+
+## Getting Started
+- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara-html5/0.9.1/koara-xml-0.9.1.jar)
+- Gradle
+
+  ```groovy
+  dependencies {
+	compile "io.koara:koara-xml:0.9.1"
+  }
+  ```
+  
+- Maven
+
+  ```xml
+  <dependency>
+    <groupId>io.koara</groupId>
+    <artifactId>koara-xml</artifactId>
+    <version>0.9.1</version>
+  </dependency>
+  ```
+  
+## Usage
+```java
+package io.koara;
+
+import io.koara.ast.Document;
+import io.koara.renderer.XmlRenderer;
+import static io.koara.Module.*;
+
+public class Demo {
+
+	public static void main(String[] args) {
+		
+		Parser parser = new Parser();
+		
+		// Enable which modules to parse (all are parsed by default)
+		parser.setModules(PARAGRAPHS, HEADINGS, LISTS, LINKS, IMAGES, FORMATTING, BLOCKQUOTES, CODE);
+		
+		// Parse string or file and generate AST
+		Document document = parser.parse("Hello World!"); 
+		
+		// Render AST as XML
+		Html5Renderer renderer = new XmlRenderer();
+		document.accept(renderer);
+		
+		System.out.println(renderer.getOutput());
+	}
+	
+}
+```
+
+<!-- FOOTER -->
+## Community
+- Mailing Lists: [archive](http://groups.google.com/group/koara-users/topics), [subscribe](mailto:koara-users+subscribe@googlegroups.com), [unsubscribe](mailto:koara-users+unsubscribe@googlegroups.com)
+- Projects: [http://koara.io/projects.html](http://koara.io/projects)
+<!-- FOOTER:END -->

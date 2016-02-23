@@ -11,18 +11,49 @@
 
 # Koara
 
-## Summary
-When building an application you can use a [lightweight markup language](https://en.wikipedia.org/wiki/Lightweight_markup_language) to enhance the user's writing experience. But these languages are inflexible. You either allow all the syntax or nothing. 
-This is not always appropriate, so most developers end up with a custom language or fork of an existing language. It requires the user to 
-each time learn a different language and jeopardizes portability between applications.</p>
+## Getting Started
+- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara/0.9.1/koara-0.9.1.jar)
+- Gradle
 
-[Koara](http://www.koara.io) is a modular lightweight markup language. The developer decides which parts of the syntax are 
-allowed to be parsed. The rest will render as plain text.
+  ```groovy
+  dependencies {
+	compile "io.koara:koara:0.9.1"
+  }
+  ```
+  
+- Maven
 
+  ```xml
+  <dependency>
+    <groupId>io.koara</groupId>
+    <artifactId>koara</artifactId>
+    <version>0.9.1</version>
+  </dependency>
+  ```
+  
 ## Usage
-- [Generate as HTML](http://www.github.com/koara/koara-java/koara-html5)
+```java
+package io.koara;
 
-- [Generate as XML](http://www.github.com/koara/koara-java/koara-xml)
+import io.koara.ast.Document;
+import io.koara.renderer.Html5Renderer;
+import static io.koara.Module.*;
+
+public class Demo {
+
+	public static void main(String[] args) {
+		
+		Parser parser = new Parser();
+		
+		// Enable which modules to parse (all are parsed by default)
+		parser.setModules(PARAGRAPHS, HEADINGS, LISTS, LINKS, IMAGES, FORMATTING, BLOCKQUOTES, CODE);
+		
+		// Parse string or file and generate AST
+		Document document = parser.parse("Hello World!"); 
+	}
+	
+}
+```
 
 <!-- FOOTER -->
 ## Community

@@ -3,7 +3,6 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'com.github.townsfolk:gradle-release:1.2'
 		classpath 'net.saliman:gradle-cobertura-plugin:2.0.0'
 		classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:1.0.2'
 	}
@@ -14,7 +13,6 @@ subprojects {
 	apply plugin: 'com.github.kt3k.coveralls'
 	apply plugin: 'java'
 	apply plugin: 'maven'
-	apply plugin: 'release'
 	apply plugin: 'signing'
     
     repositories {
@@ -35,6 +33,18 @@ subprojects {
 	task javadocJar(type: Jar) {
 		classifier = "javadoc"
 		from javadoc
+	}
+	
+	task docs << {
+		def hMatcher = new File(rootProject.projectDir.toString() + '/README.md').getText('UTF-8') =~ /(?m)<!-- HEADER -->([\s\S]*)<!-- HEADER:END -->/
+   		def fMatcher = new File(rootProject.projectDir.toString() + '/README.md').getText('UTF-8') =~ /(?m)<!-- FOOTER -->([\s\S]*)<!-- FOOTER:END -->/
+
+		ant.replaceregexp(match:'<!-- HEADER -->.*<!-- HEADER:END -->', replace:'<!-- HEADER -->' + hMatcher[0][1] + '<!-- HEADER:END -->', flags:'gis', byline: false) {
+      		fileset(dir: project.projectDir, includes: 'README.md')
+   		}
+		ant.replaceregexp(match:'<!-- FOOTER -->.*<!-- FOOTER:END -->', replace:'<!-- FOOTER -->' + fMatcher[0][1] + '<!-- FOOTER:END -->', flags:'gis', byline: false) {
+      		fileset(dir: project.projectDir, includes: 'README.md')
+   		}
 	}
 	
 	artifacts {
@@ -86,13 +96,13 @@ subprojects {
 
 project("koara-html5") {
 	dependencies {
-		compile(project(":koara-core"))
+		compile(project(":koara"))
 	}
 }
 
 project("koara-xml") {
 	dependencies {
-		compile(project(":koara-core"))
+		compile(project(":koara"))
 	}
 }
 
@@ -120,4 +130,8 @@ task releaseFix << {
 def doRelease(oldVersion, newVersion) {
 	println "Bump version $oldVersion -> $newVersion"
 	ant.replace(file: 'gradle.properties', token: oldVersion, value: newVersion)
+	ant.replace(file: 'README.md', token: oldVersion, value: newVersion)
+	ant.replace(file: 'koara/README.md', token: oldVersion, value: newVersion)
+	ant.replace(file: 'koara-html5/README.md', token: oldVersion, value: newVersion)
+	ant.replace(file: 'koara-xml/README.md', token: oldVersion, value: newVersion)
 }
