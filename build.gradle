@@ -8,10 +8,10 @@ buildscript {
 	}
 }
 	
-subprojects {
-	apply plugin: 'java'
+configure(subprojects) { subproject ->
     apply plugin: 'cobertura'
 	apply plugin: 'com.github.kt3k.coveralls'
+	apply plugin: 'java'
 	apply plugin: 'maven'
 	apply plugin: 'signing'
     
