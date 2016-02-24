@@ -1,8 +1,0 @@
-Unordered lists use 2 character indentation:
-- This is the first paragraph of text
-  which has multiple lines.
-
-  If you don't start the paragraph at the beginning of the line,
-  you are still inside the list item.
-  
-Outside this list
