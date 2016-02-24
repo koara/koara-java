@@ -9,6 +9,11 @@ repositories {
 	mavenCentral()
 }
 
+signing {
+	required = false
+	sign configurations.archives
+}
+
 task sourcesJar(type: Jar, dependsOn:classes) {
 	classifier = "sources"
 	from sourceSets.main.allJava.srcDirs
