@@ -1160,7 +1160,7 @@ public class Parser {
                     break;
                 }
             }
-        } while (emWithinStrongMultilineContentHasElementsAhaed());
+        } while (emWithinStrongMultilineContentHasElementsAhead());
     }
 
     private void emWithinStrong() {
@@ -1699,7 +1699,7 @@ public class Parser {
         }
     }
 
-    private boolean emWithinStrongMultilineContentHasElementsAhaed() {
+    private boolean emWithinStrongMultilineContentHasElementsAhead() {
         lookAhead = 1;
         lastPosition = scanPosition = token;
         try {
