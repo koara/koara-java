@@ -70,7 +70,7 @@ public class TokenManager {
 
                 matchedKind = Integer.MAX_VALUE;
                 matchedPos = 0;
-                curPos = moveStringLiteralDfa0_0();
+                curPos = moveStringLiteralDfa0();
                 if (matchedKind != Integer.MAX_VALUE) {
                     if (matchedPos + 1 < curPos) {
                         cs.backup(curPos - matchedPos - 1);
@@ -88,7 +88,7 @@ public class TokenManager {
                 cs.getImage());
     }
 
-    private int moveStringLiteralDfa0_0() throws IOException {
+    private int moveStringLiteralDfa0() throws IOException {
         switch (curChar) {
         case 9:
             return startNfaWithStates(0, TAB, 8);
@@ -113,7 +113,7 @@ public class TokenManager {
         case 62:
             return stopAtPos(0, GT);
         case 73:
-            return moveStringLiteralDfa1_0(0x2000L);
+            return moveStringLiteralDfa1(0x2000L);
         case 91:
             return stopAtPos(0, LBRACK);
         case 92:
@@ -125,7 +125,7 @@ public class TokenManager {
         case 96:
             return stopAtPos(0, BACKTICK);
         case 105:
-            return moveStringLiteralDfa1_0(0x2000L);
+            return moveStringLiteralDfa1(0x2000L);
         default:
             return moveNfa(6, 0);
         }
@@ -148,40 +148,40 @@ public class TokenManager {
         return pos + 1;
     }
 
-    private int moveStringLiteralDfa1_0(long active) throws IOException {
+    private int moveStringLiteralDfa1(long active) throws IOException {
         curChar = cs.readChar();
         if (curChar == 77 || curChar == 109) {
-            return moveStringLiteralDfa2_0(active, 0x2000L);
+            return moveStringLiteralDfa2(active, 0x2000L);
         }
         return startNfa(0, active);
     }
 
-    private int moveStringLiteralDfa2_0(long old, long active) throws IOException {
+    private int moveStringLiteralDfa2(long old, long active) throws IOException {
         curChar = cs.readChar();
         if (curChar == 65 || curChar == 97) {
-            return moveStringLiteralDfa3_0(active, 0x2000L);
+            return moveStringLiteralDfa3(active, 0x2000L);
         }
         return startNfa(1, active);
 
     }
 
-    private int moveStringLiteralDfa3_0(long old, long active) throws IOException {
+    private int moveStringLiteralDfa3(long old, long active) throws IOException {
         curChar = cs.readChar();
         if (curChar == 71 || curChar == 103) {
-            return moveStringLiteralDfa4_0(active, 0x2000L);
+            return moveStringLiteralDfa4(active, 0x2000L);
         }
         return startNfa(2, active);
     }
 
-    private int moveStringLiteralDfa4_0(long old, long active) throws IOException {
+    private int moveStringLiteralDfa4(long old, long active) throws IOException {
         curChar = cs.readChar();
         if (curChar == 69 || curChar == 101) {
-            return moveStringLiteralDfa5_0(active, 0x2000L);
+            return moveStringLiteralDfa5(active, 0x2000L);
         }
         return startNfa(3, active);
     }
 
-    private int moveStringLiteralDfa5_0(long old, long active) throws IOException {
+    private int moveStringLiteralDfa5(long old, long active) throws IOException {
         curChar = cs.readChar();
         if (curChar == 58 && ((active & 0x2000L) != 0L)) {
             return stopAtPos(5, 13);
