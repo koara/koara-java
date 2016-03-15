@@ -16,6 +16,7 @@
 package io.koara;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class TokenManager {
 
@@ -199,6 +200,7 @@ public class TokenManager {
         int i = 1;
         jjstateSet[0] = startState;
         int kind = 0x7fffffff;
+        
         while (true) {
             if (++round == 0x7fffffff) {
                 round = 0x80000001;

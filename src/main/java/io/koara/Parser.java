@@ -403,14 +403,8 @@ public class Parser {
         tree.closeScope(codeBlock);
     }
 
-    private void paragraph() {
-        BlockElement paragraph;
-        if (modules.contains(Module.PARAGRAPHS)) {
-            paragraph = new Paragraph();
-        } else {
-            paragraph = new BlockElement();
-        }
-
+    private void paragraph() { 
+        BlockElement paragraph = modules.contains(Module.PARAGRAPHS) ? new Paragraph() : new BlockElement();
         tree.openScope();
         inline();
         while (textAhead()) {
