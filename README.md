@@ -8,11 +8,7 @@
 # Koara-java
 [Koara](http://www.koara.io) is a modular lightweight markup language. This project is a Koara parser written in Java.
 
-## Render Output 
-Most users are interested in rendering Koara as a specific output format. Every format is available as a seperate project.
+## Related Projects
 
-- Html:
-  [http://www.github.com/koara/koara-java-html](http://www.github.com/koara/koara-java-html)
-  
-- Xml:
-  [http://www.github.com/koara/koara-java-xml](http://www.github.com/koara/koara-java-xml)
+- [koara / koara-java-html](http://www.github.com/koara/koara-java-html): Koara to Html parser written in Java
+- [koara / koara-java-xml](http://www.github.com/koara/koara-java-html): Koara to Xml parser written in Java
