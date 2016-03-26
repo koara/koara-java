@@ -318,8 +318,9 @@ public class Parser {
             levelWhiteSpace(beginColumn);
         }
         
-        while (getNextTokenKind() != EOF && (getNextTokenKind() != EOL || !fencesAhead())) {
-            switch (getNextTokenKind()) {
+        int kind = getNextTokenKind();
+        while (kind != EOF && ((kind != EOL && kind != BACKTICK) || !fencesAhead())) {
+            switch (kind) {
         	case CHAR_SEQUENCE:
         		s.append(consumeToken(CHAR_SEQUENCE).image);
         		break;
@@ -376,7 +377,7 @@ public class Parser {
                 break;
             default:
                 if (!nextAfterSpace(EOL, EOF)) {
-                    switch (getNextTokenKind()) {
+                    switch (kind) {
                     case SPACE:
                         s.append(consumeToken(SPACE).image);
                         break;
@@ -391,6 +392,7 @@ public class Parser {
                     levelWhiteSpace(beginColumn);
                 }
             }
+            kind = getNextTokenKind();
         }
         if (fencesAhead()) {
             consumeToken(EOL);
@@ -1283,12 +1285,10 @@ public class Parser {
     }
 
     private boolean fencesAhead() {
-        if (getNextTokenKind() == EOL) {
-            int i = skip(2, SPACE, TAB, GT);
-            if (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK) {
-                i = skip(i + 3, SPACE, TAB);
-                return getToken(i).kind == EOL || getToken(i).kind == EOF;
-            }
+        int i = skip(2, SPACE, TAB, GT);
+        if (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK) {
+            i = skip(i + 3, SPACE, TAB);
+            return getToken(i).kind == EOL || getToken(i).kind == EOF;
         }
         return false;
     }
@@ -1363,9 +1363,10 @@ public class Parser {
     }
 
     private int skip(int offset, Integer... tokens) {
+    	List<Integer> tokenList = Arrays.asList(tokens);
         for (int i = offset;; i++) {
             Token t = getToken(i);
-            if (!Arrays.asList(tokens).contains(t.kind) || t.kind == EOF) {
+            if (!tokenList.contains(t.kind)) {
                 return i;
             }
         }
@@ -1382,7 +1383,7 @@ public class Parser {
     }
 
     private boolean hasFencedCodeBlockAhead() {
-        lookAhead = 2147483647;
+        lookAhead = 3;
         lastPosition = scanPosition = token;
         try {
             return !scanFencedCodeBlock();
@@ -2594,29 +2595,7 @@ public class Parser {
     }
 
     private boolean scanFencedCodeBlock() {
-        if (scanToken(BACKTICK) || scanToken(BACKTICK) || scanToken(BACKTICK)) {
-            return true;
-        }
-        Token xsp;
-        while (true) {
-            xsp = scanPosition;
-            if (scanToken(BACKTICK)) {
-                scanPosition = xsp;
-                break;
-            }
-        }
-        if (scanWhitspaceTokens()) {
-            return true;
-        }
-        xsp = scanPosition;
-        if (scanForCodeLanguageElements()) {
-            scanPosition = xsp;
-        }
-        xsp = scanPosition;
-        if (scanToken(EOL) || scanWhitspaceTokens()) {
-            scanPosition = xsp;
-        }
-        return false;
+        return scanToken(BACKTICK) || scanToken(BACKTICK) || scanToken(BACKTICK);
     }
 
     private boolean scanBlockQuoteEmptyLines() {
