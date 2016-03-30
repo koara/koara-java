@@ -75,12 +75,10 @@ public class Parser {
     private boolean lookingAhead;
     private boolean semanticLookAhead;
     private LookaheadSuccess lookAheadSuccess;
-    private List<Module> modules;
+    private List<String> modules = Arrays.asList("paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code");
 
     public Parser() {
         this.lookAheadSuccess = new LookaheadSuccess();
-        this.modules = Arrays.asList(Module.PARAGRAPHS, Module.HEADINGS, Module.LISTS, Module.LINKS, Module.IMAGES,
-                Module.FORMATTING, Module.BLOCKQUOTES, Module.CODE);
     }
 
     public Document parse(String text) {
@@ -129,15 +127,15 @@ public class Parser {
 
     private void blockElement() {
         currentBlockLevel++;
-        if (modules.contains(Module.HEADINGS) && headingAhead(1)) {
+        if (modules.contains("headings") && headingAhead(1)) {
             heading();
-        } else if (modules.contains(Module.BLOCKQUOTES) && getNextTokenKind() == GT) {
+        } else if (modules.contains("blockquotes") && getNextTokenKind() == GT) {
             blockQuote();
-        } else if (modules.contains(Module.LISTS) && getNextTokenKind() == DASH) {
+        } else if (modules.contains("lists") && getNextTokenKind() == DASH) {
             unorderedList();
-        } else if (modules.contains(Module.LISTS) && hasOrderedListAhead()) {
+        } else if (modules.contains("lists") && hasOrderedListAhead()) {
             orderedList();
-        } else if (modules.contains(Module.CODE) && hasFencedCodeBlockAhead()) {
+        } else if (modules.contains("code") && hasFencedCodeBlockAhead()) {
             fencedCodeBlock();
         } else {
             paragraph();
@@ -158,15 +156,15 @@ public class Parser {
         while (headingHasInlineElementsAhead()) {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.FORMATTING) && hasStrongAhead()) {
+            } else if (modules.contains("formatting") && hasStrongAhead()) {
                 strong();
-            } else if (modules.contains(Module.FORMATTING) && hasEmAhead()) {
+            } else if (modules.contains("formatting") && hasEmAhead()) {
                 em();
-            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.contains("code") && hasCodeAhead()) {
                 code();
             } else {
                 looseChar();
@@ -406,13 +404,13 @@ public class Parser {
     }
 
     private void paragraph() { 
-        BlockElement paragraph = modules.contains(Module.PARAGRAPHS) ? new Paragraph() : new BlockElement();
+        BlockElement paragraph = modules.contains("paragraphs") ? new Paragraph() : new BlockElement();
         tree.openScope();
         inline();
         while (textAhead()) {
             lineBreak();
             whiteSpace();
-            if (modules.contains(Module.BLOCKQUOTES)) {
+            if (modules.contains("blockquotes")) {
                 while (getNextTokenKind() == GT) {
                     consumeToken(GT);
                     whiteSpace();
@@ -520,13 +518,13 @@ public class Parser {
         consumeToken(LBRACK);
         whiteSpace();
         while (linkHasAnyElements()) {
-            if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.FORMATTING) && hasStrongAhead()) {
+            } else if (modules.contains("formatting") && hasStrongAhead()) {
                 strong();
-            } else if (modules.contains(Module.FORMATTING) && hasEmAhead()) {
+            } else if (modules.contains("formatting") && hasEmAhead()) {
                 em();
-            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.contains("code") && hasCodeAhead()) {
                 code();
             } else if (hasResourceTextAhead()) {
                 resourceText();
@@ -550,11 +548,11 @@ public class Parser {
         while (strongHasElements()) {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImage()) {
+            } else if (modules.contains("images") && hasImage()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
+            } else if (modules.contains("code") && multilineAhead(BACKTICK)) {
                 codeMultiline();
             } else if (strongEmWithinStrongAhead()) {
                 emWithinStrong();
@@ -583,11 +581,11 @@ public class Parser {
         while (emHasElements()) {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImage()) {
+            } else if (modules.contains("images") && hasImage()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.contains("code") && hasCodeAhead()) {
                 code();
             } else if (emHasStrongWithinEm()) {
                 strongWithinEm();
@@ -808,15 +806,15 @@ public class Parser {
         do {
             if (hasInlineTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.FORMATTING) && multilineAhead(ASTERISK)) {
+            } else if (modules.contains("formatting") && multilineAhead(ASTERISK)) {
                 strongMultiline();
-            } else if (modules.contains(Module.FORMATTING) && multilineAhead(UNDERSCORE)) {
+            } else if (modules.contains("formatting") && multilineAhead(UNDERSCORE)) {
                 emMultiline();
-            } else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
+            } else if (modules.contains("code") && multilineAhead(BACKTICK)) {
                 codeMultiline();
             } else {
                 looseChar();
@@ -985,11 +983,11 @@ public class Parser {
         do {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.contains("code") && hasCodeAhead()) {
                 code();
             } else if (hasEmWithinStrongMultiline()) {
                 emWithinStrongMultiline();
@@ -1026,11 +1024,11 @@ public class Parser {
         do {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.contains("code") && hasCodeAhead()) {
                 code();
             } else {
                 switch (getNextTokenKind()) {
@@ -1055,11 +1053,11 @@ public class Parser {
         do {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.contains("code") && hasCodeAhead()) {
                 code();
             } else {
                 switch (getNextTokenKind()) {
@@ -1096,11 +1094,11 @@ public class Parser {
         do {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
+            } else if (modules.contains("code") && multilineAhead(BACKTICK)) {
                 codeMultiline();
             } else if (hasStrongWithinEmMultilineAhead()) {
                 strongWithinEmMultiline();
@@ -1137,11 +1135,11 @@ public class Parser {
         do {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.contains("code") && hasCodeAhead()) {
                 code();
             } else {
                 switch (getNextTokenKind()) {
@@ -1166,11 +1164,11 @@ public class Parser {
         do {
             if (hasTextAhead()) {
                 text();
-            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.contains("images") && hasImageAhead()) {
                 image();
-            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.contains("links") && hasLinkAhead()) {
                 link();
-            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.contains("code") && hasCodeAhead()) {
                 code();
             } else {
                 switch (getNextTokenKind()) {
@@ -1330,15 +1328,15 @@ public class Parser {
         if (getNextTokenKind() == EOL && getToken(2).kind != EOL) {
             int i = skip(2, SPACE, TAB);
             int quoteLevel = newQuoteLevel(i);
-            if (quoteLevel == currentQuoteLevel || !modules.contains(Module.BLOCKQUOTES)) {
+            if (quoteLevel == currentQuoteLevel || !modules.contains("blockquotes")) {
                 i = skip(i, SPACE, TAB, GT);
 
                 Token t = getToken(i);
-                return getToken(i).kind != EOL && !(modules.contains(Module.LISTS) && t.kind == DASH)
-                        && !(modules.contains(Module.LISTS) && t.kind == DIGITS && getToken(i + 1).kind == DOT)
+                return getToken(i).kind != EOL && !(modules.contains("lists") && t.kind == DASH)
+                        && !(modules.contains("lists") && t.kind == DIGITS && getToken(i + 1).kind == DOT)
                         && !(getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK
                                 && getToken(i + 2).kind == BACKTICK)
-                        && !(modules.contains(Module.HEADINGS) && headingAhead(i));
+                        && !(modules.contains("headings") && headingAhead(i));
             }
         }
         return false;
@@ -2557,32 +2555,6 @@ public class Parser {
         return false;
     }
 
-    private boolean scanForCodeLanguageElement() {
-        Token xsp = scanPosition;
-        if (scanToken(CHAR_SEQUENCE)) {
-            scanPosition = xsp;
-            if (scanToken(BACKTICK)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean scanForCodeLanguageElements() {
-        if (scanForCodeLanguageElement()) {
-            return true;
-        }
-        Token xsp;
-        while (true) {
-            xsp = scanPosition;
-            if (scanForCodeLanguageElement()) {
-                scanPosition = xsp;
-                break;
-            }
-        }
-        return false;
-    }
-
     private boolean scanWhitspaceToken() {
         Token xsp = scanPosition;
         if (scanToken(SPACE)) {
@@ -2713,7 +2685,7 @@ public class Parser {
         return t;
     }
 
-    public void setModules(Module... modules) {
+    public void setModules(String... modules) {
         this.modules = Arrays.asList(modules);
     }
 
