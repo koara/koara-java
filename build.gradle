@@ -1,13 +1,22 @@
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'signing'
+plugins {
+    id "net.saliman.cobertura" version "2.3.1"
+    id "com.github.kt3k.coveralls" version "2.6.3"
+}
 
+apply plugin: "java"
+apply plugin: "maven"
+apply plugin: "signing"
+apply plugin: "net.saliman.cobertura"
+apply plugin: "com.github.kt3k.coveralls"
+	
 group = "io.koara"
-jar.baseName = 'koara'
+jar.baseName = "koara"
 
 repositories {
 	mavenCentral()
 }
+
+cobertura.coverageFormats = ["xml"]
 
 compileJava {
 	sourceCompatibility = 1.6
@@ -37,6 +46,7 @@ artifacts {
 
 dependencies {
 	testCompile "junit:junit:4.11"
+	testCompile "org.slf4j:slf4j-nop:1.7.12"
 }
 
 uploadArchives {
@@ -44,33 +54,33 @@ uploadArchives {
 		mavenDeployer {
 			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-				ext.sonatypeUsername = rootProject.hasProperty('sonatypeUsername') ? rootProject.sonatypeUsername : ''
-				ext.sonatypePassword = rootProject.hasProperty('sonatypePassword') ? rootProject.sonatypePassword : ''
+				ext.sonatypeUsername = rootProject.hasProperty("sonatypeUsername") ? rootProject.sonatypeUsername : ""
+				ext.sonatypePassword = rootProject.hasProperty("sonatypePassword") ? rootProject.sonatypePassword : ""
 				authentication(userName: sonatypeUsername, password: sonatypePassword)
 			}
 
 			pom.project {
-				name 'koara'
-				packaging 'jar'
-				description 'Koara parser written in Java'
-				url 'http://www.koara.io'
+				name "koara"
+				packaging "jar"
+				description "Koara parser written in Java"
+				url "http://www.koara.io"
 
 				scm {
-					url 'https://github.com/koara/koara-java.git'
-					connection 'https://github.com/koara/koara-java.git'
-					developerConnection 'https://github.com/koara/koara-java.git'
+					url "https://github.com/koara/koara-java.git"
+					connection "https://github.com/koara/koara-java.git"
+					developerConnection "https://github.com/koara/koara-java.git"
 				}
 				licenses {
 					license {
-						name 'The Apache Software License, Version 2.0'
-						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-						distribution 'repo'
+						name "The Apache Software License, Version 2.0"
+						url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+						distribution "repo"
 					}
 				}
 				developers {
 					developer {
-						id 'codeaddslife'
-						name 'Andy Van Den Heuvel'
+						id "codeaddslife"
+						name "Andy Van Den Heuvel"
 					}
 				}
 			}
