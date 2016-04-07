@@ -7,7 +7,7 @@
 
 # Koara-java
 [Koara](http://www.koara.io) is a modular lightweight markup language. This project is the core koara parser written in Java.  
-If you are interested in converting koara to a specific outputFormat, please look the 'Related Projects' section.
+If you are interested in converting koara to a specific outputFormat, please look the [Related Projects](#related-projects) section.
 
 ## Getting started
 - Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara/0.10/koara-0.10.jar)
@@ -33,10 +33,11 @@ If you are interested in converting koara to a specific outputFormat, please loo
 ```
 ```
 
-## Configuration
-You can configure the `Parser`:
+### Configuration
+You can configure the Parser:
 
-- `setModules`
+#### setModules(String... modules)
+Default: ["paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"]
 
 ## Related Projects
 
