@@ -31,10 +31,11 @@ If you are interested in converting koara to a specific outputFormat, please loo
 
 ## Usage
 ```java
-package io.koara;
+package demo;
 
 import java.io.File;
 import java.io.IOException;
+import io.koara.Parser;
 import io.koara.ast.Document;
 
 public class App {
@@ -46,6 +47,7 @@ public class App {
 	}
 	
 }
+
 ```
 
 ## Configuration
