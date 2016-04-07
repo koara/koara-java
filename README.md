@@ -29,7 +29,7 @@ If you are interested in converting koara to a specific outputFormat, please loo
   </dependency>
   ```
 
-# Usage
+## Usage
 ```java
 package io.koara;
 
@@ -48,15 +48,15 @@ public class App {
 }
 ```
 
-# Configuration
+## Configuration
 You can configure the Parser:
 
-- `parser.setModules(String... modules)`  
-   Default:	{"paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"}
+-  **parser.setModules(String... modules)** 
+   Default:	`{"paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"}`
    
    Specify which parts of the syntax are allowed to be parsed. The rest will render as plain text.
 
-### Related Projects
+## Related Projects
 
 - [koara / koara-java-html](http://www.github.com/koara/koara-java-html): Koara to Html renderer written in Java
 - [koara / koara-java-xml](http://www.github.com/koara/koara-java-html): Koara to Xml renderer written in Java
