@@ -1,4 +1,4 @@
-# [![Koara](http://www.koara.io/logo.png)](http://www.koara.io)
+[![Koara](http://www.koara.io/logo.png)](http://www.koara.io)
 
 [![Build Status](https://img.shields.io/travis/koara/koara-java.svg)](https://travis-ci.org/koara/koara-java)
 [![Coverage Status](https://img.shields.io/coveralls/koara/koara-java.svg)](https://coveralls.io/github/koara/koara-java?branch=master)
@@ -31,17 +31,32 @@ If you are interested in converting koara to a specific outputFormat, please loo
 
 ### Usage
 ```
+package io.koara;
+
+import java.io.File;
+import java.io.IOException;
+import io.koara.ast.Document;
+
+public class App {
+
+	public static void main(String[] args) throws IOException {
+		Parser parser = new Parser();
+		Document document1 = parser.parse("Hello World!"); // parse a string
+		Document document2 = parser.parseFile(new File("hello.kd")); // parse a file
+	}
+	
+}
 ```
 
 ### Configuration
 You can configure the Parser:
 
-#### setModules(String... modules)
+#### parser.setModules(String... modules)
 Default: `["paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"]`
 
 Specify which parts of the syntax are allowed to be parsed. The rest will render as plain text.
 
-## Related Projects
+### Related Projects
 
 - [koara / koara-java-html](http://www.github.com/koara/koara-java-html): Koara to Html renderer written in Java
 - [koara / koara-java-xml](http://www.github.com/koara/koara-java-html): Koara to Xml renderer written in Java
