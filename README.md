@@ -6,9 +6,39 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/koara/koara-java/blob/master/LICENSE)
 
 # Koara-java
-[Koara](http://www.koara.io) is a modular lightweight markup language. This project is a Koara parser written in Java.
+[Koara](http://www.koara.io) is a modular lightweight markup language. This project is the core koara parser written in Java.  
+If you are interested in converting koara to a specific outputFormat, please look the 'Related Projects' section.
+
+## Getting started
+- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara/0.10/koara-0.10.jar)
+- Gradle
+
+  ```groovy
+  dependencies {
+	compile "io.koara:koara:0.10"
+  }
+  ```
+  
+- Maven
+
+  ```xml
+  <dependency>
+    <groupId>io.koara</groupId>
+    <artifactId>koara</artifactId>
+    <version>0.10</version>
+  </dependency>
+  ```
+
+## Usage
+```
+```
+
+## Configuration
+You can configure the `Parser`:
+
+- `setModules`
 
 ## Related Projects
 
-- [koara / koara-java-html](http://www.github.com/koara/koara-java-html): Koara to Html parser written in Java
-- [koara / koara-java-xml](http://www.github.com/koara/koara-java-html): Koara to Xml parser written in Java
+- [koara / koara-java-html](http://www.github.com/koara/koara-java-html): Koara to Html renderer written in Java
+- [koara / koara-java-xml](http://www.github.com/koara/koara-java-html): Koara to Xml renderer written in Java
