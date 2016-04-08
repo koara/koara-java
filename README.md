@@ -42,8 +42,8 @@ public class App {
 
 	public static void main(String[] args) throws IOException {
 		Parser parser = new Parser();
-		Document document1 = parser.parse("Hello World!"); // parse a string
-		Document document2 = parser.parseFile(new File("hello.kd")); // parse a file
+		Document result1 = parser.parse("Hello World!"); // parse a string
+		Document result2 = parser.parseFile(new File("hello.kd")); // parse a file
 	}
 	
 }
