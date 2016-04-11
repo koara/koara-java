@@ -28,6 +28,15 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Heading node) {
+		Integer level = (Integer) node.getValue();
+		for(int i=0; i < level; i++) {
+			out.append("=");
+		}
+		if(node.getChildren() != null && node.getChildren().length > 0) {
+			out.append(" ");
+			node.childrenAccept(this);
+		}
+		out.append("\n\n");
 	}
 
 	@Override
