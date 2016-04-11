@@ -56,6 +56,25 @@ public class ComplianceTest {
         }
         return modules;
     }
+    
+    @Test
+    public void testKoaraToKoara() throws Exception {
+    	String input = readFile("testsuite/input/" + module + "/" + testcase + ".kd");
+        String expected = readFile("testsuite/output/koara/" + module + "/" + testcase + ".kd");
+        String expectedHtml = readFile("testsuite/output/html5/" + module + "/" + testcase + ".htm");
+
+        Parser parser = new Parser();
+        Document document = parser.parse(input);
+        KoaraRenderer renderer = new KoaraRenderer();
+        document.accept(renderer);
+        assertEquals(expected, renderer.getOutput());
+
+        // Make sure the koara output correctly parses back to html
+        Html5Renderer html5Renderer = new Html5Renderer();
+        document = parser.parse(renderer.getOutput());
+        document.accept(html5Renderer);
+        assertEquals(expectedHtml, html5Renderer.getOutput());
+    }
 
     @Test
     public void testKoaraToHtml5() throws Exception {

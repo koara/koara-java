@@ -28,6 +28,10 @@ signing {
 	sign configurations.archives
 }
 
+task release << {
+	println "Release " + project.version  + "...";	
+}
+
 task sourcesJar(type: Jar, dependsOn:classes) {
 	classifier = "sources"
 	from sourceSets.main.allJava.srcDirs
@@ -37,6 +41,7 @@ task javadocJar(type: Jar) {
 	classifier = "javadoc"
 	from javadoc
 }
+
 
 artifacts {
 	archives jar
