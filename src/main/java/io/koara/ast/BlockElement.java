@@ -26,6 +26,20 @@ public class BlockElement extends Node {
     public boolean isSingleChild() {
         return ((Node) this.getParent()).getChildren().length == 1;
     }
+    
+    public boolean isFirstChild() {
+    	return ((Node) this.getParent()).getChildren()[0] == this;
+    }
+    
+    public Node next() {
+    	Node[] node = this.getParent().getChildren();
+    	for(int i=0; i < node.length - 1; i++) {
+    		if(node[i] == this) {
+    			return node[i+1];
+    		}
+    	}
+    	return null;
+    }
 
     @Override
     public void accept(Renderer renderer) {
