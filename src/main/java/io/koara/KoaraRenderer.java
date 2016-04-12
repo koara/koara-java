@@ -2,6 +2,8 @@ package io.koara;
 
 import java.util.Stack;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+
 import io.koara.ast.BlockElement;
 import io.koara.ast.BlockQuote;
 import io.koara.ast.Code;
@@ -20,25 +22,24 @@ import io.koara.ast.Text;
 
 public class KoaraRenderer implements Renderer {
 
-	private StringBuffer out;
-	private Stack<String> pre;
+	private StringBuilder out;
+	private Stack<String> left;
 	
 	@Override
 	public void visit(Document node) {
-		out = new StringBuffer();
-		pre = new Stack<String>();
+		out = new StringBuilder();
+		left = new Stack<String>();
 		node.childrenAccept(this);
 	}
 
 	@Override
 	public void visit(Heading node) {
-		Integer level = (Integer) node.getValue();
-		for(int i=0; i < level; i++) {
+		for(int i=0; i<node.getLevel(); i++) {
 			out.append("=");
 		}
-		if(node.getChildren() != null && node.getChildren().length > 0) {
-			out.append(" ");
-			node.childrenAccept(this);
+		if(node.hasChildren()) {
+		  out.append(" ");
+		  node.childrenAccept(this);
 		}
 		out.append("\n\n");
 	}
@@ -49,24 +50,30 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(ListBlock node) {
-		if(node.isNested()) { 
-			pre.push("  ");
-		}
 		node.childrenAccept(this);
-		if(node.isNested()) {
-			pre.pop();
+		Object next = node.next();
+		out.append("\n");
+		if(next instanceof ListBlock && ((ListBlock) next).isOrdered() == node.isOrdered() ) {
+			out.append("\n");
 		}
 	}
 
 	@Override
 	public void visit(ListItem node) {
-		boolean ordered = ((ListBlock) node.getParent()).isOrdered();
-		out.append(indent());
-		out.append(ordered ? node.getNumber() + "." : "-");
-		out.append(" ");
-			pre.push("  ");
-		node.childrenAccept(this);
-			pre.pop();
+		indent();
+		if(node.getNumber() != null) {
+			out.append(node.getNumber() + ".");		
+		} else {
+			out.append("-");		
+		}
+		left.push("  ");
+		if(node.hasChildren()) {
+		  out.append(" ");
+		  node.childrenAccept(this);
+		} else {
+		  out.append("\n");
+		}
+		left.pop();
 	}
 
 	@Override
@@ -75,15 +82,17 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Paragraph node) {
-		if(!node.isFirstChild()) {
-			out.append(indent());
+		if(!(node.getParent() instanceof ListItem) || !node.isFirstChild()) {
+		indent();
 		}
 		node.childrenAccept(this);
 		out.append("\n");
-		if(!node.isSingleChild() && (!node.isNested() || node.next() instanceof Paragraph)) {
+		if(!node.isNested() || node.next() instanceof Paragraph) {
+			out.append("\n");
+		} else if (!node.isSingleChild() && node.isLastChild()) {
 			out.append("\n");
 		}
-	}
+	} 
 
 	@Override
 	public void visit(BlockElement node) {
@@ -116,7 +125,8 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(LineBreak node) {
-		out.append("\n" + indent());
+		out.append("\n");
+		indent();
 	}
 	
 	public String escape(String text) {
@@ -131,16 +141,15 @@ public class KoaraRenderer implements Renderer {
 				.replaceFirst("(\\d+)\\.", "\\\\$1.");
 	}
 	
-	public String indent() {
-		StringBuilder str = new StringBuilder();
-		for(String s : pre) {
-			str.append(s);
+	private void indent() {
+		for(String s : left) {
+			out.append(s);
 		}
-		return str.toString();
 	}
 
 	public String getOutput() {
 		return out.toString().trim();
 	}
+	
 	
 }

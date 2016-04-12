@@ -17,7 +17,7 @@ package io.koara.ast;
 
 import io.koara.Renderer;
 
-public class ListItem extends Node {
+public class ListItem extends BlockElement {
 
     private Integer number;
 
