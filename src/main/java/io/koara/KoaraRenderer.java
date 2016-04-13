@@ -2,8 +2,6 @@ package io.koara;
 
 import java.util.Stack;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
-
 import io.koara.ast.BlockElement;
 import io.koara.ast.BlockQuote;
 import io.koara.ast.Code;
@@ -104,6 +102,14 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Link node) {
+		out.append("[");
+		node.childrenAccept(this);
+		out.append("]");
+		if(node.getValue() != null && node.getValue().toString().trim().length() > 0) {
+			out.append("(");
+			out.append(escapeUrl(node.getValue().toString()));
+			out.append(")");
+		}
 	}
 
 	@Override
@@ -127,6 +133,11 @@ public class KoaraRenderer implements Renderer {
 	public void visit(LineBreak node) {
 		out.append("\n");
 		indent();
+	}
+	
+	public String escapeUrl(String text) {
+		return text.replaceAll("\\(", "\\\\(")
+				.replaceAll("\\)", "\\\\)");
 	}
 	
 	public String escape(String text) {
