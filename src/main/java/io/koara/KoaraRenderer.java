@@ -127,14 +127,23 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Strong node) {
+		out.append("*");
+		node.childrenAccept(this);
+		out.append("*");
 	}
 
 	@Override
 	public void visit(Em node) {
+		out.append("_");
+		node.childrenAccept(this);
+		out.append("_");
 	}
 
 	@Override
 	public void visit(Code node) {
+		out.append("`");
+		node.childrenAccept(this);
+		out.append("`");
 	}
 
 	@Override

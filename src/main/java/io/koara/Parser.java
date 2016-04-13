@@ -973,6 +973,7 @@ public class Parser {
         strongMultilineContent();
         while (textAhead()) {
             lineBreak();
+            whiteSpace();
             strongMultilineContent();
         }
         consumeToken(ASTERISK);
@@ -1084,6 +1085,7 @@ public class Parser {
         emMultilineContent();
         while (textAhead()) {
             lineBreak();
+            whiteSpace();
             emMultilineContent();
         }
         consumeToken(UNDERSCORE);
