@@ -98,6 +98,14 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Image node) {
+		out.append("[image: ");
+		node.childrenAccept(this);
+		out.append("]");
+		if(node.getValue() != null && node.getValue().toString().trim().length() > 0) {
+			out.append("(");
+			out.append(escapeUrl(node.getValue().toString()));
+			out.append(")");
+		}
 	}
 
 	@Override
