@@ -48,30 +48,16 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(ListBlock node) {
+		left.push("  ");
 		node.childrenAccept(this);
-		Object next = node.next();
-		out.append("\n");
-		if(next instanceof ListBlock && ((ListBlock) next).isOrdered() == node.isOrdered() ) {
-			out.append("\n");
-		}
+		left.pop();
 	}
 
 	@Override
 	public void visit(ListItem node) {
 		indent();
-		if(node.getNumber() != null) {
-			out.append(node.getNumber() + ".");		
-		} else {
-			out.append("-");		
-		}
-		left.push("  ");
-		if(node.hasChildren()) {
-		  out.append(" ");
-		  node.childrenAccept(this);
-		} else {
-		  out.append("\n");
-		}
-		left.pop();
+		out.append("- ");
+		node.childrenAccept(this);
 	}
 
 	@Override
@@ -80,17 +66,12 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Paragraph node) {
-		if(!(node.getParent() instanceof ListItem) || !node.isFirstChild()) {
-		indent();
-		}
 		node.childrenAccept(this);
-		out.append("\n");
-		if(!node.isNested() || node.next() instanceof Paragraph) {
-			out.append("\n");
-		} else if (!node.isSingleChild() && node.isLastChild()) {
+		if(!node.isNested()) {
 			out.append("\n");
 		}
-	} 
+		out.append("\n");
+	}
 
 	@Override
 	public void visit(BlockElement node) {
@@ -98,26 +79,10 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Image node) {
-		out.append("[image: ");
-		node.childrenAccept(this);
-		out.append("]");
-		if(node.getValue() != null && node.getValue().toString().trim().length() > 0) {
-			out.append("(");
-			out.append(escapeUrl(node.getValue().toString()));
-			out.append(")");
-		}
 	}
 
 	@Override
 	public void visit(Link node) {
-		out.append("[");
-		node.childrenAccept(this);
-		out.append("]");
-		if(node.getValue() != null && node.getValue().toString().trim().length() > 0) {
-			out.append("(");
-			out.append(escapeUrl(node.getValue().toString()));
-			out.append(")");
-		}
 	}
 
 	@Override
@@ -127,34 +92,25 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Strong node) {
-		out.append("*");
-		node.childrenAccept(this);
-		out.append("*");
 	}
 
 	@Override
 	public void visit(Em node) {
-		out.append("_");
-		node.childrenAccept(this);
-		out.append("_");
 	}
 
 	@Override
 	public void visit(Code node) {
-		out.append("`");
-		node.childrenAccept(this);
-		out.append("`");
 	}
 
 	@Override
 	public void visit(LineBreak node) {
 		out.append("\n");
-		indent();
 	}
 	
-	public String escapeUrl(String text) {
-		return text.replaceAll("\\(", "\\\\(")
-				.replaceAll("\\)", "\\\\)");
+	private void indent() {
+		for(String s : left) {
+			out.append(s);
+		}
 	}
 	
 	public String escape(String text) {
@@ -167,12 +123,6 @@ public class KoaraRenderer implements Renderer {
 				.replaceFirst("\\>", "\\\\>")
 				.replaceFirst("\\-", "\\\\-")
 				.replaceFirst("(\\d+)\\.", "\\\\$1.");
-	}
-	
-	private void indent() {
-		for(String s : left) {
-			out.append(s);
-		}
 	}
 
 	public String getOutput() {

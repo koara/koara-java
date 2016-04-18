@@ -29,9 +29,11 @@ signing {
 }
 
 task release << {
-    println "Release ${project.version}..."
+	def version = System.console().readLine "\nRelease version (current: ${project.version}): "
+	println "OK $version"
+
+    //println "Release ${project.version}..."
 	//"git tag -a ${project.version} -m \"${project.version}\"".execute()
-    def newVersion = 'XXX'
     //ant.replace(file: "README.md", token: "${project.lastRelease}", value: "${project.version}")
     //ant.replace(file: "gradle.properties", token: "${project.version}", value: "${newVersion}")
     //ant.replace(file: "gradle.properties", token: "${project.lastRelease}", value: "${project.version}")
