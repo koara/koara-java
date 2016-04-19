@@ -36,10 +36,13 @@ task release << {
 	input = input ? input : suggest.join('.')
 
     println "Release ${input}..."
-	//"git tag -a ${project.version} -m \"${project.version}\"".execute()
     ant.replace(file: "README.md", token: "${project.version}", value: "${input}")
-    //ant.replace(file: "gradle.properties", token: "${project.version}", value: "${newVersion}")
-    //ant.replace(file: "gradle.properties", token: "${project.lastRelease}", value: "${project.version}")
+    ant.replace(file: "gradle.properties", token: "${project.version}", value: "${input}")
+
+    "git add README.md".execute()
+    "git add gradle.properties".execute()
+    "git commit \"prepare release\"".execute()
+	"git tag -a ${input} -m \"${input}\"".execute()
 }
 
 task sourcesJar(type: Jar, dependsOn:classes) {
