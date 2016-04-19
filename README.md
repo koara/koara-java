@@ -10,12 +10,12 @@
 If you are interested in converting koara to a specific outputFormat, please look the [Related Projects](#related-projects) section.
 
 ## Getting started
-- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara/0.10/koara-0.10.jar)
+- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara/0.10.0/koara-0.10.0.jar)
 - Gradle
 
   ```groovy
   dependencies {
-	compile "io.koara:koara:0.10"
+	compile "io.koara:koara:0.10.0"
   }
   ```
   
@@ -25,7 +25,7 @@ If you are interested in converting koara to a specific outputFormat, please loo
   <dependency>
     <groupId>io.koara</groupId>
     <artifactId>koara</artifactId>
-    <version>0.10</version>
+    <version>0.10.0</version>
   </dependency>
   ```
 
