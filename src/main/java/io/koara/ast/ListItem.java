@@ -32,5 +32,10 @@ public class ListItem extends BlockElement {
     public void accept(Renderer renderer) {
         renderer.visit(this);
     }
+    
+    @Override
+    public ListBlock getParent() {
+    	return (ListBlock) super.getParent();
+    }
 
 }

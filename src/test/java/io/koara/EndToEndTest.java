@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.junit.Before;
@@ -1297,15 +1298,25 @@ public class EndToEndTest {
     }
 
     private void assertOutput(String file, String... modules) throws Exception {
-        File kd = new File("testsuite/input/end2end.kd");
+        File input = new File("testsuite/input/end2end.kd");
+        String kd = readFile("testsuite/output/koara/end2end/" + file + ".kd");
         String html = readFile("testsuite/output/html5/end2end/" + file + ".htm");
 
         parser.setModules(modules);
-        Document document = parser.parseFile(kd);
-        Html5Renderer renderer = new Html5Renderer();
-        document.accept(renderer);
-
-        assertEquals(html, renderer.getOutput());
+        Document document = parser.parseFile(input);
+        KoaraRenderer koaraRenderer = new KoaraRenderer();
+        document.accept(koaraRenderer);
+        assertEquals(kd, koaraRenderer.getOutput());
+        
+        //FileWriter fw = new FileWriter(new File("/Users/andy/Desktop/" + file + ".kd"));
+        //fw.write(koaraRenderer.getOutput());
+        //fw.close();
+        
+        //document = parser.parse(koaraRenderer.getOutput());
+        //Html5Renderer html5renderer = new Html5Renderer();
+        //document.accept(html5renderer);
+        //assertEquals(html, html5renderer.getOutput());
+        
     }
     
     private String readFile(String path) throws IOException {
