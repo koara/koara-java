@@ -46,8 +46,6 @@ public class BlockElement extends Node {
     			return getParent().getChildren()[i + 1];
     		}
     	}
-    	
-    	
     	return null;
     }
 

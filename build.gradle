@@ -28,23 +28,6 @@ signing {
 	sign configurations.archives
 }
 
-task release << {
-	def suggest = project.version.split('\\.');
-	suggest[2] = suggest[2].toInteger() + 1;
-
-	def input = System.console().readLine "\nversion: (${suggest.join('.')}) "
-	input = input ? input : suggest.join('.')
-
-    println "Release ${input}..."
-    ant.replace(file: "README.md", token: "${project.version}", value: "${input}")
-    ant.replace(file: "gradle.properties", token: "${project.version}", value: "${input}")
-
-    "git add README.md".execute()
-    "git add gradle.properties".execute()
-    "git commit \"prepare release\"".execute()
-	"git tag -a ${input} -m \"${input}\"".execute()
-}
-
 task sourcesJar(type: Jar, dependsOn:classes) {
 	classifier = "sources"
 	from sourceSets.main.allJava.srcDirs
