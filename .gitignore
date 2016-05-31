@@ -4,5 +4,7 @@ build
 .coveralls.yml
 .DS_Store
 .gradle
+.idea
 .settings
 .project
+*.iml
