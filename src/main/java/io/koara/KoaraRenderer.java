@@ -120,9 +120,12 @@ public class KoaraRenderer implements Renderer {
 		out.append("\n");
 		indent();
 		out.append("```");
+		out.append("\n");
 		
-		out.append("\n");
-		out.append("\n");
+		if(!node.isLastChild()) {
+			indent();
+			out.append("\n");
+		}
 	}
 
 	@Override
@@ -204,11 +207,9 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(Code node) {
-		System.out.println("CODE");
 		out.append("`");
 		node.childrenAccept(this);
 		out.append("`");
-		System.out.println("/CODE");
 	}
 
 	@Override
