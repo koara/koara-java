@@ -394,6 +394,7 @@ public class Parser {
         }
         if (fencesAhead()) {
             consumeToken(EOL);
+            blockQuotePrefix();
             whiteSpace();
             while (getNextTokenKind() == BACKTICK) {
                 consumeToken(BACKTICK);
