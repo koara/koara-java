@@ -1,4 +1,4 @@
-[![Koara](http://www.koara.io/logo.png)](http://www.koara.io)
+[![Koara](http://koara.io/logo.png)](http://www.koara.io)
 
 [![Build Status](https://img.shields.io/travis/koara/koara-java.svg)](https://travis-ci.org/koara/koara-java)
 [![Coverage Status](https://img.shields.io/coveralls/koara/koara-java.svg)](https://coveralls.io/github/koara/koara-java?branch=master)
