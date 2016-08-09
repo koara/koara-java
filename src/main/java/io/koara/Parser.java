@@ -718,7 +718,8 @@ public class Parser {
         while (getNextTokenKind() == SPACE || getNextTokenKind() == TAB) {
             consumeToken(getNextTokenKind());
         }
-        consumeToken(EOL);
+        Token t = consumeToken(EOL);
+        linebreak.setExplicit(t.image.startsWith("  "));
         tree.closeScope(linebreak);
     }
 

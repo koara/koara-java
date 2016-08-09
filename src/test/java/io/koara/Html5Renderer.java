@@ -40,7 +40,8 @@ public class Html5Renderer implements Renderer {
 	private StringBuffer out;
 	private int level;
 	private Stack<Integer> listSequence = new Stack<Integer>();
-
+	private boolean hardWrap;
+	
 	public void visit(Document node) {
 		out = new StringBuffer();
 		node.childrenAccept(this);
@@ -170,7 +171,11 @@ public class Html5Renderer implements Renderer {
 	}
 	
 	public void visit(LineBreak node) {
-		out.append("<br>\n" + indent());
+		if(hardWrap || node.isExplicit()) {
+			out.append("<br>\n" + indent());
+		} else {
+			out.append(" ");
+		}
 		node.childrenAccept(this);
 	}
 	
@@ -193,6 +198,11 @@ public class Html5Renderer implements Renderer {
 		} 
 		return new String(buf);
 	}
+	
+	public void setHardWrap(boolean hardWrap) {
+		this.hardWrap = hardWrap;
+	}
+	
 	
 	public String getOutput() {
         return out.toString().trim();
