@@ -203,7 +203,6 @@ public class Html5Renderer implements Renderer {
 		this.hardWrap = hardWrap;
 	}
 	
-	
 	public String getOutput() {
         return out.toString().trim();
     }

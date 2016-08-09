@@ -22,6 +22,7 @@ public class KoaraRenderer implements Renderer {
 
 	private StringBuilder out;
 	private Stack<String> left;
+	private boolean hardWrap;
 	
 	@Override
 	public void visit(Document node) {
@@ -214,6 +215,9 @@ public class KoaraRenderer implements Renderer {
 
 	@Override
 	public void visit(LineBreak node) {
+		if(hardWrap || node.isExplicit()) {
+			out.append("  ");
+		}
 		out.append("\n");
 		indent();
 	}
@@ -239,6 +243,10 @@ public class KoaraRenderer implements Renderer {
 		for(String s : left) {
 			out.append(s);
 		}
+	}
+	
+	public void setHardWrap(boolean hardWrap) {
+		this.hardWrap = hardWrap;
 	}
 
 	public String getOutput() {
