@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.junit.Before;
@@ -1304,6 +1305,12 @@ public class EndToEndTest {
         Document document = parser.parseFile(input);
         Html5Renderer renderer = new Html5Renderer();
         document.accept(renderer);
+        
+        
+        FileWriter fw = new FileWriter(new File("/Users/andy/Desktop/" + file + ".htm"));
+        		fw.write(renderer.getOutput());
+        fw.close();
+        
         assertEquals(html, renderer.getOutput());
     }
     
