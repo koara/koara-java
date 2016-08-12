@@ -1305,12 +1305,6 @@ public class EndToEndTest {
         Document document = parser.parseFile(input);
         Html5Renderer renderer = new Html5Renderer();
         document.accept(renderer);
-        
-        
-        FileWriter fw = new FileWriter(new File("/Users/andy/Desktop/" + file + ".htm"));
-        		fw.write(renderer.getOutput());
-        fw.close();
-        
         assertEquals(html, renderer.getOutput());
     }
     
