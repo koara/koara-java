@@ -53,11 +53,6 @@ public class App {
 ## Configuration
 You can configure the Parser:
 
--  **parser.setHardWrap(boolean hardWrap)**  
-   Default: `false`
-   
-   Specify if newlines should be hard-wrapped (return-based linebreaks) by default.
-
 -  **parser.setModules(String... modules)**  
    Default:	`{"paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"}`
    
