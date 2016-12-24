@@ -124,7 +124,6 @@ public class CharStream {
 
     public String getImage() {
         if (bufPos >= tokenBegin) {
-        	System.out.println(buffer.length);
             return new String(buffer, tokenBegin, bufPos - tokenBegin + 1);
         } 
         return new String(buffer, tokenBegin, bufSize - tokenBegin) + new String(buffer, 0, bufPos + 1);
