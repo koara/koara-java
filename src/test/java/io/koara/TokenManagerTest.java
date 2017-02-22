@@ -85,6 +85,13 @@ public class TokenManagerTest {
 	}
 	
 	@Test
+	public void testEolWithSpaces() {
+		Token token = new TokenManager(new CharStream(new StringReader("  \n"))).getNextToken();
+		assertEquals(TokenManager.EOL, token.kind);
+		assertEquals("  \n", token.image);
+	}
+	
+	@Test
 	public void testEq() {
 		Token token = new TokenManager(new CharStream(new StringReader("="))).getNextToken();
 		assertEquals(TokenManager.EQ, token.kind);
@@ -166,6 +173,20 @@ public class TokenManagerTest {
 		Token token = new TokenManager(new CharStream(new StringReader("_"))).getNextToken();
 		assertEquals(TokenManager.UNDERSCORE, token.kind);
 		assertEquals("_", token.image);
+	}
+		
+	@Test
+	public void testLineBreak() {
+		TokenManager tm = new TokenManager(new CharStream(new StringReader("a\nb")));
+		Token token = tm.getNextToken();
+		assertEquals(TokenManager.CHAR_SEQUENCE, token.kind);
+		assertEquals("a", token.image);
+		token = tm.getNextToken();
+		assertEquals(TokenManager.EOL, token.kind);
+		assertEquals("\n", token.image);
+		token = tm.getNextToken();
+		assertEquals(TokenManager.CHAR_SEQUENCE, token.kind);
+		assertEquals("b", token.image);
 	}
 	
 }

@@ -16,6 +16,7 @@
 package io.koara;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class TokenManager {
 
@@ -57,6 +58,7 @@ public class TokenManager {
     }
 
     public Token getNextToken() {
+
         try {
             int curPos = 0;
             while (true) {
@@ -285,6 +287,9 @@ public class TokenManager {
                 } while (i != startsAt);
             } else if (curChar < 128) {
                 long l = 1L << (curChar & 077);
+                
+                System.out.println(Arrays.toString(jjstateSet));
+                
                 do {
                     switch (jjstateSet[--i]) {
                     case 6:
@@ -328,9 +333,7 @@ public class TokenManager {
                 matchedPos = curPos;
                 kind = 0x7fffffff;
             }
-            ++curPos;
-            
-            
+            ++curPos; 
             if ((i = jjnewStateCnt) == (startsAt = 8 - (jjnewStateCnt = startsAt))) {
                 return curPos;
             }
