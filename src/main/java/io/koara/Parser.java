@@ -2671,7 +2671,7 @@ public class Parser {
         }
         nextTokenKind = -1;
         if (token.kind == kind) {
-            return token;
+        	return token;
         }
         token = old;
         return token;

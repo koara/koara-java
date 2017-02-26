@@ -287,9 +287,6 @@ public class TokenManager {
                 } while (i != startsAt);
             } else if (curChar < 128) {
                 long l = 1L << (curChar & 077);
-                
-                System.out.println(Arrays.toString(jjstateSet));
-                
                 do {
                     switch (jjstateSet[--i]) {
                     case 6:
