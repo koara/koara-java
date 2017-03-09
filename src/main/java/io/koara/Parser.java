@@ -1311,7 +1311,9 @@ public class Parser {
     }
 
     private boolean listItemAhead(int listBeginColumn, boolean ordered) {
+    	System.out.println("A");
         if (getNextTokenKind() == EOL) {
+        	System.out.println("B");
             for (int i = 2, eol = 1;; i++) {
                 Token t = getToken(i);
 
