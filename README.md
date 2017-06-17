@@ -35,8 +35,8 @@ package demo;
 
 import java.io.File;
 import java.io.IOException;
-import io.koara.Parser;
-import io.koara.ast.Document;
+import Parser;
+import Document;
 
 public class App {
 
