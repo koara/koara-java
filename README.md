@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/travis/koara/koara-java.svg)](https://travis-ci.org/koara/koara-java)
 [![Coverage Status](https://img.shields.io/coveralls/koara/koara-java.svg)](https://coveralls.io/github/koara/koara-java?branch=master)
-[![Latest Version](https://img.shields.io/maven-central/v/io.koara/koara.svg?label=Maven Central)](http://search.maven.org/#search%7Cga%7C1%7Ckoara)
+[![Latest Version](https://img.shields.io/maven-central/v/com.codeaddslife.koara/koara.svg?label=Maven Central)](http://search.maven.org/#search%7Cga%7C1%7Ckoara)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/koara/koara-java/blob/master/LICENSE)
 
 # Koara-java
@@ -10,12 +10,12 @@
 If you are interested in converting koara to a specific outputFormat, please look the [Related Projects](#related-projects) section.
 
 ## Getting started
-- Download [JAR file](http://repo1.maven.org/maven2/io/koara/koara/0.14.0/koara-0.14.0.jar)
+- Download [JAR file](http://repo1.maven.org/maven2/com/codeaddslife/koara/0.15.0/koara-0.15.0.jar)
 - Gradle
 
   ```groovy
   dependencies {
-	compile "io.koara:koara:0.14.0"
+	compile "com.codeaddslife.koara:koara:0.15.0"
   }
   ```
   
@@ -23,9 +23,9 @@ If you are interested in converting koara to a specific outputFormat, please loo
 
   ```xml
   <dependency>
-    <groupId>io.koara</groupId>
+    <groupId>com.codeaddslife.koara</groupId>
     <artifactId>koara</artifactId>
-    <version>0.14.0</version>
+    <version>0.15.0</version>
   </dependency>
   ```
 
