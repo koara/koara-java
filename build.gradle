@@ -9,7 +9,7 @@ apply plugin: 'signing'
 apply plugin: 'net.saliman.cobertura'
 apply plugin: 'com.github.kt3k.coveralls'
 	
-group = 'io.koara'
+group = 'com.codeaddslife.koara'
 jar.baseName = 'koara'
 version = '0.14.0'
 

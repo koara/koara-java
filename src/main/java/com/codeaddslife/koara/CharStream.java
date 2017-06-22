@@ -18,6 +18,7 @@ package com.codeaddslife.koara;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 
 public class CharStream {
 
@@ -125,8 +126,9 @@ public class CharStream {
     public String getImage() {
         if (bufPos >= tokenBegin) {
             return new String(buffer, tokenBegin, bufPos - tokenBegin + 1);
-        } 
-        return new String(buffer, tokenBegin, bufSize - tokenBegin) + new String(buffer, 0, bufPos + 1);
+        }
+        String str = new String(buffer, tokenBegin, bufSize - tokenBegin); //+ new String(buffer, 0, bufPos + 1);
+        return str;
     }
 
     public int getEndColumn() {
