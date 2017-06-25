@@ -1,4 +1,4 @@
-[![Koara](http://koara.io/logo.png)](http://www.koara.io)
+[![Koara](http://www.codeaddslife.com/koara.png)](http://www.codeaddslife.com/koara)
 
 [![Build Status](https://img.shields.io/travis/koara/koara-java.svg)](https://travis-ci.org/koara/koara-java)
 [![Coverage Status](https://img.shields.io/coveralls/koara/koara-java.svg)](https://coveralls.io/github/koara/koara-java?branch=master)
@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/koara/koara-java/blob/master/LICENSE)
 
 # Koara-java
-[Koara](http://www.koara.io) is a modular lightweight markup language. This project is the core koara parser written in Java.  
+[Koara](http://www.codeaddslife.com/koara) is a modular lightweight markup language. This project is the core koara parser written in Java.  
 If you are interested in converting koara to a specific outputFormat, please look the [Related Projects](#related-projects) section.
 
 ## Getting started
