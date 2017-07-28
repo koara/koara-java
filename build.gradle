@@ -14,7 +14,9 @@ jar.baseName = 'koara'
 version = '0.15.0'
 
 repositories {
-	mavenCentral()
+    maven  {
+        url "http://repo1.maven.org/maven2"
+    }
 }
 
 cobertura.coverageFormats = ['xml']
