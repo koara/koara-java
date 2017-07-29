@@ -6,4 +6,4 @@ jdk:
   - oraclejdk8
 
 script:
-  - gradle cobertura coveralls --info
+  - gradle build --info
