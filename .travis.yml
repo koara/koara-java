@@ -2,9 +2,6 @@ language: java
 
 matrix:
   include:
-    - jdk: openjdk6
-      after_success:
-        - gradle build --info
     - jdk: openjdk7
       after_success:
         - gradle build --info
