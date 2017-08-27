@@ -1,5 +1,4 @@
 language: java
-
 matrix:
   include:
     - jdk: openjdk7
@@ -11,5 +10,5 @@ matrix:
     - jdk: oraclejdk8
       after_success:
         - gradle cobertura coveralls --info
-
-
+notifications:
+  email: false
