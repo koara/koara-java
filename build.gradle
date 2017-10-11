@@ -49,6 +49,10 @@ task javadocJar(type: Jar) {
 	from javadoc
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
+
 artifacts {
 	archives jar
 	archives javadocJar
