@@ -6,7 +6,8 @@ matrix:
       script:
         - ./gradlew build --info
     - jdk: oraclejdk9
-          script:
-            - ./gradlew build --info
+      script:
+        - ./gradlew build --info
 
-notifications.email: false
+notifications:
+  email: false
