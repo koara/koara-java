@@ -50,7 +50,7 @@ task javadocJar(type: Jar) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.0'
+    gradleVersion = '4.2'
 }
 
 artifacts {
