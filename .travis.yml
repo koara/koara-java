@@ -1,10 +1,23 @@
 language: java
-script: gradle build
-jdk:
-  - oraclejdk7
-  - oraclejdk8
-  - openjdk7
-  - openjdk6
+
+matrix:
+  include:
+    - env: SEND_TO_COVERALLS='YES'
+      jdk: oraclejdk8
+    - env: SEND_TO_COVERALLS='NO'
+      jdk: oraclejdk7
+    - env: SEND_TO_COVERALLS='NO'
+      jdk: openjdk7
+    - env: SEND_TO_COVERALLS='NO'
+      jdk: openjdk6
+
+script: gradle build --info
+
+after_success:
+  - if [ $SEND_TO_COVERALLS == "YES" ]; then
+      echo "Send to coveralls"
+      gradle cobertura coveralls --info
+    fi
 
 notifications:
   email: false
