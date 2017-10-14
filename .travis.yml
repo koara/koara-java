@@ -1,9 +1,10 @@
 language: java
+script: gradle build
+jdk:
+  - oraclejdk7
+  - oraclejdk8
+  - openjdk7
+  - openjdk6
 
-matrix:
-  include:
-    - jdk: oraclejdk8
-      script:
-        - ./gradlew build --info
 notifications:
   email: false
