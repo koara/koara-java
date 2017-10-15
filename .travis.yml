@@ -5,11 +5,7 @@ matrix:
     - env: SEND_TO_COVERALLS='YES'
       jdk: oraclejdk8
     - env: SEND_TO_COVERALLS='NO'
-      jdk: oraclejdk7
-    - env: SEND_TO_COVERALLS='NO'
-      jdk: openjdk7
-    - env: SEND_TO_COVERALLS='NO'
-      jdk: openjdk6
+      jdk: oraclejdk9
 
 script: gradle build --info
 
