@@ -6,8 +6,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'net.saliman:gradle-cobertura-plugin:2.3.1'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.7.1'
+        classpath 'net.saliman:gradle-cobertura-plugin:2.5.4'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
     }
 }
 
@@ -19,7 +19,7 @@ apply plugin: 'com.github.kt3k.coveralls'
 	
 group = 'com.codeaddslife.koara'
 jar.baseName = 'koara'
-version = '0.15.0'
+version = '0.16.0'
 
 repositories {
     maven  {
@@ -78,7 +78,7 @@ uploadArchives {
 				name 'koara'
 				packaging 'jar'
 				description 'Koara parser written in Java'
-				url 'http://www.koara.io'
+				url 'http://www.codeaddslife.com/koara'
 
 				scm {
 					url 'https://github.com/koara/koara-java.git'
